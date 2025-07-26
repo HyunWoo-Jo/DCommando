@@ -11,8 +11,8 @@ namespace GamePlay
 
         private void Update() {
 
-            _moveDir.x = Input.GetAxis("Horizontal");
-            _moveDir.y = Input.GetAxis("Vertical");
+            _moveDir.x = Input.GetAxisRaw("Horizontal");
+            _moveDir.y = Input.GetAxisRaw("Vertical");
 
             _inputMoveData.moveDirObservable.Value = _moveDir;
         }
