@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Zenject;
 using Data;
 using R3;
@@ -24,16 +24,16 @@ namespace GamePlay
 
         private void UpdateMove() {
             Vector3 newDir = _inputMoveData.moveDirObservable.Value;
-            newDir.z = newDir.y; // y -> z º¯È¯
+            newDir.z = newDir.y; // y -> z ë³€í™˜
             newDir.y = 0;
             newDir.Normalize();
 
-            if (newDir.sqrMagnitude > 0.0001f) // ¹æÇâÀÌ ÀÖÀ» ¶§¸¸ È¸Àü
+            if (newDir.sqrMagnitude > 0.0001f) // ë°©í–¥ì´ ìˆì„ ë•Œë§Œ íšŒì „
 {
-                // ¸ñÇ¥ È¸ÀüÀº YÃà¸¸
+                // ëª©í‘œ íšŒì „ì€ Yì¶•ë§Œ
                 Quaternion targetRot = Quaternion.LookRotation(newDir, Vector3.up);
 
-                // ºÎµå·´°Ô È¸Àü
+                // ë¶€ë“œëŸ½ê²Œ íšŒì „
                 transform.rotation = Quaternion.Slerp(
                     transform.rotation,
                     targetRot,

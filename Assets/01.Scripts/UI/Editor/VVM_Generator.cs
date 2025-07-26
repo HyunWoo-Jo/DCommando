@@ -1,10 +1,10 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEditor;
 using System.IO;
 using UnityEditor.VersionControl;
 namespace CA.UI {
     /// <summary>
-    /// MVP UI ÀÚµ¿ »ı¼º ÄÚµå
+    /// MVP UI ìë™ ìƒì„± ì½”ë“œ
     /// </summary>
     public class VVM_Generator : EditorWindow {
 
@@ -31,7 +31,7 @@ namespace CA.UI {
             }
         }
         /// <summary>
-        /// ³»¿ë ÀÛ¼º
+        /// ë‚´ìš© ì‘ì„±
         /// </summary>
         private void SetContext() {
 
@@ -50,7 +50,7 @@ namespace UI
 #if UNITY_EDITOR // Assertion
             RefAssert();
 #endif
-            // ¹öÆ° ÃÊ±âÈ­
+            // ë²„íŠ¼ ì´ˆê¸°í™”
            
 
         }}
@@ -59,12 +59,12 @@ namespace UI
         }}
 
 #if UNITY_EDITOR
-        // °ËÁõ
+        // ê²€ì¦
         private void RefAssert() {{
 
         }}
 #endif
-        // UI °»½Å
+        // UI ê°±ì‹ 
         private void UpdateUI() {{
             
         }}
@@ -83,7 +83,7 @@ namespace UI
     {{   
 
         /// <summary>
-        /// µ¥ÀÌÅÍ º¯°æ ¾Ë¸²
+        /// ë°ì´í„° ë³€ê²½ ì•Œë¦¼
         /// </summary>
         public void Notify() {{
 
@@ -95,7 +95,7 @@ namespace UI
 
         }
         /// <summary>
-        /// »ı¼º
+        /// ìƒì„±
         /// </summary>
         private void GenerateScript() {
             string path = $"{Application.dataPath}/01.Scripts/UI/MVVM/";

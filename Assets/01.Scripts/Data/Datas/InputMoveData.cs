@@ -1,9 +1,9 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using R3;
 namespace Data
 {
     public class InputMoveData
     {
-        public ReactiveProperty<Vector3> moveDirObservable = new(); // ¿Ãµø πÊ«‚
+        public ReactiveProperty<Vector3> moveDirObservable = new(); // Ïù¥Îèô Î∞©Ìñ•
     }
 }
