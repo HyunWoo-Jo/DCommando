@@ -11,7 +11,6 @@ graph LR
     Network;
     UI;
     Contracts;
-
 UI --> Contracts
 
 GamePlay --> UI
@@ -61,3 +60,42 @@ EditorOnly --> Test;
 #### 8. Test
 역할: Unity 에디터 환경에서만 사용되는 스크립트. </br>
 주요 내용: 테스트 코드.
+
+---
+### 7.26
+## player Control 설계
+#### 구현 내용
+```mermaid
+classDiagram
+class Data.MoveInputData{
+    + moveDir : ReactiveProperty&ltVector2&gt // R3
+}
+
+class UI.ControllerViewModel {
+    - Data.MoveData // inject
+    + RO_Data :ReadOnlyReactiveProperty
+}
+
+
+class UI.ControllerView {
+    - UI.ControllerViewModel // inject
+    - Bind()
+    - UpdateUI()
+}
+
+class GamePlay.InputSystem {
+    - UpdateInput()
+}
+
+class Player {
+    - Data.MoveInputData  // inject
+    - UpdateMove()
+}
+
+UI.ControllerViewModel --> Data.MoveInputData : View에 중재
+GamePlay.InputSystem --> Data.MoveInputData : Input 업데이트
+
+UI.ControllerView --> UI.ControllerViewModel : ReactiveProperty를 전달 받아 UI를 Bind
+Data.MoveInputData <-- Player : data를 이용해 움직임 구현
+```
+---
