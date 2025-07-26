@@ -63,39 +63,103 @@ EditorOnly --> Test;
 
 ---
 ### 7.26
-## player Control 설계
-#### 구현 내용
+## Input 처리 과정
+#### 주요 클레스
+- **Input**
+    - **`InputSystem`:** `InputData`를 이용해 사용 가능한 정보로 가공
+    - **`IInputStrategy`:** 각 플렛폼의 맞는 입력정보(`InputData`) 생성
+- **UI**
+    - **`ControllerViewModel`:** View에서 필요한 데이터를 중재
+    - **`ControllerView`:** 데이터를 이용해 UI 출력
+#### Class Diagram
 ```mermaid
 classDiagram
-class Data.MoveInputData{
-    + moveDir : ReactiveProperty&ltVector2&gt // R3
+namespace Core{
+    class Installer{
+        <<MonoInstaller>>
+        - Bind()
+    }
 }
 
-class UI.ControllerViewModel {
-    - Data.MoveData // inject
-    + RO_Data :ReadOnlyReactiveProperty
+namespace Data {
+    class InputData {
+       inputType: ReactiveProperty&ltInputType&gt
+    }
+    class PlayerMoveData{
+     + dir : ReactiveProperty&ltVector3&gt // R3
+    }
 }
 
+namespace UI {
 
-class UI.ControllerView {
-    - UI.ControllerViewModel // inject
-    - Bind()
-    - UpdateUI()
+    class ControllerViewModel {
+     - InputData // Inject
+     - PlayerMoveData // inject
+     + RO_Data :ReadOnlyReactiveProperty 
+    }
+
+
+    class ControllerView {
+     <<Monobehaviour>>
+     - ControllerViewModel // inject
+     - Bind()
+     - UpdateUI()
+    }
 }
 
-class GamePlay.InputSystem {
-    - UpdateInput()
+namespace GamePlay.Input {
+    class InputSystem {
+     <<Monobehaviour>>
+     - IInputStrategy // Inject
+     - InputData // Inject
+     - UpdateInput()
+    }
+
+    class IInputStrategy {
+     <<interface>>
+     + UpdateInput()
+    }
+
+    class InputBase{
+     <<Abstruct>>
+     - InputData // Inject
+     + UpdateInput()
+    }
+    class PcInputStrategy{
+
+    }
+    class MobileInputStrategy {
+
+    }
+
+}
+namespace GamePlay {
+    class Player {
+     <<Monobehaviour>>
+     - PlayerMoveData  // inject
+     - UpdateMove()
+    }
 }
 
-class Player {
-    - Data.MoveInputData  // inject
-    - UpdateMove()
-}
+ControllerViewModel --> PlayerMoveData : View에 중재
+ControllerViewModel --> InputData : View에 중재
 
-UI.ControllerViewModel --> Data.MoveInputData : View에 중재
-GamePlay.InputSystem --> Data.MoveInputData : Input 업데이트
+ControllerView --> ControllerViewModel : ReactiveProperty를 전달 받아 UI를 Bind
+PlayerMoveData <-- Player : data를 이용해 움직임 구현
 
-UI.ControllerView --> UI.ControllerViewModel : ReactiveProperty를 전달 받아 UI를 Bind
-Data.MoveInputData <-- Player : data를 이용해 움직임 구현
+InputSystem --> IInputStrategy : UpdateInput을 호출하여 매 프레임 갱신
+IInputStrategy <|-- InputBase 
+
+InputBase <|-- PcInputStrategy
+InputBase <|-- MobileInputStrategy
+
+InputSystem  --> InputData : Input 정보를 이용해 이동 데이터 생성
+InputSystem --> PlayerMoveData : 이동 data를 생성해서 전달
+
+Installer ..> ControllerViewModel : Bind(의존 등록)
+Installer ..> PlayerMoveData : Bind(의존 등록)
+Installer ..> InputData : Bind(의존 등록)
+Installer ..> PcInputStrategy : Bind(의존 등록)
+Installer ..> MobileInputStrategy : Bind(의존 등록)
 ```
 ---
