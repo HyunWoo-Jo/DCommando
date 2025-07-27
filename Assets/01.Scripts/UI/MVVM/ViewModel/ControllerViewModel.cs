@@ -8,13 +8,17 @@ namespace UI
 {
     public class ControllerViewModel 
     {
-        [Inject] private InputMoveData _inputMoveData;
-
+        [Inject] private PlayerMoveData _inputPlayerMoveData;
+        [Inject] private InputData _inputData;
 
         /// <summary>
         /// RO Data
         /// </summary>
-        public ReadOnlyReactiveProperty<Vector3> RO_MoveDir => _inputMoveData.moveDirObservable;
+        public ReadOnlyReactiveProperty<Vector2> RO_MoveDir => _inputPlayerMoveData.moveDirObservable;
+        public ReadOnlyReactiveProperty<InputType> RO_InputType => _inputData.inputTypeObservable;
+
+        public Vector2 FirstFramePointScreenPosition => _inputData.GetFirstFramePointPosition();
+        public Vector2 CurrentPointScreenPosition => _inputData.GetCurrentPointPosition();
 
         /// <summary>
         /// 데이터 변경 알림

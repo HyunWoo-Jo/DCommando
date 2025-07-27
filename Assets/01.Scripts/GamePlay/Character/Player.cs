@@ -9,40 +9,45 @@ namespace GamePlay
     public class Player : MonoBehaviour
     {
         [SerializeField] private CharacterData _characterData;
-        [Inject] private InputMoveData _inputMoveData;
+        [Inject] private PlayerMoveData _playerMoveData;
 
         private void Awake() {
-            
-        }
 
-        private void Update() {
-            UpdateMove();
+            Bind();
         }
 
 
+        private void Bind() {
+            _playerMoveData.moveDirObservable
+                .ThrottleLastFrame(1)
+                .Subscribe(UpdateMove)
+                .AddTo(this);
+        }
 
 
-        private void UpdateMove() {
-            Vector3 newDir = _inputMoveData.moveDirObservable.Value;
-            newDir.z = newDir.y; // y -> z 변환
-            newDir.y = 0;
-            newDir.Normalize();
+        private void UpdateMove(Vector2 dir) {
+            if (dir.sqrMagnitude > 0.0001f) { // 방향이 있을 때만 회전
 
-            if (newDir.sqrMagnitude > 0.0001f) // 방향이 있을 때만 회전
-{
-                // 목표 회전은 Y축만
-                Quaternion targetRot = Quaternion.LookRotation(newDir, Vector3.up);
+                if (dir.sqrMagnitude < 0.0001f) return;
 
-                // 부드럽게 회전
-                transform.rotation = Quaternion.Slerp(
-                    transform.rotation,
-                    targetRot,
-                    _characterData.rotationSpeed * Time.deltaTime
-                );
+                // 현재 회전
+                Vector3 currentRot = transform.eulerAngles;
+
+                // Y 각도 
+                float targetY = dir.x >= 0 ? 180f : 0f;
+
+                // Z 각도 획득
+                float zFromDir = -Mathf.Atan2(dir.y, Mathf.Abs(dir.x)) * Mathf.Rad2Deg;
+
+                // 보간하여 부드럽게 적용
+                float newZ = Mathf.LerpAngle(currentRot.z, zFromDir, _characterData.rotationSpeed * Time.deltaTime);
+
+                // 3. 회전 적용 (Y는 즉시 스냅, X는 0 유지)
+                transform.rotation = Quaternion.Euler(0, targetY, newZ);
             }
 
           
-            transform.position += newDir * _characterData.moveSpeed * Time.deltaTime ;  
+            transform.position = (Vector2)transform.position + dir * _characterData.moveSpeed * Time.deltaTime ;  
         }
 
     }
