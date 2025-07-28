@@ -3,6 +3,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Game.Systems;
+using Game.Core;
 
 namespace ViewModels
 {
@@ -13,7 +14,7 @@ namespace ViewModels
         /// <summary>
         /// Screen UI 열기
         /// </summary>
-        public async UniTask<T> OpenScreenAsync<T>(string uiName) where T : Component
+        public async UniTask<T> OpenScreenAsync<T>(UI_Name uiName) where T : Component
         {
             return await _uiSystem.OpenScreenAsync<T>(uiName);
         }
@@ -21,7 +22,7 @@ namespace ViewModels
         /// <summary>
         /// Popup UI 열기
         /// </summary>
-        public async UniTask<T> OpenPopupAsync<T>(string uiName) where T : Component
+        public async UniTask<T> OpenPopupAsync<T>(UI_Name uiName) where T : Component
         {
             return await _uiSystem.OpenPopupAsync<T>(uiName);
         }
@@ -29,7 +30,7 @@ namespace ViewModels
         /// <summary>
         /// UI 닫기
         /// </summary>
-        public void CloseUI(string uiName)
+        public void CloseUI(UI_Name uiName)
         {
             _uiSystem.CloseUI(uiName);
         }

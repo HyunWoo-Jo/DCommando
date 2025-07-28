@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Game.Core;
+using UnityEngine;
 
 namespace Game.Services
 {
@@ -6,8 +7,7 @@ namespace Game.Services
     {
         void UpdateInput();
         Vector2 GetCurrentPosition();
-        bool IsInputActive();
-        bool IsInputStarted();
-        bool IsInputEnded();
+
+        InputType GetInputType();
     }
 }

@@ -63,14 +63,14 @@ namespace Game.ViewModels
             _checkAmount = amount;
         }
         
-        public async UniTask<bool> AddGoldAsync(int amount)
+        public bool AddGold(int amount)
         {
-            return await _goldSystem.AddGoldAsync(amount);
+            return  _goldSystem.AddGold(amount);
         }
         
-        public async UniTask<bool> SpendGoldAsync(int amount)
+        public bool SpendGold(int amount)
         {
-            var success = await _goldSystem.SpendGoldAsync(amount);
+            var success = _goldSystem.SpendGold(amount);
             if (!success)
             {
                 OnNotificationEvent.OnNext("골드가 부족합니다!");
@@ -83,6 +83,7 @@ namespace Game.ViewModels
             return _goldSystem.CanSpend(amount);
         }
         
+        // Zenject에서 관리
         public void Dispose()
         {
             _disposables?.Dispose();

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Game.Policies;
 using Game.Data;
+using Game.Core;
 
 namespace Game.Services
 {
@@ -13,30 +14,27 @@ namespace Game.Services
         
         protected override void ProcessInput()
         {
-            // 마우스 클릭 시작
-            if (Input.GetMouseButtonDown(0))
-            {
-                if (!_inputPolicy.ShouldIgnoreUIClick())
-                {
-                    _isInputActive = true;
-                    _isInputStarted = true;
-                }
-            }
-            // 마우스 클릭 중
-            else if (Input.GetMouseButton(0) && _isInputActive)
-            {
-                // 드래그 중이므로 특별한 처리 없음
-            }
-            // 마우스 클릭 종료
-            else if (Input.GetMouseButtonUp(0) && _isInputActive)
-            {
-                _isInputActive = false;
-                _isInputEnded = true;
-            }
-            // 입력이 없는 상태
-            else if (!Input.GetMouseButton(0))
-            {
-                _isInputActive = false;
+            switch (_inputType) {
+                case InputType.None:
+                if (Input.GetMouseButtonDown(0) && !_inputPolicy.ShouldIgnoreUIClick())
+                    _inputType = InputType.First;
+                break;
+
+                case InputType.First:
+                if (Input.GetMouseButtonUp(0))
+                    _inputType = InputType.End;
+                else if (Input.GetMouseButton(0))
+                    _inputType = InputType.Push;
+                break;
+
+                case InputType.Push:
+                if (!Input.GetMouseButton(0)) // 버튼 해제 or Up
+                    _inputType = InputType.End;
+                break;
+
+                case InputType.End:
+                _inputType = InputType.None; // 한 프레임만 유지
+                break;
             }
         }
         

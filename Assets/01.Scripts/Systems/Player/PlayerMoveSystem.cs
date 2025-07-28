@@ -2,6 +2,7 @@
 using Game.Systems;
 using R3;
 using UnityEngine;
+using Zenject;
 
 namespace Game.Systems
 {
@@ -13,7 +14,8 @@ namespace Game.Systems
         private readonly PlayerMoveModel _playerMoveModel;
         private readonly InputSystem _inputSystem;
         private readonly CompositeDisposable _disposables = new();
-        
+
+        [Inject]
         public PlayerMoveSystem(PlayerMoveModel playerMoveModel, InputSystem inputSystem)
         {
             _playerMoveModel = playerMoveModel;

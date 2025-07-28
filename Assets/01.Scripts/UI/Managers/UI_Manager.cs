@@ -2,6 +2,7 @@
 using Zenject;
 using ViewModels;
 using Cysharp.Threading.Tasks;
+using Game.Core;
 
 namespace UI
 {
@@ -36,7 +37,7 @@ namespace UI
         /// <summary>
         /// Screen UI 열기
         /// </summary>
-        public async UniTask<T> OpenScreenAsync<T>(string uiName) where T : Component
+        public async UniTask<T> OpenScreenAsync<T>(UI_Name uiName) where T : Component
         {
             return await _viewModel.OpenScreenAsync<T>(uiName);
         }
@@ -44,7 +45,7 @@ namespace UI
         /// <summary>
         /// Popup UI 열기
         /// </summary>
-        public async UniTask<T> OpenPopupAsync<T>(string uiName) where T : Component
+        public async UniTask<T> OpenPopupAsync<T>(UI_Name uiName) where T : Component
         {
             return await _viewModel.OpenPopupAsync<T>(uiName);
         }
@@ -52,7 +53,7 @@ namespace UI
         /// <summary>
         /// UI 닫기
         /// </summary>
-        public void CloseUI(string uiName)
+        public void CloseUI(UI_Name uiName)
         {
             _viewModel.CloseUI(uiName);
         }
@@ -62,7 +63,7 @@ namespace UI
         /// </summary>
         public async UniTask<MonoBehaviour> OpenGoldUIAsync()
         {
-            return await OpenScreenAsync<MonoBehaviour>("GoldUI");
+            return await OpenScreenAsync<MonoBehaviour>(UI_Name.Gold_UI);
         }
         
         /// <summary>
@@ -70,7 +71,7 @@ namespace UI
         /// </summary>
         public async UniTask<MonoBehaviour> OpenControllerUIAsync()
         {
-            return await OpenPopupAsync<MonoBehaviour>("ControllerUI");
+            return await OpenPopupAsync<MonoBehaviour>(UI_Name.Controller_UI);
         }
     }
 }

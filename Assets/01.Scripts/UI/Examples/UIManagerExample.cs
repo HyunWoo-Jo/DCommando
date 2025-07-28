@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UI;
 using Cysharp.Threading.Tasks;
+using Game.Core;
 
 namespace Game.UI
 {
@@ -36,8 +37,8 @@ namespace Game.UI
             
             // 3초 후 UI 닫기
             await UniTask.Delay(3000);
-            UI_Manager.Instance.CloseUI("GoldUI");
-            UI_Manager.Instance.CloseUI("ControllerUI");
+            UI_Manager.Instance.CloseUI(UI_Name.Gold_UI);
+            UI_Manager.Instance.CloseUI(UI_Name.Controller_UI);
         }
         
         // 버튼에서 호출할 수 있는 메서드들
@@ -53,8 +54,8 @@ namespace Game.UI
         
         public void OnCloseAllUIClicked()
         {
-            UI_Manager.Instance.CloseUI("GoldUI");
-            UI_Manager.Instance.CloseUI("ControllerUI");
+            UI_Manager.Instance.CloseUI(UI_Name.Gold_UI);
+            UI_Manager.Instance.CloseUI(UI_Name.Controller_UI);
         }
     }
 }

@@ -4,56 +4,76 @@ using Game.ViewModels;
 using R3;
 using System;
 using Cysharp.Threading.Tasks;
-
+using TMPro;
+using Zenject;
+using UnityEngine.Assertions;
 namespace Game.UI
 {
     public class GoldView : MonoBehaviour
     {
+        [Inject] private GoldViewModel _viewModel;
+        private CompositeDisposable _disposables = new();
+
         [Header("UI 컴포넌트")]
-        [SerializeField] private Text _goldText;
+        [SerializeField] private TextMeshProUGUI _goldText;
+
+#if UNITY_EDITOR
         [SerializeField] private Button _testAddButton;
         [SerializeField] private Button _testSpendButton;
-        
-        private GoldViewModel _viewModel;
-        private CompositeDisposable _disposables = new();
-        
-        public void Initialize(GoldViewModel viewModel)
-        {
-            _viewModel = viewModel;
+#endif
+
+        private void Awake() {
+#if UNITY_EDITOR // Assertion
+            RefAssert();
+            TestBind();
+#endif
+
+            // Bind
             BindViewModel();
         }
-        
+
+
+#if UNITY_EDITOR
+        // 검증
+        private void RefAssert() {
+            Assert.IsNotNull(_goldText, "GoldText가 할당되지 않았습니다!");
+            
+        }
+#endif
+
         private void BindViewModel()
         {
             // 골드 텍스트 바인딩
             _viewModel.GoldText
                 .Subscribe(text => _goldText.text = $"Gold: {text}")
-                .AddTo(_disposables);
+                .AddTo(this);
             
             // 알림 이벤트 바인딩
             _viewModel.OnNotificationEvent
                 .Subscribe(message => Debug.Log($"[Gold] {message}"))
-                .AddTo(_disposables);
-            
-            // 버튼 이벤트 바인딩 (UniTaskVoid 사용)
-            _testAddButton.onClick.AddListener(() => OnAddGoldClicked().Forget());
-            _testSpendButton.onClick.AddListener(() => OnSpendGoldClicked().Forget());
+                .AddTo(this);
+        }
+
+#if UNITY_EDITOR
+        private void TestBind() {
+            // 버튼 이벤트 바인딩
+            _testAddButton.onClick.AddListener(() => OnTestAddGoldClicked());
+            _testSpendButton.onClick.AddListener(() => OnTestSpendGoldClicked());
+        }
+
+        /// <summary>
+        /// Test용 
+        /// </summary>
+        private void OnTestAddGoldClicked()
+        {
+             _viewModel.AddGold(100);
         }
         
-        private async UniTaskVoid OnAddGoldClicked()
+        private void OnTestSpendGoldClicked()
         {
-            await _viewModel.AddGoldAsync(100);
+             _viewModel.SpendGold(50);
         }
-        
-        private async UniTaskVoid OnSpendGoldClicked()
-        {
-            await _viewModel.SpendGoldAsync(50);
-        }
-        
-        private void OnDestroy()
-        {
-            _disposables?.Dispose();
-            _viewModel?.Dispose();
-        }
+#endif
+      
     }
 }
