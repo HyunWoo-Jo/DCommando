@@ -1,7 +1,10 @@
 {
     "name": "Game.Policies",
     "rootNamespace": "Game.Policies",
-    "references": [],
+    "references": [
+        "GUID:0d8beb7f090555447a6cf5ce9e54dbb4",
+        "GUID:79ba8d8a4d57c4844995ede4a27f1866"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

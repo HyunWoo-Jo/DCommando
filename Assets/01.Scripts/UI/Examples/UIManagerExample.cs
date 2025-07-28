@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UI;
 using Cysharp.Threading.Tasks;
 using Game.Core;
 

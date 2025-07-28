@@ -5,7 +5,7 @@ using UnityEngine;
 using Game.Systems;
 using Game.Core;
 
-namespace ViewModels
+namespace Game.ViewModels
 {
     public class UIViewModel 
     {

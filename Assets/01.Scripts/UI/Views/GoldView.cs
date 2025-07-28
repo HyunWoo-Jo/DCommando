@@ -45,7 +45,7 @@ namespace Game.UI
         {
             // 골드 텍스트 바인딩
             _viewModel.GoldText
-                .Subscribe(text => _goldText.text = $"Gold: {text}")
+                .Subscribe(text => _goldText.text = $"{text}")
                 .AddTo(this);
             
             // 알림 이벤트 바인딩
@@ -57,8 +57,8 @@ namespace Game.UI
 #if UNITY_EDITOR
         private void TestBind() {
             // 버튼 이벤트 바인딩
-            _testAddButton.onClick.AddListener(() => OnTestAddGoldClicked());
-            _testSpendButton.onClick.AddListener(() => OnTestSpendGoldClicked());
+            _testAddButton?.onClick.AddListener(() => OnTestAddGoldClicked());
+            _testSpendButton?.onClick.AddListener(() => OnTestSpendGoldClicked());
         }
 
         /// <summary>

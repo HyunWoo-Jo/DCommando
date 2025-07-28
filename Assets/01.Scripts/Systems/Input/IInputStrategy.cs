@@ -1,10 +1,8 @@
 ﻿using Game.Core;
 using UnityEngine;
 
-namespace Game.Services
-{
-    public interface IInputStrategy
-    {
+namespace Game.Systems {
+    public interface IInputStrategy {
         void UpdateInput();
         Vector2 GetCurrentPosition();
 

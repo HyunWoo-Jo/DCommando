@@ -2,8 +2,7 @@
 using Game.Policies;
 using Game.Data;
 using Game.Core;
-namespace Game.Services
-{
+namespace Game.Systems {
     public class MobileInputStrategy : InputStrategyBase
     {
         private Touch? _currentTouch;

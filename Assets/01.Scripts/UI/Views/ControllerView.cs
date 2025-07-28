@@ -95,7 +95,7 @@ namespace Game.UI
             _pivotTr.localPosition = Vector3.Lerp(
                 _pivotTr.localPosition,   // 현재
                 target,                   // 목표
-                _smooth * Time.unscaledDeltaTime);
+                _smooth * Time.deltaTime);
         }
         
         // 이동 상태 변경 시

@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using Zenject;
-using ViewModels;
+using Game.ViewModels;
 using Cysharp.Threading.Tasks;
 using Game.Core;
 
-namespace UI
+namespace Game.UI
 {
     /// <summary>
     /// UI 매니저 - ViewModel을 통한 UI 생성 및 관리
