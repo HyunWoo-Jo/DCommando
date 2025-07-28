@@ -1,165 +1,211 @@
 # 개발일지
-
-
+## 목차
+- [2025-07-26 - 프로젝트 계층 구조 설계](프로젝트-계층-구조-설계) 
+- [2025-07-28 - Gold, Input, Move, UI Manager, DI 구현](gold-input-move)
 ---
-### 7.26
-## 프로젝트 네임스페이스 설계
-```mermaid
-graph LR
-    Core;
-    GamePlay;
-    Network;
-    UI;
-    Contracts;
-UI --> Contracts
-
-GamePlay --> UI
-GamePlay --> Contracts
-GamePlay --> Network
-
-Core --> GamePlay
-Core --> UI
-Core --> Network
+## 📅 2025-07-26 
+### 🎯 프로젝트 계층 구조 설계
+#### 계층 구조
+```
+Root
+ ┣ Core                // 이벤트, 상태머신, DI, 유틸
+ ┣ Systems             // 게임 도메인 시스템(전투, 퀘스트, 인벤토리 등)
+ ┃ ┣ ...
+ ┣ Policies            // 정책 도메인
+ ┣ Models              // 도메인 데이터 모델
+ ┣ Services            // 네트워크, 저장, SDK 연동
+ ┣ UI                  // Unity View 계층
+ ┣ ViewModels          // UI <-> 도메인 상태 연결
+ ┗ Data                // ScriptableObject, Config, DB 모델
 ```
 ```mermaid
-graph LR
-Project --> Data 
-Project --> Utility
-EditorOnly --> Test;
+graph TB
+    subgraph "계층"
+        UI[UI<br/>Unity View 계층]
+        VM[ViewModel<br/>UI ↔ 도메인 연결]
+        SYS[Systems<br/>게임 도메인 시스템]
+        POL[Policies<br/>비즈니스 규칙]
+        MOD[Models<br/>도메인 데이터]
+        SER[Services<br/>외부 서비스 연동]
+        DAT[Data<br/>설정 및 저장 데이터]
+        COR[Core<br/>공통 인프라]
 
-  style Test fill:#f9d,stroke:#333,stroke-width:2px
+        Memo[모든 계층에서 참조 가능]
+    end
+    COR --> Memo
+
+    UI --> VM
+    VM --> SYS
+    VM --> SER
+    VM --> MOD
+    SYS --> MOD
+    SYS --> POL
+    SYS --> SER
+    SER --> DAT
+    SER --> POL
+    MOD --> DAT
+    
 ```
-#### 1. Core
-역할: 게임의 전체 적으로 필요한 초기화 관리.</br>
-주요 내용: 게임 초기화 관리 
-
-#### 2. Data
-역할: 게임 설정, 초기값, 영구 데이터 정의 및 관리.</br>
-주요 내용: `ScriptableObject` 정의 (스탯, 정보 등), 설정 값, 데이터 테이블 구조, 데이터 저장/로드 인터페이스/기본 핸들러.
-
-#### 3. GamePlay
-역할: 실제 인게임 플레이 로직의 대부분. 핵심 게임 메커니즘 구현.</br> 
-주요 내용: 타워/적 로직 및 AI, 전투 시스템, 맵 시스템, 플레이어 상태(인게임), 로그라이크 요소, 아이템/스킬 로직. 게임 상태 관리, 씬 로딩, 핵심 게임 루프 관리, 인풋 관리.
-
-#### 4. Network
-역할: 네트워크 관련 기능.</br> 
-주요 내용: Firebase 연동.
-
-#### 5. UI
-역할: 사용자 인터페이스 요소 표시, 상호작용, 로직. </br>
-주요 내용: 화면(View/Screen) 관리, (Button, Popup) 등 제어, UI 애니메이션/효과, UI 이벤트/데이터 바인딩.
-
-#### 6. Utility
-역할: 범용 헬퍼 함수, 확장 메소드, 유틸리티 클래스.</br>
-주요 내용: 유틸리티
-
-#### 7. Contracts
-역할: `UI`와 `GamePlay`를 이어주는 `Contracts.Interface`.</br>
-주요내용: 주로 구현되는 내용은 `Ineterface.Service`로직으로 `GamePlay`에서 구현된 `Service`내용을 `UI`의 `ViewModel`에서 참조 할수 있도록 함. 
-
-#### 8. Test
-역할: Unity 에디터 환경에서만 사용되는 스크립트. </br>
-주요 내용: 테스트 코드.
 
 ---
-### 7.26
-## Input 처리 과정
-#### 주요 클레스
-- **Input**
-    - **`InputSystem`:** `InputData`를 이용해 사용 가능한 정보로 가공
-    - **`IInputStrategy`:** 각 플렛폼의 맞는 입력정보(`InputData`) 생성
-- **UI**
-    - **`ControllerViewModel`:** View에서 필요한 데이터를 중재
-    - **`ControllerView`:** 데이터를 이용해 UI 출력
-#### Class Diagram
+## 📅 2025-07-28
+### 🎯 Gold, Input, Move, UI Manager, DI 구현
+
+#### 1. Gold 시스템 구현
+- **Gold Model**: 반응형 골드 시스템 구현 완료
+- **Gold Service**: 비동기 골드 검증 로직 구현
+- **Gold Policy**: 골드 관련 비즈니스 로직 처리
+
+#### 2. Input 시스템 구현
+- **Input Model**: 터치/마우스 입력 처리 시스템 구현
+- **Input Policy**: 입력 유효성 검증 로직 구현
+- **드래그 및 클릭 감지**: 실시간 입력 상태 추적
+
+#### 3. Move 시스템 구현
+- **Player Move Model**: 플레이어 이동 데이터 관리
+- **방향성 이동**: Vector2 기반 이동 시스템 구현
+
+#### 4. UI Manager 시스템 구현
+- **UI Manager**: 싱글톤 패턴 기반 UI 통합 관리
+- **UI System**: Canvas 계층 관리 및 UI 생명주기 처리
+- **UI Service**: Addressable 기반 비동기 UI 로딩
+- **UI Model**: 반응형 UI 상태 관리
+- **UI ViewModel**: MVVM 패턴 적용한 UI 로직 분리
+  
+#### 5. DI(Dependency Injection) 시스템
+- **Zenject 기반 DI**: 모듈별 의존성 주입 구현
+- **계층별 바인딩**: Core, Model, Service, Policy 계층 분리
+
+---
+
+### Gold 시스템 상세
+
 ```mermaid
-classDiagram
-namespace Core{
-    class Installer{
-        <<MonoInstaller>>
-        - Bind()
-    }
-}
-
-namespace Data {
-    class InputData {
-       inputType: ReactiveProperty&ltInputType&gt
-    }
-    class PlayerMoveData{
-     + dir : ReactiveProperty&ltVector3&gt // R3
-    }
-}
-
-namespace UI {
-
-    class ControllerViewModel {
-     - InputData // Inject
-     - PlayerMoveData // inject
-     + RO_Data :ReadOnlyReactiveProperty 
-    }
-
-
-    class ControllerView {
-     <<Monobehaviour>>
-     - ControllerViewModel // inject
-     - Bind()
-     - UpdateUI()
-    }
-}
-
-namespace GamePlay.Input {
-    class InputSystem {
-     <<Monobehaviour>>
-     - IInputStrategy // Inject
-     - InputData // Inject
-     - UpdateInput()
-    }
-
-    class IInputStrategy {
-     <<interface>>
-     + UpdateInput()
-    }
-
-    class InputBase{
-     <<Abstruct>>
-     - InputData // Inject
-     + UpdateInput()
-    }
-    class PcInputStrategy{
-
-    }
-    class MobileInputStrategy {
-
-    }
-
-}
-namespace GamePlay {
-    class Player {
-     <<Monobehaviour>>
-     - PlayerMoveData  // inject
-     - UpdateMove()
-    }
-}
-
-ControllerViewModel --> PlayerMoveData : View에 중재
-ControllerViewModel --> InputData : View에 중재
-
-ControllerView --> ControllerViewModel : ReactiveProperty를 전달 받아 UI를 Bind
-PlayerMoveData <-- Player : data를 이용해 움직임 구현
-
-InputSystem --> IInputStrategy : UpdateInput을 호출하여 매 프레임 갱신
-IInputStrategy <|-- InputBase 
-
-InputBase <|-- PcInputStrategy
-InputBase <|-- MobileInputStrategy
-
-InputSystem  --> InputData : Input 정보를 이용해 이동 데이터 생성
-InputSystem --> PlayerMoveData : 이동 data를 생성해서 전달
-
-Installer ..> ControllerViewModel : Bind(의존 등록)
-Installer ..> PlayerMoveData : Bind(의존 등록)
-Installer ..> InputData : Bind(의존 등록)
-Installer ..> PcInputStrategy : Bind(의존 등록)
-Installer ..> MobileInputStrategy : Bind(의존 등록)
+flowchart LR
+    subgraph "골드 시스템 처리 흐름"
+        A[골드 요청] --> B{골드 정책 검증}
+        B -->|유효함| C[골드 모델 업데이트]
+        B -->|무효함| D[요청 거부]
+        C --> E[골드 서비스 검증]
+        E --> F[R3를 통한 UI 업데이트]
+    end
+    
+    subgraph "시스템 구성요소"
+        GM["GoldModel
+        - 현재 골드 반응형 프로퍼티
+        - 최대 골드 반응형 프로퍼티
+        - 골드 설정 메서드
+        - 소모 가능 여부 확인"]
+        GS["GoldSerivce
+        - 비동기 골드 검증
+        - (추후 Log 확장 가능)"]
+        GP["GoldPolicy
+        - 비즈니스 로직 처리"]
+        GSY["GoldSystem
+        - 정책 적용해 계산 반영"]
+    end
 ```
+
+**주요 기능:**
+- 최대, 최소 골드량 제한 
+- 골드 소모 가능 여부 검증
+- 골드 검증 로직
 ---
+
+### Input 시스템 상세
+
+```mermaid
+stateDiagram-v2
+    [*] --> 대기상태
+    대기상태 --> 클릭상태 : 터치/마우스 다운
+    대기상태 --> 드래그상태 : 터치/마우스 다운 + 이동
+    클릭상태 --> 대기상태 : 터치/마우스 업
+    클릭상태 --> 드래그상태 : 움직임 감지
+    드래그상태 --> 대기상태 : 터치/마우스 업
+    드래그상태 --> 드래그상태 : 계속 이동
+```
+
+**주요 기능:**
+- 터치/마우스 입력 통합 처리
+- 실시간 드래그 방향/거리 계산
+- UI 클릭 무시 정책
+- 입력 유효성 검증
+---
+
+### Move 시스템 상세
+
+```mermaid
+flowchart TD
+    A[입력 감지] --> B[입력 모델]
+    B --> C[이동 계산]
+    C --> D[플레이어 이동 모델]
+    D --> E{이동 중인가?}
+    E -->|예| F[위치 업데이트]
+    E -->|아니오| G[이동 정지]
+    F --> H[이동 적용]
+    G --> H
+```
+
+**주요 기능:**
+- Vector2 기반 이동 방향 관리
+- 이동 속도 제어
+- 이동 상태 추적
+
+---
+### UI Manager 시스템 상세
+**주요 구성 요소:**
+
+#### 1. UI_Manager (싱글톤)
+- 전역 UI 접근점
+- ViewModel을 통한 UI 요청 위임
+- 편의 메서드 제공 (Gold UI, Controller UI)
+
+
+#### 2. UIViewModel (MVVM 패턴)
+- View와 Model 사이의 중간 계층
+- UI 비즈니스 로직 분리
+- UISystem으로 실제 작업 위임
+
+
+#### 3. UISystem (핵심 로직)
+- Canvas 계층 자동 생성 및 관리
+- Screen/Popup 분리 관리
+- UI 정렬 순서 및 이벤트 처리
+
+
+#### 4. UIService (리소스 관리)
+- Addressable 기반 비동기 로딩
+- UI 인스턴스 생성/해제
+- 메모리 관리 및 핸들 추적
+
+---
+
+### DI 바인딩 시스템
+
+#### Scene 별 바인딩
+```c#
+// SystemsInstaller.cs
+public override void InstallBindings() {
+     switch (_sceneName) {
+         case SceneName.MainLobby:
+         BindMainLobbySystem();
+         break;
+         case SceneName.Play:
+         BindInputStrategies();
+         BindGameplaySystems();
+         break;
+     }
+ }
+```
+
+**바인딩 전략:**
+- **계층별 바인딩**: 계층별로 각자 바인딩
+- **Scene별 조건부 바인딩**: `SceneName(enum)`에 따른 선택적 바인딩
+
+---
+
+### 📋 다음 개발 예정 사항
+- PlayerMover 구현
+- Crystal 구현
+---
+
