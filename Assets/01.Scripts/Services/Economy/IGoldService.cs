@@ -4,7 +4,6 @@ namespace Game.Services
 {
     public interface IGoldService
     {
-        UniTask<int> LoadGoldAsync();
-        UniTask SaveGoldAsync(int gold);
+        UniTask CheckGoldAsync(int gold);
     }
 }

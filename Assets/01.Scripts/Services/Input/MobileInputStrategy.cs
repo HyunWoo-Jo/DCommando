@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Game.Policies;
 using Game.Data;
+using Game.Core;
 namespace Game.Services
 {
     public class MobileInputStrategy : InputStrategyBase
@@ -15,48 +16,40 @@ namespace Game.Services
         protected override void ProcessInput()
         {
             _currentTouch = null;
-            
+
             // 터치가 하나만 있을 때
-            if (Input.touchCount == 1)
-            {
+            if (Input.touchCount == 1) {
                 Touch touch = Input.touches[0];
-                
-                // UI 위에 있지 않은 터치만 처리
-                if (!_inputPolicy.ShouldIgnoreUIClick(touch.fingerId))
-                {
+
+                // UI 위 터치 무시
+                if (!_inputPolicy.ShouldIgnoreUIClick(touch.fingerId)) {
                     _currentTouch = touch;
-                    
-                    switch (touch.phase)
-                    {
+
+                    switch (touch.phase) {
                         case TouchPhase.Began:
-                            _isInputActive = true;
-                            _isInputStarted = true;
-                            break;
-                            
+                        _inputType = InputType.First; // 터치 시작
+                        break;
+
                         case TouchPhase.Moved:
                         case TouchPhase.Stationary:
-                            // 터치 중이므로 특별한 처리 없음
-                            break;
-                            
+                        if (_inputType == InputType.First || _inputType == InputType.Push)
+                            _inputType = InputType.Push; // 터치 중
+                        break;
+
                         case TouchPhase.Ended:
                         case TouchPhase.Canceled:
-                            if (_isInputActive)
-                            {
-                                _isInputActive = false;
-                                _isInputEnded = true;
-                            }
-                            break;
+                        if (_inputType == InputType.First || _inputType == InputType.Push)
+                            _inputType = InputType.End; // 터치 종료
+                        break;
                     }
                 }
             }
-            // 터치가 없거나 여러 개일 때
-            else
-            {
-                if (_isInputActive)
-                {
-                    _isInputActive = false;
-                    _isInputEnded = true;
-                }
+            // 터치가 없거나 여러 개일 때 입력 종료 처리
+            else {
+                if (_inputType == InputType.Push || _inputType == InputType.First)
+                    _inputType = InputType.End;
+                else if (_inputType == InputType.End)
+                    _inputType = InputType.None; // 한 프레임 후 초기화
             }
         }
         

@@ -21,7 +21,6 @@ namespace Game.UI
         
         private Vector2 _originBasePos; // 기본 Position
         private Vector2 _originPivotLocalPos; // 기본 Position
-        private CompositeDisposable _disposables = new();
         private bool _isControllerActive = false;
 
         private void Awake() {
@@ -52,23 +51,23 @@ namespace Game.UI
                 .Skip(1) // 초기값 무시
                 .Where(pos => pos != Vector2.zero)
                 .Subscribe(OnInputStart)
-                .AddTo(_disposables);
+                .AddTo(this);
             
             // 드래그 방향 업데이트
             _viewModel.DragDirection
                 .Subscribe(OnDragDirectionChanged)
-                .AddTo(_disposables);
+                .AddTo(this);
                 
             // 이동 상태에 따른 컨트롤러 표시/숨김
             _viewModel.IsMoving
                 .Subscribe(OnMovingStateChanged)
-                .AddTo(_disposables);
+                .AddTo(this);
                 
-            // 드래그 거리로 입력 종료 감지
-            _viewModel.DragDistance
-                .Where(distance => distance == 0f && _isControllerActive)
+            // 입력 타입 감지로 종료 감지
+            _viewModel.InputType
+                .Where(type => type == Core.InputType.End)
                 .Subscribe(_ => OnInputEnd())
-                .AddTo(_disposables);
+                .AddTo(this);
         }
 
         // 입력 시작 시
@@ -120,9 +119,5 @@ namespace Game.UI
             _baseTr.gameObject.SetActive(visible);
         }
         
-        private void OnDestroy()
-        {
-            _disposables?.Dispose();
-        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using R3;
+using Game.Core;
 
 namespace Game.Models
 {
@@ -8,15 +9,15 @@ namespace Game.Models
     /// </summary>
     public class UIModel
     {
-        private readonly ReactiveProperty<string> _currentScreen = new(string.Empty);
+        private readonly ReactiveProperty<UI_Name> _currentScreen = new(UI_Name.None);
         private readonly ReactiveProperty<bool> _isAnyPopupOpen = new(false);
         private readonly ReactiveProperty<bool> _isLoading = new(false);
         
-        public ReadOnlyReactiveProperty<string> CurrentScreen => _currentScreen;
+        public ReadOnlyReactiveProperty<UI_Name> CurrentScreen => _currentScreen;
         public ReadOnlyReactiveProperty<bool> IsAnyPopupOpen => _isAnyPopupOpen;
         public ReadOnlyReactiveProperty<bool> IsLoading => _isLoading;
         
-        public void SetCurrentScreen(string screenName)
+        public void SetCurrentScreen(UI_Name screenName)
         {
             _currentScreen.Value = screenName;
         }

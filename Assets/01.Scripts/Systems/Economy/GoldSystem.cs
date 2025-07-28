@@ -28,50 +28,59 @@ namespace Game.Systems
             
             // 최대 골드 설정
             _goldModel.SetMaxGold(_config.maxGold);
+            Initialize();
         }
         
-        public async UniTask InitializeAsync()
+        public void Initialize()
         {
-            var savedGold = await _goldService.LoadGoldAsync();
+            var savedGold = _config.startingGold;
             var clampedGold = _goldPolicy.ClampGold(savedGold, _config.minGold, _config.maxGold);
             _goldModel.SetGold(clampedGold);
         }
         
-        public async UniTask<bool> AddGoldAsync(int amount)
+        public bool AddGold(int amount)
         {
             if (amount <= 0) return false;
-            
+
             var currentGold = _goldModel.CurrentGold.CurrentValue;
+
+            // 정책 검사 (최대 골드 초과 여부 확인)
             if (!_goldPolicy.CanAddGold(currentGold, amount, _config.maxGold))
                 return false;
-            
+
+            // 골드 계산 정책에 따라 제한
             var newGold = _goldPolicy.ClampGold(currentGold + amount, _config.minGold, _config.maxGold);
             _goldModel.SetGold(newGold);
-            
-            await _goldService.SaveGoldAsync(newGold);
-            
+
+            // 추후 체크용 
+            _ = _goldService.CheckGoldAsync(newGold);
+
+            // 이벤트 Call
             OnGoldAddedEvent.OnNext(amount);
             OnGoldChangedEvent.OnNext(newGold);
-            
+
             return true;
         }
         
-        public async UniTask<bool> SpendGoldAsync(int amount)
+        public bool SpendGold(int amount)
         {
-            if (amount <= 0) return false;
-            
+            if (amount <= 0) return false; 
             var currentGold = _goldModel.CurrentGold.CurrentValue;
+
+            // 정책 검사 (소비 가능 여부 확인)
             if (!_goldPolicy.CanSpendGold(currentGold, amount))
                 return false;
             
+            // 골드 감소
             var newGold = currentGold - amount;
             _goldModel.SetGold(newGold);
-            
-            await _goldService.SaveGoldAsync(newGold);
-            
+
+            // 추후 체크용 
+            _ = _goldService.CheckGoldAsync(newGold);
+
+            // 이벤트 Call
             OnGoldSpentEvent.OnNext(amount);
             OnGoldChangedEvent.OnNext(newGold);
-            
             return true;
         }
         
