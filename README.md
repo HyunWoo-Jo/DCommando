@@ -1,4 +1,6 @@
 # DCommando
+## 문서
+- [개발일지](/DevelopmentLog_7_8.md)
 
 ### 계층 구조
 ```
@@ -15,27 +17,31 @@ Root
 ```
 ### 참조 방향
 ```mermaid
-graph LR
-  c[Core]
-  u[UI]
-  vm[ViewModel]
-  sys[Systems]
-  m[Model]
-  d[Data]
-  p[Policies]
-  ser[Service]
+graph TB
+    subgraph "계층"
+        UI[UI<br/>Unity View 계층]
+        VM[ViewModel<br/>UI ↔ 도메인 연결]
+        SYS[Systems<br/>게임 도메인 시스템]
+        POL[Policies<br/>비즈니스 규칙]
+        MOD[Models<br/>도메인 데이터]
+        SER[Services<br/>외부 서비스 연동]
+        DAT[Data<br/>설정 및 저장 데이터]
+        COR[Core<br/>공통 인프라]
 
-u --> vm
-vm --> m
-vm --> sys
-vm --> ser
-sys --> m
-m --> d
-sys --> ser
-ser --> d
-ser --> p
-sys --> p
-c --> memo[모든 계층에서 참조 가능]
+        Memo[모든 계층에서 참조 가능]
+    end
+    COR --> Memo
+
+    UI --> VM
+    VM --> SYS
+    VM --> SER
+    VM --> MOD
+    SYS --> MOD
+    SYS --> POL
+    SYS --> SER
+    SER --> DAT
+    SER --> POL
+    MOD --> DAT
 ```
 
 ---
