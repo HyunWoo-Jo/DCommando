@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 42b1425f30a27a6459141f16baadb193
   m_SerializeEntries:
+  - m_GUID: 2b4dea0f3f33daf47862d8ff82b5044d
+    m_Address: Assets/02.Prefabs/UI/PausePanel_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3a2491242235e6840a27821eb7f4bee2
     m_Address: Assets/02.Prefabs/UI/PauseButton_UI.prefab
     m_ReadOnly: 0

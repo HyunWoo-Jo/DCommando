@@ -31,7 +31,7 @@ namespace Game.Systems
 
 
         [Inject]
-        public UISystem(IEventBus eventBus) {
+        public UISystem() {
             SetupUIParents();
             // 추후 EventBus에 연결
         }

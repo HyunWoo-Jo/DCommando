@@ -39,16 +39,14 @@ namespace CA.UI {
 using UnityEngine;
 using Zenject;
 using System;
-using ViewModel;
+using Game.ViewModels;
 ////////////////////////////////////////////////////////////////////////////////////
 // Auto Generated Code
-namespace UI
+namespace Game.UI
 {{
     public class {_vvmName}View : MonoBehaviour
     {{
         [Inject] private {_vvmName}ViewModel _viewModel;
-         [Header(""UI 컴포넌트"")]
-
 
         private void Awake() {{
 #if UNITY_EDITOR // Assertion
@@ -66,11 +64,11 @@ namespace UI
         private void RefAssert() {{
 
         }}
-        
+#endif        
         private void Bind(){{
 
         }}   
-#endif
+
         // UI 갱신
         private void UpdateUI() {{
             
@@ -84,7 +82,7 @@ namespace UI
             _viewModelContect = $@"
 using Zenject;
 using System;
-namespace ViewModels
+namespace Game.ViewModels
 {{
     public class {_vvmName}ViewModel 
     {{   
@@ -109,6 +107,8 @@ namespace ViewModels
      
             string viewPath = path + $"UI/{_vvmName}View.cs";
             string viewModelPath = path + $"ViewModels/{_vvmName}ViewModel.cs";
+            Debug.Log($"{viewPath} 생성");
+            Debug.Log($"{viewModelPath} 생성");
 
             File.WriteAllText(viewPath, _viewContext);
             File.WriteAllText(viewModelPath, _viewModelContect);

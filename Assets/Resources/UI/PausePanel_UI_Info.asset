@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PausePanel_UI_Info
   m_EditorClassIdentifier: Game.Data::Game.Data.SO_UIInfo
   uiName: 5
-  addressableKey: 
+  addressableKey: Assets/02.Prefabs/UI/PausePanel_UI.prefab
   uiType: 1
   sortOrder: 0

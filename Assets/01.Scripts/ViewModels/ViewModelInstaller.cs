@@ -44,6 +44,7 @@ namespace Game.ViewModels {
         private void BindPlaySceneViewModels() {
             Container.BindInterfacesAndSelfTo<ControllerViewModel>().AsCached();
             Container.BindInterfacesAndSelfTo<GoldViewModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<PausePanelViewModel>().AsCached();
         }
 
 

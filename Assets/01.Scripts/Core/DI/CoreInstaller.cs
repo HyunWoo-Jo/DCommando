@@ -17,9 +17,7 @@ namespace Game.Core
         /// Core 서비스 바인딩
         /// </summary>
         private void BindCoreServices() {
-            // 이벤트 시스템
-            Container.Bind<IEventBus>().To<EventBus>().AsSingle();
-
+       
 
         }
 
@@ -27,8 +25,7 @@ namespace Game.Core
         /// Core 유틸리티 바인딩
         /// </summary>
         private void BindCoreUtilities() {
-            // 시간 관리자
-            Container.Bind<ITimeManager>().To<TimeManager>().AsSingle();
+
         }
 
         /// <summary>

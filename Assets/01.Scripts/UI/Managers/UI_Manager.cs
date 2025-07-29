@@ -6,6 +6,8 @@ using Game.Core;
 using System.Collections.Generic;
 using Game.Core.Event;
 using UnityEngine.UI;
+using System;
+using R3;
 namespace Game.UI
 {
     /// <summary>
@@ -15,13 +17,13 @@ namespace Game.UI
     public class UI_Manager : MonoBehaviour
     {
         [Inject] private UIViewModel _viewModel;
-        [Inject] private IEventBus _eventBus;
 
         private static UI_Manager _instance;
         public static UI_Manager Instance => _instance;
 
         private Dictionary<UIName, UIAnchor> _uiAnchorDictionary = new();
 
+        private readonly CompositeDisposable _disposables = new();
 
         private void Awake()
         {
@@ -30,26 +32,36 @@ namespace Game.UI
             foreach (var anchor in anchorList) {
                 _uiAnchorDictionary.Add(anchor.Ui_Name, anchor);
             }
-            _eventBus.Subscribe<UICreationEvent>(CreationEvent);
+            _disposables.Add(EventBus.Subscribe<UICreationEvent>(CreationEvent));
+            _disposables.Add(EventBus.Subscribe<UICloseEvent>(CloseEvent));
+        }
+        private void OnDestroy() {
+            _disposables?.Dispose();
         }
 
-        public async void CreationEvent(UICreationEvent uiCEvent) {
-            GameDebug.Log($"{uiCEvent.ui_Name} Creation Event 발생");
+        public async void CreationEvent(UICreationEvent creationEvent) {
+            GameDebug.Log($"{creationEvent.uiName} Creation Event 발생");
             Transform tr;
-            switch (uiCEvent.ui_Type) {
+            switch (creationEvent.uiType) {
                 case UIType.Screen:
-                tr = await OpenScreenMoveToAnchorAsync<Transform>(uiCEvent.ui_Name);
+                tr = await OpenScreenMoveToAnchorAsync<Transform>(creationEvent.uiName);
                 break;
                 case UIType.Popup:
-                tr = await OpenPopupMoveToAnchorAsync<Transform>(uiCEvent.ui_Name);
+                tr = await OpenPopupMoveToAnchorAsync<Transform>(creationEvent.uiName);
                 break;
                 case UIType.HUD:
                 break;
                 case UIType.Overlay:
                 break;
             }
+        }
+
+        public void CloseEvent(UICloseEvent closeEvent) {
+            GameDebug.Log($"{closeEvent.uiName} close Event 발생");
+            _viewModel.CloseUI(closeEvent.uiName);
 
         }
+
 
         /// <summary>
         /// 생성 이동

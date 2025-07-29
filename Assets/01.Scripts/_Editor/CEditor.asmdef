@@ -1,7 +1,9 @@
 {
     "name": "CEditor",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:79ba8d8a4d57c4844995ede4a27f1866"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
