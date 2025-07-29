@@ -14,6 +14,7 @@ namespace Game.Policies
 
 
         public override void InstallBindings() {
+            BindPolicy();
             switch (_sceneName) {
                 case SceneName.MainLobby:
                 break;
@@ -22,6 +23,10 @@ namespace Game.Policies
                 break;
             }
             Debug.Log(GetType().Name + " Bind 완료");
+        }
+
+        private void BindPolicy() {
+            Container.Bind<ICrystalPolicy>().To<CrystalPolicy>().AsSingle();
         }
 
         /// <summary>

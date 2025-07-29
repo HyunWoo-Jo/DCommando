@@ -6,7 +6,8 @@ namespace Game.Core
     {
         None,
         Gold_UI,
-        Controller_UI,
+        MoveController_UI,
+        Crystal_UI,
 
     }
 }

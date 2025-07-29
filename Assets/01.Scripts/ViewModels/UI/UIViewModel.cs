@@ -35,12 +35,5 @@ namespace Game.ViewModels
             _uiSystem.CloseUI(uiName);
         }
 
-        /// <summary>
-        /// 데이터 변경 알림
-        /// </summary>
-        public void Notify() 
-        {
-            // UI 상태 변경 알림 로직
-        }
     }
 }

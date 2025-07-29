@@ -1,6 +1,6 @@
 using Zenject;
-
-namespace Game.Core.Core
+using Game.Core.Event;
+namespace Game.Core
 {
     /// <summary>
     /// Core 계층 전용 DI 바인딩
@@ -21,7 +21,7 @@ namespace Game.Core.Core
         private void BindCoreServices()
         {
             // 이벤트 시스템
-            // Container.Bind<IEventBus>().To<EventBus>().AsSingle();
+            Container.Bind<IEventBus>().To<EventBus>().AsSingle();
             
             // 상태머신
             // Container.Bind<IStateMachine>().To<StateMachine>().AsSingle();

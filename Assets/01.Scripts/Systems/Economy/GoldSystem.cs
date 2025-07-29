@@ -42,7 +42,7 @@ namespace Game.Systems
         {
             if (amount <= 0) return false;
 
-            var currentGold = _goldModel.CurrentGold.CurrentValue;
+            var currentGold = _goldModel.RORP_CurrentGold.CurrentValue;
 
             // 정책 검사 (최대 골드 초과 여부 확인)
             if (!_goldPolicy.CanAddGold(currentGold, amount, _config.maxGold))
@@ -65,7 +65,7 @@ namespace Game.Systems
         public bool SpendGold(int amount)
         {
             if (amount <= 0) return false; 
-            var currentGold = _goldModel.CurrentGold.CurrentValue;
+            var currentGold = _goldModel.RORP_CurrentGold.CurrentValue;
 
             // 정책 검사 (소비 가능 여부 확인)
             if (!_goldPolicy.CanSpendGold(currentGold, amount))

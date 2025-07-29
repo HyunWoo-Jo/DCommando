@@ -16,12 +16,15 @@ MonoBehaviour:
   - uiName: Gold_UI
     addressableKey: Assets/02.Prefabs/UI/Gold_UI.prefab
     uiType: 0
-    isModal: 0
-    isPersistent: 0
+    isPersistent: 1
     sortOrder: 0
-  - uiName: ControllerView_UI
-    addressableKey: Assets/02.Prefabs/UI/ControllerView_UI.prefab
+  - uiName: Crystal_UI
+    addressableKey: Assets/02.Prefabs/UI/Crystal_UI.prefab
     uiType: 0
-    isModal: 0
-    isPersistent: 0
+    isPersistent: 1
     sortOrder: 1
+  - uiName: MoveController_UI
+    addressableKey: Assets/02.Prefabs/UI/MoveController_UI.prefab
+    uiType: 0
+    isPersistent: 1
+    sortOrder: 2

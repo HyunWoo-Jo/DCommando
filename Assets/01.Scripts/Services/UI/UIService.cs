@@ -3,6 +3,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Game.Core;
 
 namespace Game.Services
 {
@@ -19,16 +20,15 @@ namespace Game.Services
                 
                 if (prefab == null)
                 {
-                    Debug.LogError($"UI Prefab을 찾을 수 없습니다: {addressableKey}");
+                    GameDebug.LogError($"UI Prefab을 찾을 수 없습니다: {addressableKey}");
                     return null;
                 }
-                
-                var instance = Object.Instantiate(prefab);
+                var instance = DIHelper.InstantiateWithInjection(prefab);
                 var component = instance.GetComponent<T>();
                 
                 if (component == null)
                 {
-                    Debug.LogError($"UI Component를 찾을 수 없습니다: {typeof(T).Name} in {addressableKey}");
+                    GameDebug.LogError($"UI Component를 찾을 수 없습니다: {typeof(T).Name} in {addressableKey}");
                     Object.Destroy(instance);
                     return null;
                 }
@@ -40,7 +40,7 @@ namespace Game.Services
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"UI 로드 실패: {addressableKey}, Error: {e.Message}");
+                GameDebug.LogError($"UI 로드 실패: {addressableKey}, Error: {e.Message}");
                 return null;
             }
         }
@@ -54,11 +54,11 @@ namespace Game.Services
                 
                 if (prefab == null)
                 {
-                    Debug.LogError($"UI Prefab을 찾을 수 없습니다: {addressableKey}");
+                    GameDebug.LogError($"UI Prefab을 찾을 수 없습니다: {addressableKey}");
                     return null;
                 }
-                
-                var instance = Object.Instantiate(prefab);
+
+                var instance = DIHelper.InstantiateWithInjection(prefab);
                 
                 // Handle 저장
                 _loadedAssets[addressableKey] = handle;
@@ -67,7 +67,7 @@ namespace Game.Services
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"UI 로드 실패: {addressableKey}, Error: {e.Message}");
+                GameDebug.LogError($"UI 로드 실패: {addressableKey}, Error: {e.Message}");
                 return null;
             }
         }

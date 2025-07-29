@@ -36,7 +36,6 @@ namespace Game.Data
         public string uiName;           // UI 이름 (Key)
         public string addressableKey;   // Addressable Asset Key
         public UIType uiType;          // UI 타입
-        public bool isModal;           // 모달 여부
         public bool isPersistent;      // 영구 유지 여부
         public int sortOrder;          // 정렬 순서
     }

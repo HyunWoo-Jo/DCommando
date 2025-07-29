@@ -33,10 +33,6 @@ namespace Game.UI
             Bind();
         }
         
-        private void Start() {
-            _viewModel.Notify();
-        }
-
 #if UNITY_EDITOR
         // 검증
         private void RefAssert() {
