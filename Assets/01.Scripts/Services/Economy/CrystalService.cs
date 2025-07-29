@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Game.Core;
+using Game.Data;
 namespace Game.Services
 {
     public class CrystalService : ICrystalService

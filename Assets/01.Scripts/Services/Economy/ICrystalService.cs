@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-
+using Game.Data;
 namespace Game.Services
 {
     /// <summary>
@@ -38,31 +38,4 @@ namespace Game.Services
         UniTask<bool> SyncCrystalWithServerAsync();
     }
     
-    /// <summary>
-    /// Firebase에 저장될 크리스탈 데이터 구조
-    /// </summary>
-    [System.Serializable]
-    public class CrystalData
-    {
-        public int freeCrystal;
-        public int paidCrystal;
-        public long lastUpdated;
-        public string version;
-        
-        public CrystalData()
-        {
-            freeCrystal = 0;
-            paidCrystal = 0;
-            lastUpdated = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            version = "1.0";
-        }
-        
-        public CrystalData(int free, int paid)
-        {
-            freeCrystal = free;
-            paidCrystal = paid;
-            lastUpdated = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            version = "1.0";
-        }
-    }
 }
