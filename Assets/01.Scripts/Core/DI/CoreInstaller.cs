@@ -1,4 +1,4 @@
-using Zenject;
+﻿using Zenject;
 using Game.Core.Event;
 namespace Game.Core
 {

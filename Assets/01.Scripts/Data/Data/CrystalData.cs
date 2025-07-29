@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 namespace Game.Data
 {
     /// <summary>
-    /// Firebase¿¡ ÀúÀåµÉ Å©¸®½ºÅ» µ¥ÀÌÅÍ ±¸Á¶
+    /// Firebaseì— ì €ì¥ë  í¬ë¦¬ìŠ¤íƒˆ ë°ì´í„° êµ¬ì¡°
     /// </summary>
     [Serializable]
     public class CrystalData {

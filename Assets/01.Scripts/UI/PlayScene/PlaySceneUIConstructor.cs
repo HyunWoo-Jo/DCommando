@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Game.Core;
 using Zenject;
 using UnityEngine.Assertions;
@@ -13,7 +13,7 @@ namespace Game.UI {
 #if UNITY_EDITOR
             Assert.IsNotNull(_manager);
 #endif
-            // UI »ı¼º, ÀÌµ¿
+            // UI ìƒì„±, ì´ë™
             _ = _manager.OpenScreenMoveToAnchorAsync<GoldView>(UIName.Gold_UI);
 
             _ = _manager.OpenScreenMoveToAnchorAsync<CrystalView>(UIName.Crystal_UI);

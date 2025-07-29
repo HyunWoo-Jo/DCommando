@@ -1,10 +1,10 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Zenject;
 namespace Game.Systems
 {
 
     /// <summary>
-    /// PlayScene¿¡¼­ Update°¡ ÀÌ·ç¾îÁö´Â ½Ã½ºÅÛÀ» Áß¾ÓÁı±ÇÀ¸·Î ÄÁÆ®·Ñ
+    /// PlaySceneì—ì„œ Updateê°€ ì´ë£¨ì–´ì§€ëŠ” ì‹œìŠ¤í…œì„ ì¤‘ì•™ì§‘ê¶Œìœ¼ë¡œ ì»¨íŠ¸ë¡¤
     /// </summary>
     public class PlaySceneUpdateSystem : MonoBehaviour
     {

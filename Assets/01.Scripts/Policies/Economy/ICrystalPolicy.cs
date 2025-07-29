@@ -1,4 +1,4 @@
-namespace Game.Policies
+﻿namespace Game.Policies
 {
     /// <summary>
     /// 크리스탈 정책 인터페이스

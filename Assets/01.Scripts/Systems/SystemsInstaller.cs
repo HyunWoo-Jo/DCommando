@@ -1,4 +1,4 @@
-using Game.Core;
+﻿using Game.Core;
 using Game.Data;
 using Game.Models;
 using Game.Policies;

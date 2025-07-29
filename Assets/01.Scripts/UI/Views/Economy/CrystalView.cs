@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Zenject;
@@ -11,7 +11,7 @@ namespace Game.UI
     public class CrystalView : MonoBehaviour {
         [Inject] private CrystalViewModel _viewModel;
 
-        [Header("UI ƒƒ∆˜≥Õ∆Æ")]
+        [Header("UI Ïª¥Ìè¨ÎÑåÌä∏")]
         [SerializeField] private TextMeshProUGUI _totalCrystalText;
         [SerializeField] private TextMeshProUGUI _freeCrystalText;
         [SerializeField] private TextMeshProUGUI _paidCrystalText;
@@ -47,7 +47,7 @@ namespace Game.UI
                 .AddTo(this);
         }
 
-        // UI æ˜µ•¿Ã∆Æ
+        // UI ÏóÖÎç∞Ïù¥Ìä∏
         private void UpdateTotalCrystalText(string crystalStr) {
             if (_totalCrystalText != null)
                 _totalCrystalText.text = crystalStr;

@@ -1,4 +1,4 @@
-namespace Game.Core.Event { 
+﻿namespace Game.Core.Event { 
     /// <summary>
     /// 이벤트 베이스 클래스
     /// </summary>

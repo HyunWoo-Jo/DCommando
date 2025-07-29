@@ -1,13 +1,13 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Game.Core;
 namespace Game.Data {
     [CreateAssetMenu(fileName = "SO_UIInfo", menuName = "Scriptable Objects/SO_UIInfo")]
     public class SO_UIInfo : ScriptableObject {
-        [Header("UI Á¤º¸")]
-        public UIName uiName;           // UI ÀÌ¸§ (Key)
+        [Header("UI ì •ë³´")]
+        public UIName uiName;           // UI ì´ë¦„ (Key)
         public string addressableKey;   // Addressable Asset Key
-        public UIType uiType;          // UI Å¸ÀÔ
-        public int sortOrder;          // Á¤·Ä ¼ø¼­
+        public UIType uiType;          // UI íƒ€ì…
+        public int sortOrder;          // ì •ë ¬ ìˆœì„œ
 
     }
 

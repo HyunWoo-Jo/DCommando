@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace Game.Core
 {
     public enum UIType {
-        Screen,     // ÀüÃ¼ È­¸é UI
-        Popup,      // ÆË¾÷ UI
+        Screen,     // ì „ì²´ í™”ë©´ UI
+        Popup,      // íŒì—… UI
         HUD,        // HUD UI
-        Overlay     // ¿À¹ö·¹ÀÌ UI
+        Overlay     // ì˜¤ë²„ë ˆì´ UI
     }
 }
