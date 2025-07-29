@@ -14,14 +14,13 @@ namespace Game.UI {
             Assert.IsNotNull(_manager);
 #endif
             // UI 생성, 이동
-            _manager.OpenScreenAsync<GoldView>(UI_Name.Gold_UI)
-                .ContinueWith(t => _manager.MoveToAnchor(UI_Name.Gold_UI, t.transform));
+            _ = _manager.OpenScreenMoveToAnchorAsync<GoldView>(UIName.Gold_UI);
 
-            _ = _manager.OpenScreenAsync<CrystalView>(UI_Name.Crystal_UI)
-                .ContinueWith(t => _manager.MoveToAnchor(UI_Name.Crystal_UI, t.transform));
+            _ = _manager.OpenScreenMoveToAnchorAsync<CrystalView>(UIName.Crystal_UI);
 
-            _ = _manager.OpenScreenAsync<ControllerView>(UI_Name.MoveController_UI)
-                .ContinueWith(t => _manager.MoveToAnchor(UI_Name.MoveController_UI, t.transform));
+            _ = _manager.OpenScreenMoveToAnchorAsync<ControllerView>(UIName.MoveController_UI);
+
+            _ = _manager.OpenScreenMoveToAnchorAsync<PauseButtonUI>(UIName.Pause_UI);
         }
     }
 

@@ -4,7 +4,8 @@ using Game.ViewModels;
 using Cysharp.Threading.Tasks;
 using Game.Core;
 using System.Collections.Generic;
-
+using Game.Core.Event;
+using UnityEngine.UI;
 namespace Game.UI
 {
     /// <summary>
@@ -14,11 +15,12 @@ namespace Game.UI
     public class UI_Manager : MonoBehaviour
     {
         [Inject] private UIViewModel _viewModel;
-        
+        [Inject] private IEventBus _eventBus;
+
         private static UI_Manager _instance;
         public static UI_Manager Instance => _instance;
 
-        private Dictionary<UI_Name, UIAnchor> _uiAnchorDictionary = new();
+        private Dictionary<UIName, UIAnchor> _uiAnchorDictionary = new();
 
 
         private void Awake()
@@ -28,6 +30,50 @@ namespace Game.UI
             foreach (var anchor in anchorList) {
                 _uiAnchorDictionary.Add(anchor.Ui_Name, anchor);
             }
+            _eventBus.Subscribe<UICreationEvent>(CreationEvent);
+        }
+
+        public async void CreationEvent(UICreationEvent uiCEvent) {
+            GameDebug.Log($"{uiCEvent.ui_Name} Creation Event 발생");
+            Transform tr;
+            switch (uiCEvent.ui_Type) {
+                case UIType.Screen:
+                tr = await OpenScreenMoveToAnchorAsync<Transform>(uiCEvent.ui_Name);
+                break;
+                case UIType.Popup:
+                tr = await OpenPopupMoveToAnchorAsync<Transform>(uiCEvent.ui_Name);
+                break;
+                case UIType.HUD:
+                break;
+                case UIType.Overlay:
+                break;
+            }
+
+        }
+
+        /// <summary>
+        /// 생성 이동
+        /// </summary>
+        public async UniTask<T> OpenScreenMoveToAnchorAsync<T>(UIName uiName) where T : Component {
+            T t = await OpenScreenAsync<T>(uiName);
+            if(t == null) {
+                GameDebug.Log($"{uiName.ToString()} 생성 실패");
+                return t;
+            }
+            MoveToAnchor(uiName, t.transform);
+            return t;
+        }
+        /// <summary>
+        /// 생성 이동
+        /// </summary>
+        public async UniTask<T> OpenPopupMoveToAnchorAsync<T>(UIName uiName) where T : Component {
+            T t = await OpenPopupAsync<T>(uiName);
+            if (t == null) {
+                GameDebug.Log($"{uiName.ToString()} 생성 실패");
+                return t;
+            }
+            MoveToAnchor(uiName, t.transform);
+            return t;
         }
 
         /// <summary>
@@ -35,7 +81,7 @@ namespace Game.UI
         /// </summary>
         /// <param name="uiName"></param>
         /// <param name="pos"></param>
-        public void MoveToAnchor(UI_Name uiName, Transform pos) {
+        public void MoveToAnchor(UIName uiName, Transform pos) {
             if(_uiAnchorDictionary.TryGetValue(uiName, out var ancher)) {
                 pos.position = ancher.AnchorTransform.position;
             }
@@ -45,7 +91,7 @@ namespace Game.UI
         /// <summary>
         /// Screen UI 열기
         /// </summary>
-        public async UniTask<T> OpenScreenAsync<T>(UI_Name uiName) where T : Component
+        public async UniTask<T> OpenScreenAsync<T>(UIName uiName) where T : Component
         {
             return await _viewModel.OpenScreenAsync<T>(uiName);
         }
@@ -53,7 +99,7 @@ namespace Game.UI
         /// <summary>
         /// Popup UI 열기
         /// </summary>
-        public async UniTask<T> OpenPopupAsync<T>(UI_Name uiName) where T : Component
+        public async UniTask<T> OpenPopupAsync<T>(UIName uiName) where T : Component
         {
             return await _viewModel.OpenPopupAsync<T>(uiName);
         }
@@ -61,10 +107,10 @@ namespace Game.UI
         /// <summary>
         /// UI 닫기
         /// </summary>
-        public void CloseUI(UI_Name uiName)
+        public void CloseUI(UIName uiName)
         {
             _viewModel.CloseUI(uiName);
         }
-        
+
     }
 }

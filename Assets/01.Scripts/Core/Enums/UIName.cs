@@ -2,12 +2,14 @@ using UnityEngine;
 
 namespace Game.Core
 {
-    public enum UI_Name
+    public enum UIName
     {
         None,
         Gold_UI,
         MoveController_UI,
         Crystal_UI,
+        Pause_UI,
+        PausePanel_UI,
 
     }
 }

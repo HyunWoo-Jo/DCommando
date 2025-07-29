@@ -11,19 +11,19 @@ using Game.Core.Event;
 namespace Game.Systems
 {
     public class UISystem {
-        private IEventBus _eventBus;
+
 
         [Inject] private readonly UIModel _uiModel;
         [Inject] private readonly IUIService _uiService;
         [Inject] private readonly SO_UIConfig _uiConfig;
 
         // UI 관리
-        private readonly Dictionary<UI_Name, GameObject> _activeUIs = new();
-        private readonly List<UI_Name> _activePopups = new();
+        private readonly Dictionary<UIName, GameObject> _activeUIs = new();
+        private readonly List<UIName> _activePopups = new();
 
         // UI 이벤트
-        public readonly Subject<UI_Name> OnScreenOpenedEvent = new();
-        public readonly Subject<UI_Name> OnPopupOpenedEvent = new();
+        public readonly Subject<UIName> OnScreenOpenedEvent = new();
+        public readonly Subject<UIName> OnPopupOpenedEvent = new();
 
         // UI 부모 Transform들
         private Transform _screenParent;
@@ -32,7 +32,6 @@ namespace Game.Systems
 
         [Inject]
         public UISystem(IEventBus eventBus) {
-            _eventBus = eventBus;
             SetupUIParents();
             // 추후 EventBus에 연결
         }
@@ -42,8 +41,8 @@ namespace Game.Systems
         /// </summary>
         private void SetupUIParents() {
             var canvas = FindOrCreateCanvas();
-            _screenParent = CreateUILayer(canvas.transform, "Screens", 0);
-            _popupParent = CreateUILayer(canvas.transform, "Popups", 100);
+            _screenParent = CreateUILayer(canvas.transform, "Screens");
+            _popupParent = CreateUILayer(canvas.transform, "Popups");
         }
 
         /// <summary>
@@ -64,11 +63,8 @@ namespace Game.Systems
         /// Layer 생성
         /// </summary>
         /// <returns></returns>
-        private Transform CreateUILayer(Transform parent, string layerName, int sortOrder) {
+        private Transform CreateUILayer(Transform parent, string layerName) {
             var layerGO = new GameObject(layerName);
-            var subCanvas = layerGO.AddComponent<Canvas>();
-            subCanvas.overrideSorting = true;
-            subCanvas.sortingOrder = sortOrder;
             layerGO.transform.SetParent(parent, false);
             return layerGO.transform;
         }
@@ -78,8 +74,8 @@ namespace Game.Systems
         /// UI Screen에 생성
         /// </summary>
 
-        public async UniTask<T> OpenScreenAsync<T>(UI_Name uiName, int sortingOrder = -1) where T : Component {
-            var uiInfo = _uiConfig.GetUIInfo(uiName.ToString());
+        public async UniTask<T> OpenScreenAsync<T>(UIName uiName, int sortingOrder = -1) where T : Component {
+            var uiInfo = _uiConfig.GetUIInfo(uiName);
             if (uiInfo == null) return null;
 
             _uiModel.SetLoadingState(true);
@@ -101,8 +97,8 @@ namespace Game.Systems
         /// UI Popup에 생성
         /// </summary>
 
-        public async UniTask<T> OpenPopupAsync<T>(UI_Name uiName, int sortingOrder = -1) where T : Component {
-            var uiInfo = _uiConfig.GetUIInfo(uiName.ToString());
+        public async UniTask<T> OpenPopupAsync<T>(UIName uiName, int sortingOrder = -1) where T : Component {
+            var uiInfo = _uiConfig.GetUIInfo(uiName);
             if (uiInfo == null) return null;
 
             var uiComponent = await _uiService.LoadUIAsync<T>(uiInfo.addressableKey);
@@ -128,7 +124,7 @@ namespace Game.Systems
             subCanvas.sortingOrder = sortingOrder;
         }
 
-        public void CloseUI(UI_Name uiName) {
+        public void CloseUI(UIName uiName) {
             if (_activeUIs.TryGetValue(uiName, out var uiObject)) {
                 _uiService.ReleaseUI(uiObject);
                 _activeUIs.Remove(uiName);
