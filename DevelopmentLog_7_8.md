@@ -52,25 +52,25 @@ graph TB
 ### 🎯 Gold, Input, Move, UI Manager, DI 구현
 
 #### 1. Gold 시스템 구현
-- **Gold Model**: 반응형 골드 시스템 구현 완료
-- **Gold Service**: 비동기 골드 검증 로직 구현
-- **Gold Policy**: 골드 관련 비즈니스 로직 처리
+- **`Gold Model`**: 반응형 골드 시스템 구현 완료
+- **`Gold Service`**: 비동기 골드 검증 로직 구현
+- **`Gold Policy`**: 골드 관련 비즈니스 로직 처리
 
 #### 2. Input 시스템 구현
-- **Input Model**: 터치/마우스 입력 처리 시스템 구현
-- **Input Policy**: 입력 유효성 검증 로직 구현
+- **`Input Model`**: 터치/마우스 입력 처리 시스템 구현
+- **`Input Policy`**: 입력 유효성 검증 로직 구현
 - **드래그 및 클릭 감지**: 실시간 입력 상태 추적
 
 #### 3. Move 시스템 구현
-- **Player Move Model**: 플레이어 이동 데이터 관리
+- **`Player Move Model`**: 플레이어 이동 데이터 관리
 - **방향성 이동**: Vector2 기반 이동 시스템 구현
 
 #### 4. UI Manager 시스템 구현
-- **UI Manager**: 싱글톤 패턴 기반 UI 통합 관리
-- **UI System**: Canvas 계층 관리 및 UI 생명주기 처리
-- **UI Service**: Addressable 기반 비동기 UI 로딩
-- **UI Model**: 반응형 UI 상태 관리
-- **UI ViewModel**: MVVM 패턴 적용한 UI 로직 분리
+- **`UI Manager`**: UI 통합 관리 (실 UI 생성부)
+- **`UI System`**: Canvas 계층 관리 및 UI 생명주기 처리
+- **`UI Service`**: Addressable 기반 비동기 UI 로딩
+- **`UI Model`**: 반응형 UI 상태 관리
+- **`UI ViewModel`**: MVVM 패턴 적용한 UI 로직 분리
   
 #### 5. DI(Dependency Injection) 시스템
 - **Zenject 기반 DI**: 모듈별 의존성 주입 구현
@@ -157,14 +157,14 @@ flowchart TD
 
 #### 1. UI_Manager (싱글톤)
 - 전역 UI 접근점
-- ViewModel을 통한 UI 요청 위임
-- 편의 메서드 제공 (Gold UI, Controller UI)
+- `ViewModel`을 통한 UI 요청 위임
+- `EventBus`를 통한 UI 생성 
 
 
 #### 2. UIViewModel (MVVM 패턴)
 - View와 Model 사이의 중간 계층
 - UI 비즈니스 로직 분리
-- UISystem으로 실제 작업 위임
+- `UISystem`으로 실제 작업 위임
 
 
 #### 3. UISystem (핵심 로직)
