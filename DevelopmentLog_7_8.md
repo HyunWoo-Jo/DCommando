@@ -3,6 +3,7 @@
 - [2025-07-26 - 프로젝트 계층 구조 설계](#1) 
 - [2025-07-28 - Gold, Input, Move, UI Manager, DI 구현](#2)
 - [2025-07-29 - Event Bus, Crystal, Time Manager, GameDebug 구현](#3)
+- [2025.07.30 - Camera 구현](#4)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -317,4 +318,64 @@ flowchart TD
 ### 📋 다음 개발 예정 사항
 - GamePlay Logic 개발
 ---
+<a id="4"></a>
+# 📅 2025-07-30
+## 🎯 Camera 시스템 구현
 
+#### 1. Camera Config 구현
+- **`SO_CameraConfig`**: 카메라 설정 데이터 관리
+- **주요 특징**: Follow, Zoom, Shake 데이터 분리
+- **설정 데이터**: 속도, 시간, 오프셋, 줌 범위, 셰이크 강도
+- **ScriptableObject**: 인스펙터에서 실시간 조정 가능
+
+#### 2. Camera Model 구현
+- **`CameraModel`**: R3 ReactiveProperty로 카메라 상태 관리
+- **주요 상태**: 타겟 위치, 줌, 추적 상태, 셰이크 상태
+- **ReactiveProperty**: 상태 변화 자동 감지 -> UI 업데이트
+- **ReadOnly**: 외부에서 읽기 전용 접근
+
+#### 3. Camera Policy 구현
+- **`CameraPolicy`**: 카메라 동작 규칙 정의
+- **검증 로직**: Follow 가능성, Zoom 범위, Shake 허용 여부
+- **Position Clamp**: 카메라 이동 범위 제한
+- **확장성**: 추후 조건 추가 가능한 구조
+
+#### 4. Camera Service 구현
+- **`CameraService`**: DOTween 기반 카메라 제어
+- **비동기 처리**: UniTask로 부드러운 애니메이션
+- **기능**: Position/Zoom 즉시 설정, 애니메이션 이동, 셰이크
+- **Tween 관리**: 중복 애니메이션 방지, 정리 기능
+
+#### 5. Camera System 구현
+- **`CameraSystem`**: 이벤트 기반 카메라 로직 통합
+- **EventBus**: 카메라 이벤트 처리
+- **Follow 로직**: Updater와 연동한 실시간 타겟 추적
+- **상태 관리**: Model -> Service 단방향 흐름
+
+---
+### Camera 시스템 상세
+**주요 기능:**
+- 타겟 추적: 실시간 Follow 기능 (오프셋 적용)
+- 부드러운 이동: DOTween 기반 애니메이션
+- 줌 제어: Orthographic/Perspective 모두 지원
+- 화면 흔들기: 강도/시간 조절 가능 셰이크
+
+**주요 구성 요소:**
+#### 1. SO_CameraConfig (Data)
+- CameraFollowData: 추적 속도, 부드러움, 오프셋
+- CameraZoomData: 최소/최대/기본 줌, 줌 속도
+- CameraShakeData: 강도, 지속시간, 주파수, 커브
+
+#### 2. CameraModel (Model)
+- ReactiveProperty로 상태 관리
+- 타겟 위치, 줌, 추적 대상, 셰이크 상태 등
+
+#### 3. CameraService (Service)
+- DOTween 기반 카메라 제어
+- 즉시 설정 + 애니메이션 기능 분리
+
+#### 4. CameraSystem (System)
+- 이벤트 타입 처리
+- Policy 기반 검증
+
+---
