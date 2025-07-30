@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using R3;
 using System;
-using Core.Utilis;
 using Game.Core;
 
 namespace Game.Models

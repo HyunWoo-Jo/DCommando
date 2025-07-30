@@ -9,63 +9,48 @@ namespace Game.Systems
     /// <summary>
     /// 플레이어 이동 시스템
     /// </summary>
-    public class PlayerMoveSystem
-    {
-        private readonly PlayerMoveModel _playerMoveModel;
-        private readonly InputSystem _inputSystem;
+    public class PlayerMoveSystem {
+        [Inject] private readonly PlayerMoveModel _playerMoveModel;
+        [Inject] private readonly InputModel _inputModel;
+        [Inject] private readonly IInputProvider _inputProvider;
         private readonly CompositeDisposable _disposables = new();
 
         [Inject]
-        public PlayerMoveSystem(PlayerMoveModel playerMoveModel, InputSystem inputSystem)
-        {
-            _playerMoveModel = playerMoveModel;
-            _inputSystem = inputSystem;
-            
-            Initialize();
-        }
-        
-        private void Initialize()
-        {
+        private void Initialize() {
             // 드래그 시작 시 이동 시작
-            _inputSystem.OnDragStartEvent
+            _inputProvider.OnDragStartEvent
                 .Subscribe(OnDragStart)
                 .AddTo(_disposables);
-            
+
             // 드래그 중 이동 방향 업데이트
-            _inputSystem.OnDragEvent
+            _inputProvider.OnDragEvent
                 .Subscribe(OnDrag)
                 .AddTo(_disposables);
-            
+
             // 드래그 종료 시 이동 중지
-            _inputSystem.OnDragEndEvent
+            _inputProvider.OnDragEndEvent
                 .Subscribe(OnDragEnd)
                 .AddTo(_disposables);
         }
-        
-        private void OnDragStart(Vector2 position)
-        {
+
+        private void OnDragStart(Vector2 position) {
             // 드래그 시작 시 초기 방향 설정
-            var inputModel = _inputSystem.GetInputModel();
-            var direction = inputModel.RORP_DragDirection.CurrentValue;
+            var direction = _inputModel.RORP_DragDirection.CurrentValue;
             _playerMoveModel.SetMoveDirection(direction);
         }
-        
-        private void OnDrag(Vector2 position)
-        {
+
+        private void OnDrag(Vector2 position) {
             // 드래그 중 방향 업데이트
-            var inputModel = _inputSystem.GetInputModel();
-            var direction = inputModel.RORP_DragDirection.CurrentValue;
+            var direction = _inputModel.RORP_DragDirection.CurrentValue;
             _playerMoveModel.SetMoveDirection(direction);
         }
-        
-        private void OnDragEnd(Vector2 position)
-        {
+
+        private void OnDragEnd(Vector2 position) {
             // 드래그 종료 시 이동 중지
             _playerMoveModel.StopMoving();
         }
-        
-        public void Dispose()
-        {
+
+        public void Dispose() {
             _disposables?.Dispose();
         }
     }

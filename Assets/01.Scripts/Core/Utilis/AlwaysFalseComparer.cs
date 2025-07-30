@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Core.Utilis
+namespace Game.Core
 {
     // 항상 다른 비교자
     public sealed class AlwaysFalseComparer<T> : IEqualityComparer<T> {

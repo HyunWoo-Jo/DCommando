@@ -2,21 +2,16 @@
 using Game.Policies;
 using Game.Data;
 using Game.Core;
+using UnityEngine.EventSystems;
 
 namespace Game.Systems
 {
-    public class PCInputStrategy : InputStrategyBase
-    {
-        public PCInputStrategy(IInputPolicy inputPolicy, SO_InputConfig config) 
-            : base(inputPolicy, config)
-        {
-        }
-        
-        protected override void ProcessInput()
-        {
+    public class PCInputStrategy : InputStrategyBase {
+
+        protected override void ProcessInput() {
             switch (_inputType) {
                 case InputType.None:
-                if (Input.GetMouseButtonDown(0) && !_inputPolicy.ShouldIgnoreUIClick())
+                if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
                     _inputType = InputType.First;
                 break;
 
@@ -37,9 +32,8 @@ namespace Game.Systems
                 break;
             }
         }
-        
-        public override Vector2 GetCurrentPosition()
-        {
+
+        public override Vector2 GetCurrentPosition() {
             return Input.mousePosition;
         }
     }

@@ -21,6 +21,7 @@ namespace Game.Systems
                 case SceneName.Play:
                 BindInputStrategies();
                 BindGameplaySystems();
+                BindPlayerSystem();
                 break;
             }
             Debug.Log(GetType().Name + " Bind 완료");
@@ -49,12 +50,15 @@ namespace Game.Systems
 #else
             Container.Bind<IInputStrategy>().To<PCInputStrategy>().AsCached();
 #endif
-            Container.Bind<InputSystem>().AsCached();
+            Container.BindInterfacesAndSelfTo<InputSystem>().AsCached();
  
 
             Container.Bind<GoldSystem>().AsCached();
         }
 
+        private void BindPlayerSystem() {
+            Container.Bind<PlayerMoveSystem>().AsCached().NonLazy();
+        }
 
 
         /// <summary>

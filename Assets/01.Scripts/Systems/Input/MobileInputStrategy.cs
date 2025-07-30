@@ -2,18 +2,11 @@
 using Game.Policies;
 using Game.Data;
 using Game.Core;
+using UnityEngine.EventSystems;
 namespace Game.Systems {
-    public class MobileInputStrategy : InputStrategyBase
-    {
+    public class MobileInputStrategy : InputStrategyBase {
         private Touch? _currentTouch;
-        
-        public MobileInputStrategy(IInputPolicy inputPolicy, SO_InputConfig config) 
-            : base(inputPolicy, config)
-        {
-        }
-        
-        protected override void ProcessInput()
-        {
+        protected override void ProcessInput() {
             _currentTouch = null;
 
             // 터치가 하나만 있을 때
@@ -21,7 +14,7 @@ namespace Game.Systems {
                 Touch touch = Input.touches[0];
 
                 // UI 위 터치 무시
-                if (!_inputPolicy.ShouldIgnoreUIClick(touch.fingerId)) {
+                if (!EventSystem.current.IsPointerOverGameObject(touch.fingerId)) {
                     _currentTouch = touch;
 
                     switch (touch.phase) {
@@ -51,9 +44,8 @@ namespace Game.Systems {
                     _inputType = InputType.None; // 한 프레임 후 초기화
             }
         }
-        
-        public override Vector2 GetCurrentPosition()
-        {
+
+        public override Vector2 GetCurrentPosition() {
             return _currentTouch?.position ?? Vector2.zero;
         }
     }

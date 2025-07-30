@@ -14,13 +14,6 @@ namespace Game.Policies {
             return dragDistance >= threshold;
         }
         
-        public bool ShouldIgnoreUIClick(int touchId = -1)
-        {
-            if (touchId >= 0)
-            {
-                return EventSystem.current.IsPointerOverGameObject(touchId);
-            }
-            return EventSystem.current.IsPointerOverGameObject();
-        }
+
     }
 }
