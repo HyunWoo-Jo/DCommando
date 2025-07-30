@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Game.Core;
 using UnityEngine;
 
 namespace Game.Services
@@ -11,6 +12,7 @@ namespace Game.Services
         /// </summary>
         public async UniTask CheckGoldAsync(int gold) {
             await UniTask.Delay(100); // 비동기 시뮬레이션
+            GameDebug.Log($"{gold} 골드 로그 전달");
         }
     }
 }

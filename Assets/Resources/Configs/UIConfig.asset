@@ -13,15 +13,8 @@ MonoBehaviour:
   m_Name: UIConfig
   m_EditorClassIdentifier: Game.Data::Game.Data.SO_UIConfig
   _uiInfos:
-  - uiName: Gold_UI
-    addressableKey: Assets/02.Prefabs/UI/Gold_UI.prefab
-    uiType: 0
-    isModal: 0
-    isPersistent: 0
-    sortOrder: 0
-  - uiName: ControllerView_UI
-    addressableKey: Assets/02.Prefabs/UI/ControllerView_UI.prefab
-    uiType: 0
-    isModal: 0
-    isPersistent: 0
-    sortOrder: 1
+  - {fileID: 11400000, guid: fda1bc2bdacdc064591dafd42a51e941, type: 2}
+  - {fileID: 11400000, guid: 69899c22beec1e340ad3806ed4e2c684, type: 2}
+  - {fileID: 11400000, guid: 57ef0c863729a9e448a223831565c9a0, type: 2}
+  - {fileID: 11400000, guid: 1863b721120188b42ba98c7d1cd4beed, type: 2}
+  - {fileID: 11400000, guid: 7b43dcccf83fa6c498e56b4224058864, type: 2}

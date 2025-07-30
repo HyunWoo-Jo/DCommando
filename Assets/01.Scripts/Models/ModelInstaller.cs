@@ -1,4 +1,4 @@
-using Game.Core;
+﻿using Game.Core;
 using Game.Models;
 using UnityEngine;
 using Zenject;
@@ -31,13 +31,14 @@ namespace Game.Models
             Container.Bind<PlayerMoveModel>().AsCached();
             Container.Bind<InputModel>().AsCached();
             Container.Bind<GoldModel>().AsCached();
+            Container.Bind<CrystalModel>().AsCached(); // Crystal 모델 추가
         }
 
         /// <summary>
         /// 게임 관련 모델 바인딩
         /// </summary>
         private void BindGameModels() {
-
+            Container.Bind<UIModel>().AsCached();
         }
 
     }

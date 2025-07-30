@@ -46,7 +46,7 @@ namespace Game.Systems
         {
             // 드래그 시작 시 초기 방향 설정
             var inputModel = _inputSystem.GetInputModel();
-            var direction = inputModel.DragDirection.CurrentValue;
+            var direction = inputModel.RORP_DragDirection.CurrentValue;
             _playerMoveModel.SetMoveDirection(direction);
         }
         
@@ -54,7 +54,7 @@ namespace Game.Systems
         {
             // 드래그 중 방향 업데이트
             var inputModel = _inputSystem.GetInputModel();
-            var direction = inputModel.DragDirection.CurrentValue;
+            var direction = inputModel.RORP_DragDirection.CurrentValue;
             _playerMoveModel.SetMoveDirection(direction);
         }
         

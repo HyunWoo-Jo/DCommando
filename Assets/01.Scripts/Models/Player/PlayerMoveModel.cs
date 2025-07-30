@@ -9,29 +9,29 @@ namespace Game.Models
     /// </summary>
     public class PlayerMoveModel
     {
-        private readonly ReactiveProperty<Vector2> _moveDirection = new(Vector2.zero, AlwaysFalseComparer<Vector2>.Instance);
-        private readonly ReactiveProperty<float> _moveSpeed = new(5f);
-        private readonly ReactiveProperty<bool> _isMoving = new(false);
+        private readonly ReactiveProperty<Vector2> RP_moveDirection = new(Vector2.zero, AlwaysFalseComparer<Vector2>.Instance);
+        private readonly ReactiveProperty<float> RP_moveSpeed = new(5f);
+        private readonly ReactiveProperty<bool> RP_isMoving = new(false);
         
-        public ReadOnlyReactiveProperty<Vector2> MoveDirection => _moveDirection;
-        public ReadOnlyReactiveProperty<float> MoveSpeed => _moveSpeed;
-        public ReadOnlyReactiveProperty<bool> IsMoving => _isMoving;
+        public ReadOnlyReactiveProperty<Vector2> RORP_MoveDirection => RP_moveDirection;
+        public ReadOnlyReactiveProperty<float> RORP_MoveSpeed => RP_moveSpeed;
+        public ReadOnlyReactiveProperty<bool> RORP_IsMoving => RP_isMoving;
         
         public void SetMoveDirection(Vector2 direction)
         {
-            _moveDirection.Value = direction;
-            _isMoving.Value = direction.magnitude > 0.01f;
+            RP_moveDirection.Value = direction;
+            RP_isMoving.Value = direction.magnitude > 0.01f;
         }
         
         public void SetMoveSpeed(float speed)
         {
-            _moveSpeed.Value = speed;
+            RP_moveSpeed.Value = speed;
         }
         
         public void StopMoving()
         {
-            _moveDirection.Value = Vector2.zero;
-            _isMoving.Value = false;
+            RP_moveDirection.Value = Vector2.zero;
+            RP_isMoving.Value = false;
         }
     }
 }

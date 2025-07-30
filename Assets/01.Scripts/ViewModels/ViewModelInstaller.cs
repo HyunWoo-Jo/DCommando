@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using Zenject;
 using Game.Core;
@@ -12,7 +12,11 @@ namespace Game.ViewModels {
 
         public override void InstallBindings() {
 
+            // 공통 Bind
+            BindViewModels();
             BindUIViewModels();
+
+            // Scene 별 Bind
             switch (_sceneName) {
                 case SceneName.MainLobby:
                 BindMainLobbySceneViewModels();
@@ -24,6 +28,13 @@ namespace Game.ViewModels {
             Debug.Log(GetType().Name + " Bind 완료");
         }
 
+        /// <summary>
+        /// 공통 Bind
+        /// </summary>
+        private void BindViewModels() {
+            Container.BindInterfacesAndSelfTo<CrystalViewModel>().AsSingle();
+        }
+
 
         private void BindMainLobbySceneViewModels() {
 
@@ -31,8 +42,9 @@ namespace Game.ViewModels {
 
 
         private void BindPlaySceneViewModels() {
-            Container.Bind<ControllerViewModel>().AsCached();
-            Container.Bind<GoldViewModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<ControllerViewModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<GoldViewModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<PausePanelViewModel>().AsCached();
         }
 
 

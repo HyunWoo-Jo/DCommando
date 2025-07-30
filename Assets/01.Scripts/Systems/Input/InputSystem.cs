@@ -72,19 +72,19 @@ namespace Game.Systems
         /// </summary>
         private void HandleInputActive() {
             if (_inputStrategy.GetInputType() == InputType.Push) {
-                var dragDistance = _inputModel.DragDistance.CurrentValue;
+                var dragDistance = _inputModel.RORP_DragDistance.CurrentValue;
 
                 // 아직 드래그가 아니고, 정책에 따라 드래그로 판정될 때
                 if (!_isDragging && _inputPolicy.IsValidDrag(dragDistance, _config.dragThreshold)) {
                     _isDragging = true;
                     _inputModel.SetInputType(InputType.Push);
                     // 드래그 시작 이벤트
-                    OnDragStartEvent.OnNext(_inputModel.StartPosition.CurrentValue);
+                    OnDragStartEvent.OnNext(_inputModel.RORP_StartPosition.CurrentValue);
                 }
 
                 // 드래그 상태에서는 매 프레임 드래그 이벤트 발생
                 if (_isDragging) {
-                    OnDragEvent.OnNext(_inputModel.CurrentPosition.CurrentValue);
+                    OnDragEvent.OnNext(_inputModel.RORP_CurrentPosition.CurrentValue);
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace Game.Systems
                 _inputModel.SetInputType(InputType.End);
 
                 if (_isDragging) {
-                    OnDragEndEvent.OnNext(_inputModel.CurrentPosition.CurrentValue);
+                    OnDragEndEvent.OnNext(_inputModel.RORP_CurrentPosition.CurrentValue);
                 } else {
                     HandleClick();
                 }
@@ -114,7 +114,7 @@ namespace Game.Systems
             // 눌러다 땐 간격에 따라 클릭 이벤트 발생
             var clickTime = _inputModel.GetClickDuration();
             if (_inputPolicy.IsValidClick(clickTime, _config.clickThreshold)) {
-                OnClickEvent.OnNext(_inputModel.CurrentPosition.CurrentValue);
+                OnClickEvent.OnNext(_inputModel.RORP_CurrentPosition.CurrentValue);
             }
         }
 

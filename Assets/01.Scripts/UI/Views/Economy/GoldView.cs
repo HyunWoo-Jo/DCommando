@@ -28,8 +28,9 @@ namespace Game.UI
             TestBind();
 #endif
 
-            // Bind
-            BindViewModel();
+        }
+        private void Start() {
+            Bind();
         }
 
 
@@ -41,18 +42,23 @@ namespace Game.UI
         }
 #endif
 
-        private void BindViewModel()
+        private void Bind()
         {
             // 골드 텍스트 바인딩
-            _viewModel.GoldText
-                .Subscribe(text => _goldText.text = $"{text}")
-                .AddTo(this);
-            
-            // 알림 이벤트 바인딩
-            _viewModel.OnNotificationEvent
-                .Subscribe(message => Debug.Log($"[Gold] {message}"))
+            _viewModel.RORP_GoldText
+                .Subscribe(UpdateGoldTest)
                 .AddTo(this);
         }
+
+
+        private void UpdateGoldTest(string goldStr) {
+            _goldText.text = goldStr;
+        }
+
+        private void UpdateGoldColor(Color color) {
+            _goldText.color = color;
+        }
+
 
 #if UNITY_EDITOR
         private void TestBind() {

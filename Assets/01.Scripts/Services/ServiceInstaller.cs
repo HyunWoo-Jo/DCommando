@@ -1,4 +1,4 @@
-using Game.Core;
+﻿using Game.Core;
 using UnityEngine;
 using Zenject;
 
@@ -21,15 +21,17 @@ namespace Game.Services
                 case SceneName.Play:
                 break;
             }
-            Debug.Log(GetType().Name + " Bind 완료");
+            GameDebug.Log(GetType().Name + " Bind 완료");
         }
 
         /// <summary>
         /// 네트워크 서비스 바인딩
         /// </summary>
         private void BindNetworkServices() {
+            Container.Bind<ICrystalService>().To<CrystalService>().AsSingle();
             Container.Bind<IGoldService>().To<GoldService>().AsSingle();
         }
+
 
         /// <summary>
         /// 저장 서비스 바인딩
@@ -39,10 +41,10 @@ namespace Game.Services
         }
 
         /// <summary>
-        /// 외부 SDK 서비스 바인딩
+        /// SDK 서비스 바인딩
         /// </summary>
         private void BindExternalServices() {
-
+            Container.Bind<IUIService>().To<UIService>().AsSingle();
         }
     }
 }

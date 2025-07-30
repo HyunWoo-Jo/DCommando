@@ -1,4 +1,4 @@
-using Game.Core;
+﻿using Game.Core;
 using UnityEngine;
 using Zenject;
 
@@ -12,9 +12,8 @@ namespace Game.Core
         [SerializeField] private SceneName _sceneName;
 
         public override void InstallBindings() {
-            // 씬 이름을 컨테이너에 바인딩
-            Container.BindInstance(_sceneName).WithId("SceneName");
-
+            // DIHelper 초기화
+            DIHelper.Initialize(Container);
             // 씬별 특화 바인딩
             InstallSceneSpecificBindings();
             Debug.Log(GetType().Name + " Bind 완료");

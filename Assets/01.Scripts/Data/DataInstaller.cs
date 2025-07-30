@@ -1,5 +1,7 @@
-using Zenject;
+﻿using Zenject;
 using UnityEngine;
+using Core;
+using Game.Core;
 namespace Game.Data
 {
     /// <summary>
@@ -12,7 +14,7 @@ namespace Game.Data
             BindScriptableObjects();
             BindConfigurations();
             BindDatabaseModels();
-            Debug.Log(GetType().Name + " Bind 완료");
+            GameDebug.Log(GetType().Name + " Bind 완료");
         }
 
         /// <summary>
@@ -23,6 +25,7 @@ namespace Game.Data
             // 다른 ScriptableObject들 (실제 에셋이 있을 때 주석 해제)
             Container.Bind<SO_InputConfig>().FromScriptableObjectResource("Configs/InputConfig").AsSingle();
             Container.Bind<SO_GoldConfig>().FromScriptableObjectResource("Configs/GoldConfig").AsSingle();
+            Container.Bind<SO_CrystalConfig>().FromScriptableObjectResource("Configs/CrystalConfig").AsSingle();
             Container.Bind<SO_UIConfig>().FromScriptableObjectResource("Configs/UIConfig").AsSingle();
 
            

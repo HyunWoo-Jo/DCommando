@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
-
+using Game.Core.Styles;
 namespace Game.Core
 {
     /// <summary>
@@ -17,29 +17,15 @@ namespace Game.Core
             // 디버그 모드 설정
             Container.BindInstance(_enableDebugMode).WithId("DebugMode");
             
-            // DIHelper 초기화
-            DIHelper.Initialize(Container);
-            
             // Core 계층 바인딩 (이벤트, 상태머신, 유틸 등)
-            BindCoreLayer();
+            BindStyle();
         }
 
-        /// <summary>
-        /// Core 계층 바인딩
-        /// </summary>
-        private void BindCoreLayer()
-        {
-            // 이벤트 시스템
-            // Container.Bind<IEventBus>().To<EventBus>().AsSingle();
-            
-            // 상태머신
-            // Container.Bind<IStateMachine>().To<StateMachine>().AsSingle();
-            
-            // 로거
-            // Container.Bind<ILogger>().To<UnityLogger>().AsSingle();
-            
-            // 시간 관리자
-            // Container.Bind<ITimeManager>().To<TimeManager>().AsSingle();
+
+        private void BindStyle() {
+           Container.Bind<SO_CrystalStyle>().FromScriptableObjectResource("Styles/CrystalStyle").AsSingle();
+           Container.Bind<SO_GoldStyle>().FromScriptableObjectResource("Styles/GoldStyle").AsSingle();
         }
+
     }
 }
