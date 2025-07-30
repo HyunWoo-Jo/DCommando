@@ -41,10 +41,13 @@ namespace Game.Services
         }
 
         /// <summary>
-        /// SDK 서비스 바인딩
+        ///기타 서비스 바인딩
         /// </summary>
         private void BindExternalServices() {
             Container.Bind<IUIService>().To<UIService>().AsSingle();
+
+            Container.Bind<ICameraService>().To<CameraService>().AsSingle();
         }
+
     }
 }

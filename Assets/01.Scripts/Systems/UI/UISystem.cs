@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using Zenject;
 using Game.Core;
 using Game.Core.Event;
+using UnityEngine.PlayerLoop;
 namespace Game.Systems
 {
-    public class UISystem {
+    public class UISystem : IInitializable {
 
 
         [Inject] private readonly UIModel _uiModel;
@@ -30,12 +31,12 @@ namespace Game.Systems
         private Transform _popupParent;
 
 
-        [Inject]
-        public UISystem() {
+        #region Zenject 관리
+        public void Initialize() {
             SetupUIParents();
-            // 추후 EventBus에 연결
+            // Event는 View.UI_Manager를 통해 들어오도록 설정
         }
-
+        #endregion
         /// <summary>
         /// 기본 UI Parents 생성
         /// </summary>
@@ -131,5 +132,7 @@ namespace Game.Systems
                 _activePopups.Remove(uiName);
             }
         }
+
+       
     }
 }

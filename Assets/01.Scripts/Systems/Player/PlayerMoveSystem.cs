@@ -1,6 +1,7 @@
 ﻿using Game.Models;
 using Game.Systems;
 using R3;
+using System;
 using UnityEngine;
 using Zenject;
 
@@ -9,14 +10,14 @@ namespace Game.Systems
     /// <summary>
     /// 플레이어 이동 시스템
     /// </summary>
-    public class PlayerMoveSystem {
+    public class PlayerMoveSystem : IInitializable, IDisposable {
         [Inject] private readonly PlayerMoveModel _playerMoveModel;
         [Inject] private readonly InputModel _inputModel;
         [Inject] private readonly IInputProvider _inputProvider;
         private readonly CompositeDisposable _disposables = new();
 
-        [Inject]
-        private void Initialize() {
+        #region Zenject 관리
+        public void Initialize() {
             // 드래그 시작 시 이동 시작
             _inputProvider.OnDragStartEvent
                 .Subscribe(OnDragStart)
@@ -32,6 +33,10 @@ namespace Game.Systems
                 .Subscribe(OnDragEnd)
                 .AddTo(_disposables);
         }
+        public void Dispose() {
+            _disposables?.Dispose();
+        }
+        #endregion
 
         private void OnDragStart(Vector2 position) {
             // 드래그 시작 시 초기 방향 설정
@@ -50,8 +55,8 @@ namespace Game.Systems
             _playerMoveModel.StopMoving();
         }
 
-        public void Dispose() {
-            _disposables?.Dispose();
-        }
+       
+
+       
     }
 }

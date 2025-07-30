@@ -6,14 +6,15 @@ using R3;
 using UnityEngine;
 using Game.Policies;
 using Zenject;
+using System;
 namespace Game.Systems
 {
-    public class InputSystem : IInputProvider  {
-        private readonly InputModel _inputModel;
-        private readonly IInputStrategy _inputStrategy;
-        private readonly IInputPolicy _inputPolicy;
-        private readonly SO_InputConfig _config;
-
+    public class InputSystem : IInputProvider, IInitializable, IDisposable  {
+        [Inject] private readonly InputModel _inputModel;
+        [Inject] private readonly IInputStrategy _inputStrategy;
+        [Inject] private readonly IInputPolicy _inputPolicy;
+        [Inject] private readonly SO_InputConfig _config;
+        [Inject] private readonly IUpdater _updater;
         // Input 이벤트
         private readonly Subject<Vector2> _onClickEvent = new();
         private readonly Subject<Vector2> _onDragStartEvent = new();
@@ -28,17 +29,21 @@ namespace Game.Systems
         private bool _isDragging = false;
         public bool IsDragging => _isDragging;
 
-      
+        private CompositeDisposable _disposables = new();
 
-        [Inject]
-        public InputSystem(InputModel inputModel, IInputStrategy inputStrategy, IInputPolicy inputPolicy, SO_InputConfig config) {
-            _inputModel = inputModel;
-            _inputStrategy = inputStrategy;
-            _inputPolicy = inputPolicy;
-            _config = config;
+        #region Zenject 관리
+        public void Initialize() {
+            _updater.OnUpdate
+                .Subscribe(Update)
+                .AddTo(_disposables);
         }
+        public void Dispose() {
+            _disposables?.Dispose();
+            _disposables = null;
+        }
+        #endregion
 
-        public void Update() {
+        public void Update(float deltaTime) {
             UpdateInput();
         }
 
@@ -123,5 +128,7 @@ namespace Game.Systems
         }
 
         public InputModel GetInputModel() => _inputModel;
+
+
     }
 }

@@ -16,12 +16,7 @@ namespace Game.Core.Event
         /// <summary>
         /// 이벤트 발행
         /// </summary>
-        public void Publish<T>(T eventData) where T : class {
-            if (eventData == null) {
-                GameDebug.LogWarning($"이벤트 데이터가 null입니다: {typeof(T).Name}");
-                return;
-            }
-
+        public void Publish<T>(T eventData) where T : struct {
             var eventType = typeof(T);
 
             if (_subjects.TryGetValue(eventType, out var subject)) {
@@ -37,7 +32,7 @@ namespace Game.Core.Event
         /// <summary>
         /// 이벤트 구독
         /// </summary>
-        public IDisposable Subscribe<T>(Action<T> onEvent) where T : class {
+        public IDisposable Subscribe<T>(Action<T> onEvent) where T : struct {
             if (onEvent == null) {
                 GameDebug.LogError("이벤트 핸들러가 null입니다.");
                 return Disposable.Empty;
@@ -53,7 +48,7 @@ namespace Game.Core.Event
         /// <summary>
         /// 특정 타입의 이벤트 스트림 가져오기
         /// </summary>
-        public Observable<T> GetEventStream<T>() where T : class {
+        public Observable<T> GetEventStream<T>() where T : struct {
             var subject = GetOrCreateSubject<T>();
             return subject.AsObservable();
         }
@@ -61,7 +56,7 @@ namespace Game.Core.Event
         /// <summary>
         /// Subject 가져오기 또는 생성
         /// </summary>
-        private Subject<T> GetOrCreateSubject<T>() where T : class {
+        private Subject<T> GetOrCreateSubject<T>() where T : struct {
             var eventType = typeof(T);
 
             if (!_subjects.TryGetValue(eventType, out var subject)) {

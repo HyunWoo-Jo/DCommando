@@ -28,9 +28,13 @@ namespace Game.Systems
         }
 
         private void BindSystem() {
-            Container.Bind<UISystem>().AsSingle();
+            Container.Bind<IUpdater>().To<Updater>().FromNewComponentOnNewPrefab(new GameObject("Updater")).AsSingle();
 
-            Container.Bind<CrystalSystem>().AsSingle();
+            Container.BindInterfacesAndSelfTo<UISystem>().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<CameraSystem>().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<CrystalSystem>().AsSingle();
         }
 
         /// <summary>
@@ -53,11 +57,11 @@ namespace Game.Systems
             Container.BindInterfacesAndSelfTo<InputSystem>().AsCached();
  
 
-            Container.Bind<GoldSystem>().AsCached();
+            Container.BindInterfacesAndSelfTo<GoldSystem>().AsCached();
         }
 
         private void BindPlayerSystem() {
-            Container.Bind<PlayerMoveSystem>().AsCached().NonLazy();
+            Container.BindInterfacesAndSelfTo<PlayerMoveSystem>().AsCached().NonLazy();
         }
 
 

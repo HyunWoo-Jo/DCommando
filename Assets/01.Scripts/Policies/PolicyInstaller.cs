@@ -27,6 +27,7 @@ namespace Game.Policies
 
         private void BindPolicy() {
             Container.Bind<ICrystalPolicy>().To<CrystalPolicy>().AsSingle();
+            Container.Bind<ICameraPolicy>().To<CameraPolicy>().AsSingle();
         }
 
         /// <summary>

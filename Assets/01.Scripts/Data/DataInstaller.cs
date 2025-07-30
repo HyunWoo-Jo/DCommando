@@ -27,7 +27,7 @@ namespace Game.Data
             Container.Bind<SO_CrystalConfig>().FromScriptableObjectResource("Configs/CrystalConfig").AsSingle();
             Container.Bind<SO_UIConfig>().FromScriptableObjectResource("Configs/UIConfig").AsSingle();
 
-           
+            Container.Bind<SO_CameraConfig>().FromScriptableObjectResource("Configs/CameraConfig").AsSingle();
         }
 
         /// <summary>

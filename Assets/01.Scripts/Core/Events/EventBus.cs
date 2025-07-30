@@ -20,19 +20,19 @@ namespace Game.Core.Event {
         /// <summary>
         /// 이벤트 발행
         /// </summary>
-        public static void Publish<T>(T eventData) where T : class {
+        public static void Publish<T>(T eventData) where T : struct {
             _instance.Publish(eventData);
         }
         /// <summary>
         /// 이벤트 구독
         /// </summary>
-        public static IDisposable Subscribe<T>(Action<T> onEvent) where T : class {
+        public static IDisposable Subscribe<T>(Action<T> onEvent) where T : struct {
             return _instance.Subscribe(onEvent);
         }
         /// <summary>
         /// 특정 타입의 이벤트 스트림 가져오기
         /// </summary>
-        public static Observable<T> GetEventStream<T>() where T : class {
+        public static Observable<T> GetEventStream<T>() where T : struct {
             return _instance.GetEventStream<T>();
         }
 

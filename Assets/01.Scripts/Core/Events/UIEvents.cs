@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Game.Core.Event
 {
-    public class UICreationEvent {
+    public readonly struct UICreationEvent {
         public readonly UIName uiName;
         public readonly UIType uiType;
         public readonly Action<GameObject> OnCreation; // 생성 되면 수행될 작업
@@ -16,7 +16,7 @@ namespace Game.Core.Event
         }
     }
 
-    public class UICloseEvent {
+    public readonly struct UICloseEvent {
         public readonly UIName uiName;
         public UICloseEvent(UIName name) {
             uiName = name;
