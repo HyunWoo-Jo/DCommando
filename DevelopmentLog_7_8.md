@@ -1,8 +1,11 @@
 # 개발일지
 ## 목차
-- [2025-07-26 - 프로젝트 계층 구조 설계](프로젝트-계층-구조-설계) 
-- [2025-07-28 - Gold, Input, Move, UI Manager, DI 구현](gold-input-move)
+- [2025-07-26 - 프로젝트 계층 구조 설계](#1) 
+- [2025-07-28 - Gold, Input, Move, UI Manager, DI 구현](#2)
+- [2025-07-29 - Event Bus, Crystal, Time Manager, GameDebug 구현](#3)
+- [2025.07.30 - Camera 구현](#4)
 ---
+<a id="1"></a>
 ## 📅 2025-07-26 
 ### 🎯 프로젝트 계층 구조 설계
 #### 계층 구조
@@ -48,6 +51,7 @@ graph TB
 ```
 
 ---
+<a id="2"></a>
 ## 📅 2025-07-28
 ### 🎯 Gold, Input, Move, UI Manager, DI 구현
 
@@ -208,4 +212,170 @@ public override void InstallBindings() {
 - PlayerMover 구현
 - Crystal 구현
 ---
+<a id="3"></a>
+# 📅 2025-07-29
+## 🎯 Event Bus, Crystal, Time Manager, GameDebug 구현
 
+#### 1. Event Bus 구현
+- **`Event Bus`**: 이벤트 기반 느슨한 결합 시스템 구현
+- **시스템 간 통신**: 직접 참조 없이 이벤트로 모듈 간 통신
+- **R3 기반 반응형**: Observable 패턴으로 비동기 이벤트 처리
+- **Static**: 전역 접근 편의성 제공
+
+#### 2. Crystal 구현
+- **`Crystal Model`**: 무료/유료 크리스탈 분리 관리 시스템
+- **ReactiveProperty 적용**: 실시간 상태 변화 추적
+- **소비 우선순위**: 무료 -> 유료 순서로 스마트 소비
+- **최대 보유량 제한**: 9,999,999 크리스탈 한도 관리
+
+#### 3. Time Manager 구현
+- **`GameTime`**: Static 접근 인터페이스로 전역 시간 관리
+- **`TimeManager`**: 일시정지/재개 및 시간 배율 제어
+- **EventBus 연동**: 상태 변화 시 자동 이벤트 발행
+- **DeltaTime 제어**: 일시정지 상태 고려한 시간 계산
+
+#### 4. GameDebug 로깅 구현
+- **조건부 컴파일**: UNITY_EDITOR/DEVELOPMENT_BUILD 환경에서만 동작
+---
+### Event Bus 시스템 상세
+```mermaid
+flowchart LR
+    subgraph "이벤트 통신 흐름"
+        A[이벤트 발행] --> B[EventBus 중앙 처리]
+        B --> C[구독자들에게 전달]
+        C --> D[R3 Observable 처리]
+        D --> E[UI/시스템 업데이트]
+    end
+    
+   subgraph "시스템 구성요소"
+        EB["EventBus (Static Facade)
+        - Publish<T>() 이벤트 발행
+        - Subscribe<T>() 이벤트 구독
+        - GetEventStream<T>() 스트림 반환
+        - ChangeEventBus() 구현체 교체"]
+        EBC["EventBusCore (Internal)
+        - 실제 이벤트 처리 구현
+        - R3 기반 Observable 관리
+        - 타입별 이벤트 분리 관리"]
+    end
+```
+**주요 기능:**
+- 시스템 간 직접 참조 제거
+- Observable 패턴을 통한 비동기 처리
+
+---
+### Crystal 경제 시스템 상세
+```mermaid
+flowchart TD
+    A[크리스탈 요청] --> B{소비 가능 검증}
+    B -->|가능| C[무료 크리스탈 우선 소모]
+    B -->|불가능| D[요청 거부]
+    C --> E{무료 크리스탈 부족?}
+    E -->|예| F[유료 크리스탈에서 차감]
+    E -->|아니오| G[소모 완료]
+    F --> G
+    G --> H[전체 크리스탈 업데이트]
+    H --> I[ReactiveProperty 알림]
+    
+    subgraph "데이터 구조"
+        CM["CrystalModel
+        - RP_currentCrystal (전체)
+        - RP_maxCrystal (최대치)
+        - RP_freeCrystal (무료)
+        - RP_paidCrystal (유료)"]
+    end
+```
+**주요 기능:**
+- 무료/유료 크리스탈 분리 관리
+- 스마트 소비 로직 (무료 -> 유료)
+- 최대 보유량 제한
+
+---
+### Time Manager 시스템 상세
+**주요 구성 요소:**
+#### 1. GameTime (Static)
+- 전역 시간 관리 접근점
+- DeltaTime 일시정지 상태 고려
+- TimeScale, IsPaused 상태 제공
+
+#### 2. TimeManager (Internal)
+- ReactiveProperty로 상태 변화 감지
+- EventBus 연동 자동 이벤트 발행
+
+**주요 기능:**
+- 게임 일시정지/재개 제어
+- 상태 변화 시 자동 이벤트 알림
+
+---
+### GameDebug 로깅 시스템 상세
+
+**주요 기능:**
+- 조건부 컴파일을 통한 성능 최적화
+- 개발 환경에서만 동작
+---
+
+
+### 📋 다음 개발 예정 사항
+- GamePlay Logic 개발
+---
+<a id="4"></a>
+# 📅 2025-07-30
+## 🎯 Camera 시스템 구현
+
+#### 1. Camera Config 구현
+- **`SO_CameraConfig`**: 카메라 설정 데이터 관리
+- **주요 특징**: Follow, Zoom, Shake 데이터 분리
+- **설정 데이터**: 속도, 시간, 오프셋, 줌 범위, 셰이크 강도
+- **ScriptableObject**: 인스펙터에서 실시간 조정 가능
+
+#### 2. Camera Model 구현
+- **`CameraModel`**: R3 ReactiveProperty로 카메라 상태 관리
+- **주요 상태**: 타겟 위치, 줌, 추적 상태, 셰이크 상태
+- **ReactiveProperty**: 상태 변화 자동 감지 -> UI 업데이트
+- **ReadOnly**: 외부에서 읽기 전용 접근
+
+#### 3. Camera Policy 구현
+- **`CameraPolicy`**: 카메라 동작 규칙 정의
+- **검증 로직**: Follow 가능성, Zoom 범위, Shake 허용 여부
+- **Position Clamp**: 카메라 이동 범위 제한
+- **확장성**: 추후 조건 추가 가능한 구조
+
+#### 4. Camera Service 구현
+- **`CameraService`**: DOTween 기반 카메라 제어
+- **비동기 처리**: UniTask로 부드러운 애니메이션
+- **기능**: Position/Zoom 즉시 설정, 애니메이션 이동, 셰이크
+- **Tween 관리**: 중복 애니메이션 방지, 정리 기능
+
+#### 5. Camera System 구현
+- **`CameraSystem`**: 이벤트 기반 카메라 로직 통합
+- **EventBus**: 카메라 이벤트 처리
+- **Follow 로직**: Updater와 연동한 실시간 타겟 추적
+- **상태 관리**: Model -> Service 단방향 흐름
+
+---
+### Camera 시스템 상세
+**주요 기능:**
+- 타겟 추적: 실시간 Follow 기능 (오프셋 적용)
+- 부드러운 이동: DOTween 기반 애니메이션
+- 줌 제어: Orthographic/Perspective 모두 지원
+- 화면 흔들기: 강도/시간 조절 가능 셰이크
+
+**주요 구성 요소:**
+#### 1. SO_CameraConfig (Data)
+- CameraFollowData: 추적 속도, 부드러움, 오프셋
+- CameraZoomData: 최소/최대/기본 줌, 줌 속도
+- CameraShakeData: 강도, 지속시간, 주파수, 커브
+
+#### 2. CameraModel (Model)
+- ReactiveProperty로 상태 관리
+- 타겟 위치, 줌, 추적 대상, 셰이크 상태 등
+
+#### 3. CameraService (Service)
+- DOTween 기반 카메라 제어
+- 즉시 설정 + 애니메이션 기능 분리
+
+#### 4. CameraSystem (System)
+- 이벤트 타입 처리
+- Policy 기반 검증
+
+---
