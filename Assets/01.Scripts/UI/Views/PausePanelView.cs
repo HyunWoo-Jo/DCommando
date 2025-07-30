@@ -1,4 +1,4 @@
-
+﻿
 using UnityEngine;
 using Zenject;
 using System;
@@ -22,7 +22,7 @@ namespace Game.UI
             RefAssert();
 #endif
             Bind();
-
+            Resize();
         }
 
 
@@ -36,6 +36,12 @@ namespace Game.UI
             _continueButton.onClick
                 .AddListener(() => _viewModel.OnContinueButton());
         }
+
+        private void Resize() {
+            RectTransform rect = GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(Screen.width, Screen.height);
+        }
+
         // UI 갱신
         private void UpdateUI() {
             

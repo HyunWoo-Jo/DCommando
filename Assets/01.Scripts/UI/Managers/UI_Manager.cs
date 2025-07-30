@@ -57,7 +57,6 @@ namespace Game.UI
         }
 
         public void CloseEvent(UICloseEvent closeEvent) {
-            GameDebug.Log($"{closeEvent.uiName} close Event 발생");
             _viewModel.CloseUI(closeEvent.uiName);
 
         }

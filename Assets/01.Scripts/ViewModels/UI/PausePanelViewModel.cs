@@ -1,4 +1,4 @@
-
+ï»¿
 using Zenject;
 using System;
 using Game.Core.Event;
@@ -9,7 +9,7 @@ namespace Game.ViewModels
            
         
         /// <summary>
-        /// °è¼Ó ¹öÆ° ´­·¶À»¶§ È£Ãâ
+        /// ê³„ì† ë²„íŠ¼ ëˆŒë €ì„ë•Œ í˜¸ì¶œ
         /// </summary>
         public void OnContinueButton() {
             GameTime.Resume();

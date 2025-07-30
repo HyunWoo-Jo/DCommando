@@ -1,14 +1,14 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace Game.Core {
 
     /// <summary>
-    /// °ÔÀÓ Á¤Áö ÀÌº¥Æ®
+    /// ê²Œì„ ì •ì§€ ì´ë²¤íŠ¸
     /// </summary>
     public class PauseGameEvent { }
 
     /// <summary>
-    /// °ÔÀÓ ½ÃÀÛ ÀÌº¥Æ®
+    /// ê²Œì„ ì‹œì‘ ì´ë²¤íŠ¸
     /// </summary>
     public class ResumeGameEvent { }
 }

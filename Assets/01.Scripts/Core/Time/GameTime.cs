@@ -1,8 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace Game.Core
 {
-    // ÆíÀÇ¸¦ À§ÇÑ Static
+    // í¸ì˜ë¥¼ ìœ„í•œ Static
     public static class GameTime {
         private static ITimeManager _timeManager = new TimeManager();
 

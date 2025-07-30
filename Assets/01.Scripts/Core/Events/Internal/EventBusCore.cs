@@ -1,4 +1,4 @@
-using R3;
+ï»¿using R3;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,18 +7,18 @@ using Zenject;
 namespace Game.Core.Event
 {
     /// <summary>
-    /// Event Bus ³»ºÎ ·ÎÁ÷
+    /// Event Bus ë‚´ë¶€ ë¡œì§
     /// </summary>
     internal class EventBusCore : IEventBus {
         private static readonly Dictionary<Type, object> _subjects = new();
         private static readonly CompositeDisposable _disposables = new();
 
         /// <summary>
-        /// ÀÌº¥Æ® ¹ßÇà
+        /// ì´ë²¤íŠ¸ ë°œí–‰
         /// </summary>
         public void Publish<T>(T eventData) where T : class {
             if (eventData == null) {
-                Debug.LogWarning($"ÀÌº¥Æ® µ¥ÀÌÅÍ°¡ nullÀÔ´Ï´Ù: {typeof(T).Name}");
+                GameDebug.LogWarning($"ì´ë²¤íŠ¸ ë°ì´í„°ê°€ nullì…ë‹ˆë‹¤: {typeof(T).Name}");
                 return;
             }
 
@@ -27,31 +27,31 @@ namespace Game.Core.Event
             if (_subjects.TryGetValue(eventType, out var subject)) {
                 if (subject is Subject<T> typedSubject) {
                     typedSubject.OnNext(eventData);
-                    Debug.Log($"ÀÌº¥Æ® ¹ßÇà: {eventType.Name}");
+                    GameDebug.Log($"ì´ë²¤íŠ¸ ë°œí–‰: {eventType.Name}");
                 }
             } else {
-                Debug.LogWarning($"±¸µ¶ÀÚ°¡ ¾ø´Â ÀÌº¥Æ®ÀÔ´Ï´Ù: {eventType.Name}");
+                GameDebug.LogWarning($"êµ¬ë…ìê°€ ì—†ëŠ” ì´ë²¤íŠ¸ì…ë‹ˆë‹¤: {eventType.Name}");
             }
         }
 
         /// <summary>
-        /// ÀÌº¥Æ® ±¸µ¶
+        /// ì´ë²¤íŠ¸ êµ¬ë…
         /// </summary>
         public IDisposable Subscribe<T>(Action<T> onEvent) where T : class {
             if (onEvent == null) {
-                Debug.LogError("ÀÌº¥Æ® ÇÚµé·¯°¡ nullÀÔ´Ï´Ù.");
+                GameDebug.LogError("ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬ê°€ nullì…ë‹ˆë‹¤.");
                 return Disposable.Empty;
             }
 
             var subject = GetOrCreateSubject<T>();
             var subscription = subject.Subscribe(onEvent);
 
-            Debug.Log($"ÀÌº¥Æ® ±¸µ¶: {typeof(T).Name}");
+            GameDebug.Log($"ì´ë²¤íŠ¸ êµ¬ë…: {typeof(T).Name}");
             return subscription;
         }
 
         /// <summary>
-        /// Æ¯Á¤ Å¸ÀÔÀÇ ÀÌº¥Æ® ½ºÆ®¸² °¡Á®¿À±â
+        /// íŠ¹ì • íƒ€ì…ì˜ ì´ë²¤íŠ¸ ìŠ¤íŠ¸ë¦¼ ê°€ì ¸ì˜¤ê¸°
         /// </summary>
         public Observable<T> GetEventStream<T>() where T : class {
             var subject = GetOrCreateSubject<T>();
@@ -59,7 +59,7 @@ namespace Game.Core.Event
         }
 
         /// <summary>
-        /// Subject °¡Á®¿À±â ¶Ç´Â »ı¼º
+        /// Subject ê°€ì ¸ì˜¤ê¸° ë˜ëŠ” ìƒì„±
         /// </summary>
         private Subject<T> GetOrCreateSubject<T>() where T : class {
             var eventType = typeof(T);
@@ -68,10 +68,10 @@ namespace Game.Core.Event
                 var newSubject = new Subject<T>();
                 _subjects[eventType] = newSubject;
 
-                // Subject¸¦ disposables¿¡ Ãß°¡ÇÏ¿© ¸Ş¸ğ¸® °ü¸®
+                // Subjectë¥¼ disposablesì— ì¶”ê°€í•˜ì—¬ ë©”ëª¨ë¦¬ ê´€ë¦¬
                 newSubject.AddTo(_disposables);
 
-                Debug.Log($"»õ·Î¿î ÀÌº¥Æ® ½ºÆ®¸² »ı¼º: {eventType.Name}");
+                GameDebug.Log($"ìƒˆë¡œìš´ ì´ë²¤íŠ¸ ìŠ¤íŠ¸ë¦¼ ìƒì„±: {eventType.Name}");
                 return newSubject;
             }
 
@@ -79,10 +79,10 @@ namespace Game.Core.Event
         }
 
         /// <summary>
-        /// ¸ğµç ÀÌº¥Æ® Á¤¸®
+        /// ëª¨ë“  ì´ë²¤íŠ¸ ì •ë¦¬
         /// </summary>
         public void Clear() {
-            Debug.Log("Event Bus Á¤¸® Áß...");
+            GameDebug.Log("Event Bus ì •ë¦¬ ì¤‘...");
 
             foreach (var kvp in _subjects) {
                 if (kvp.Value is IDisposable disposable) {
@@ -93,25 +93,25 @@ namespace Game.Core.Event
             _subjects.Clear();
             _disposables.Clear();
 
-            Debug.Log("Event Bus Á¤¸® ¿Ï·á");
+            GameDebug.Log("Event Bus ì •ë¦¬ ì™„ë£Œ");
         }
 
         /// <summary>
-        /// Event Bus ÇØÁ¦
+        /// Event Bus í•´ì œ
         /// </summary>
         public void Dispose() {
             Clear();
         }
 
         /// <summary>
-        /// ÇöÀç µî·ÏµÈ ÀÌº¥Æ® Å¸ÀÔ ¼ö ¹İÈ¯ (µğ¹ö±ë¿ë)
+        /// í˜„ì¬ ë“±ë¡ëœ ì´ë²¤íŠ¸ íƒ€ì… ìˆ˜ ë°˜í™˜ (ë””ë²„ê¹…ìš©)
         /// </summary>
         public int GetRegisteredEventCount() {
             return _subjects.Count;
         }
 
         /// <summary>
-        /// µî·ÏµÈ ÀÌº¥Æ® Å¸ÀÔµé ¹İÈ¯ (µğ¹ö±ë¿ë)
+        /// ë“±ë¡ëœ ì´ë²¤íŠ¸ íƒ€ì…ë“¤ ë°˜í™˜ (ë””ë²„ê¹…ìš©)
         /// </summary>
         public IEnumerable<Type> GetRegisteredEventTypes() {
             return _subjects.Keys;
