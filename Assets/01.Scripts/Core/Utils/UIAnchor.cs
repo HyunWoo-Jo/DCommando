@@ -10,9 +10,11 @@ namespace Game.Core {
         [SerializeField] private UIName _ui_Name;
         [SerializeField] private string _customName = "";
 #if UNITY_EDITOR
+#pragma warning disable CS0414
         [Header("디버그 정보")]
         [SerializeField, TextArea(2, 4)] 
         private string _debugInfo = "";
+#pragma warning restore
 #endif
         public UIName Ui_Name => _ui_Name;
         public string CustomName => _customName;

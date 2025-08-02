@@ -12,9 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa44bf124d6d1547925fc1bb6bc9d66, type: 3}
   m_Name: Health_UI_Info
   m_EditorClassIdentifier: Game.Data::Game.Data.SO_UIInfo
-  uiName: 5
+  uiName: 0
   addressableKey: Assets/02.Prefabs/UI/PausePanel_UI.prefab
   uiType: 2
   sortOrder: 0
-  isUsedObjectPooling: 1
-  expectedConcurrentCount: 1

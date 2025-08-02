@@ -9,11 +9,9 @@ namespace Game.Core.Event {
     /// </summary>
     public readonly struct UICreationEvent {
         public readonly UIName uiName;
-        public readonly UIType uiType;
         public readonly Action<GameObject> OnCreation; // 생성 되면 수행될 작업
-        public UICreationEvent(UIName name, UIType type, Action<GameObject> onCreatedHandle) {
+        public UICreationEvent(UIName name, Action<GameObject> onCreatedHandle) {
             uiName = name;
-            uiType = type;
             OnCreation = onCreatedHandle;
         }
     }
@@ -23,7 +21,12 @@ namespace Game.Core.Event {
     public readonly struct UICloseEvent {
         public readonly UIName uiName;
         public readonly GameObject uiObj;
-        public UICloseEvent(UIName name, GameObject obj) {
+        /// <summary>
+        /// UI Type이 HUD의 경우 다중 생성 UI로 obj를 넣어줘야함
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="obj"></param>
+        public UICloseEvent(UIName name, GameObject obj = null) {
             uiName = name;
             uiObj = obj;
         }
@@ -31,7 +34,7 @@ namespace Game.Core.Event {
 
     /// <summary>
     /// UI가 성공적으로 열렸을 때 발생하는 이벤트
-    /// </summary>
+    /// </summary>  
     public readonly struct UIOpenedNotificationEvent {
         public readonly UIName uiName;
         public readonly UIType uiType;
@@ -49,11 +52,9 @@ namespace Game.Core.Event {
     /// </summary>
     public readonly struct UIClosedNotificationEvent {
         public readonly UIName uiName;
-        public readonly UIType uiType;
 
-        public UIClosedNotificationEvent(UIName uiName, UIType uiType) {
+        public UIClosedNotificationEvent(UIName uiName) {
             this.uiName = uiName;
-            this.uiType = uiType;
         }
     }
 

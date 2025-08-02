@@ -5,8 +5,7 @@ using Game.Policies;
 using UnityEngine;
 using Zenject;
 
-namespace Game.Systems
-{
+namespace Game.Systems {
     /// <summary>
     /// Systems 계층 DI 바인딩
     /// </summary>
@@ -28,7 +27,7 @@ namespace Game.Systems
         }
 
         private void BindSystem() {
-            Container.Bind<IUpdater>().To<Updater>().FromNewComponentOnNewPrefab(new GameObject("Updater")).AsSingle();
+            Container.Bind<IUpdater>().To<Updater>().FromNewComponentOnNewGameObject().AsSingle();
 
             Container.BindInterfacesAndSelfTo<UISystem>().AsSingle();
 
@@ -55,7 +54,7 @@ namespace Game.Systems
             Container.Bind<IInputStrategy>().To<PCInputStrategy>().AsCached();
 #endif
             Container.BindInterfacesAndSelfTo<InputSystem>().AsCached();
- 
+
 
             Container.BindInterfacesAndSelfTo<GoldSystem>().AsCached();
         }

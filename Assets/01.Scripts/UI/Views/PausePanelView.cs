@@ -22,9 +22,10 @@ namespace Game.UI
             RefAssert();
 #endif
             Bind();
+        }
+        private void Start() {
             Resize();
         }
-
 
 #if UNITY_EDITOR
         // 검증
@@ -39,7 +40,11 @@ namespace Game.UI
 
         private void Resize() {
             RectTransform rect = GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(Screen.width, Screen.height);
+            // 앵커를 이용해 부모 전체 영역을 차지
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = Vector2.zero;
         }
 
         // UI 갱신

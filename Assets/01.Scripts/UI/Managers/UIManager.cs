@@ -40,31 +40,20 @@ namespace Game.UI
 
         public async void CreationEvent(UICreationEvent creationEvent) {
             GameDebug.Log($"{creationEvent.uiName} Creation Event 발생");
-            Transform tr;
-            switch (creationEvent.uiType) {
-                case UIType.Screen:
-                tr = await OpenScreenMoveToAnchorAsync<Transform>(creationEvent.uiName);
-                break;
-                case UIType.Popup:
-                tr = await OpenPopupMoveToAnchorAsync<Transform>(creationEvent.uiName);
-                break;
-                case UIType.HUD:
-                break;
-                case UIType.Overlay:
-                break;
-            }
+            Transform tr = await OpenUIMoveToAnchorAsync<Transform>(creationEvent.uiName);
+            creationEvent.OnCreation?.Invoke(tr.gameObject);
         }
 
         public void CloseEvent(UICloseEvent closeEvent) {
-            _viewModel.CloseUI(closeEvent.uiName, GameObject obj);
+            _viewModel.CloseUI(closeEvent.uiName, closeEvent.uiObj);
         }
 
 
         /// <summary>
         /// 생성 이동
         /// </summary>
-        public async UniTask<T> OpenScreenMoveToAnchorAsync<T>(UIName uiName) where T : Component {
-            T t = await OpenScreenAsync<T>(uiName);
+        public async UniTask<T> OpenUIMoveToAnchorAsync<T>(UIName uiName) where T : Component {
+            T t = await OpenUIAsync<T>(uiName);
             if(t == null) {
                 GameDebug.Log($"{uiName.ToString()} 생성 실패");
                 return t;
@@ -72,18 +61,7 @@ namespace Game.UI
             MoveToAnchor(uiName, t.transform);
             return t;
         }
-        /// <summary>
-        /// 생성 이동
-        /// </summary>
-        public async UniTask<T> OpenPopupMoveToAnchorAsync<T>(UIName uiName) where T : Component {
-            T t = await OpenPopupAsync<T>(uiName);
-            if (t == null) {
-                GameDebug.Log($"{uiName.ToString()} 생성 실패");
-                return t;
-            }
-            MoveToAnchor(uiName, t.transform);
-            return t;
-        }
+
 
         /// <summary>
         /// Anchor 위치로 이동
@@ -98,20 +76,13 @@ namespace Game.UI
 
 
         /// <summary>
-        /// Screen UI 열기
+        /// UI 열기
         /// </summary>
-        public async UniTask<T> OpenScreenAsync<T>(UIName uiName) where T : Component
+        public async UniTask<T> OpenUIAsync<T>(UIName uiName) where T : Component
         {
-            return await _viewModel.OpenScreenAsync<T>(uiName);
+            return await _viewModel.OpenUIAsync<T>(uiName);
         }
         
-        /// <summary>
-        /// Popup UI 열기
-        /// </summary>
-        public async UniTask<T> OpenPopupAsync<T>(UIName uiName) where T : Component
-        {
-            return await _viewModel.OpenPopupAsync<T>(uiName);
-        }
         
         /// <summary>
         /// UI 닫기

@@ -20,7 +20,7 @@ namespace Game.Models
                 case SceneName.Play:
                 BindPlayerModels();
                 BindGameModels();
-
+                BindPlaySceneModel();
                 break;
             }
             Debug.Log(GetType().Name + " Bind 완료");
@@ -42,10 +42,18 @@ namespace Game.Models
         }
 
         /// <summary>
+        /// 플레이 씬에서 사용하는 모델 바인딩
+        /// </summary>
+        private void BindPlaySceneModel() {
+            Container.Bind<HealthUIModel>().AsTransient();
+        }
+
+        /// <summary>
         /// 게임 관련 모델 바인딩
         /// </summary>
         private void BindGameModels() {
             Container.Bind<UIModel>().AsCached();
+            
         }
 
     }

@@ -13,7 +13,7 @@ namespace Game.ViewModels
         /// </summary>
         public void OnContinueButton() {
             GameTime.Resume();
-            EventBus.Publish<UICloseEvent>(new UICloseEvent(Core.UIName.PausePanel_UI));
+            EventBus.Publish<UICloseEvent>(new UICloseEvent(UIName.PausePanel_UI));
         }
 
     }

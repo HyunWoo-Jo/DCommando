@@ -8,130 +8,185 @@ using System.Collections.Generic;
 using Zenject;
 using Game.Core;
 using Game.Core.Event;
-using UnityEngine.PlayerLoop;
-namespace Game.Systems
-{
-    public class UISystem : IInitializable {
+using System;
+using System.Linq;
+using UnityEngine.UI;
 
-
-        [Inject] private readonly UIModel _uiModel;
+namespace Game.Systems {
+    /// <summary>
+    /// UI 관리하는 System
+    /// </summary>
+    [DefaultExecutionOrder(-50)]
+    public class UISystem {
         [Inject] private readonly IUIService _uiService;
         [Inject] private readonly SO_UIConfig _uiConfig;
 
-        // UI 관리
-        private readonly Dictionary<UIName, GameObject> _activeUIs = new();
-        private readonly List<UIName> _activePopups = new();
-
-        // UI 이벤트
-        public readonly Subject<UIName> OnScreenOpenedEvent = new();
-        public readonly Subject<UIName> OnPopupOpenedEvent = new();
-
-        // UI 부모 Transform들
-        private Transform _screenParent;
-        private Transform _popupParent;
-
+        private readonly Dictionary<UIName, GameObject> _instanceUIs = new(); // 일반 단일 생성 UI
+        private readonly Dictionary<UIName, List<GameObject>> _instanceHudUIs = new(); // 다중 생성 HUD UI
+        private readonly Dictionary<UIType, Transform> _instanceUIParents = new(); // UI 부모 
+        private Dictionary<UIName, UIType> _uiTypeMappingDict;// uiName mapping uiType
 
         #region Zenject 관리
+        [Inject]
         public void Initialize() {
-            SetupUIParents();
-            // Event는 View.UI_Manager를 통해 들어오도록 설정
+            SetupInstanceUIParents();
+            InitializeUIService();
         }
         #endregion
+
+        #region 초기화
         /// <summary>
-        /// 기본 UI Parents 생성
+        /// UIService에 InstanceUI 매핑 설정
         /// </summary>
-        private void SetupUIParents() {
-            var canvas = FindOrCreateCanvas();
-            _screenParent = CreateUILayer(canvas.transform, "Screens");
-            _popupParent = CreateUILayer(canvas.transform, "Popups");
+        private void InitializeUIService() {
+            var uiConfigDict = _uiConfig.GetUIDictionary();
+
+            // UI Name map addressablesKey
+            var instanceUIDict = uiConfigDict
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.addressableKey);
+            _uiService.Initialize(instanceUIDict);
+
+            // UiTypeMapping 생성
+            var uiTypeDict = uiConfigDict
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.uiType);
+            _uiTypeMappingDict = uiTypeDict;
         }
 
         /// <summary>
-        /// Object를 검색해 Main Canvas 등록
+        /// InstanceUI Type별 부모 Transform 생성
+        /// </summary>
+        private void SetupInstanceUIParents() {
+            var canvas = FindOrCreateCanvas();
+
+            _instanceUIParents[UIType.Screen] = CreateUILayer(canvas.transform, "Screen", 10);
+            _instanceUIParents[UIType.HUD] = CreateUILayer(canvas.transform, "HUD", 100);
+            _instanceUIParents[UIType.Popup] = CreateUILayer(canvas.transform, "Popup", 200);
+            _instanceUIParents[UIType.Overlay] = CreateUILayer(canvas.transform, "Overlay", 300);
+        }
+
+
+        /// <summary>
+        /// MainCanvas를 찾는 코드
         /// </summary>
         /// <returns></returns>
         private Canvas FindOrCreateCanvas() {
             var canvas = GameObject.FindFirstObjectByType<Canvas>();
             if (canvas == null) {
-                var canvasGO = new GameObject("Main_Canvas");
-                canvas = canvasGO.AddComponent<Canvas>();
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+               
             }
             return canvas;
         }
 
-        /// <summary>
-        /// Layer 생성
-        /// </summary>
-        /// <returns></returns>
-        private Transform CreateUILayer(Transform parent, string layerName) {
-            var layerGO = new GameObject(layerName);
-            layerGO.transform.SetParent(parent, false);
+        private Transform CreateUILayer(Transform parent, string layerName, int baseSortingOrder) {
+            var layerGO = new GameObject($"InstanceUI_{layerName}");
+            layerGO.transform.SetParent(parent, false);         
+            var layerCanvas = layerGO.AddComponent<Canvas>();
+            layerCanvas.overrideSorting = true;
+            layerCanvas.sortingOrder = baseSortingOrder;
+            layerGO.AddComponent<GraphicRaycaster>();
+
+            // Resize
+            RectTransform rect = layerGO.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = Vector2.zero;
             return layerGO.transform;
         }
+        #endregion
 
-
-        /// <summary>
-        /// UI Screen에 생성
-        /// </summary>
-
-        public async UniTask<T> OpenScreenAsync<T>(UIName uiName, int sortingOrder = -1) where T : Component {
-            var uiInfo = _uiConfig.GetUIInfo(uiName);
-            if (uiInfo == null) return null;
-
-            _uiModel.SetLoadingState(true);
-
-            var uiComponent = await _uiService.LoadUIAsync<T>(uiInfo.addressableKey);
-            if (uiComponent != null) {
-                uiComponent.transform.SetParent(_screenParent, false);
-                _activeUIs[uiName] = uiComponent.gameObject;
-                _uiModel.SetCurrentScreen(uiName);
-                SetSortOrder(uiComponent.gameObject, sortingOrder);
-                OnScreenOpenedEvent.OnNext(uiName);
+        #region InstanceUI 관리
+        private async UniTask<T> InstanceUI<T>(UIType type, UIName uiName) where T : Component {
+            if (_instanceUIs.ContainsKey(uiName)) {
+                GameDebug.LogError($"{uiName.ToString()} 중복 생성 불가능한 UI");
+                return null;
             }
-
-            _uiModel.SetLoadingState(false);
+            T uiComponent = await _uiService.LoadUIAsync<T>(uiName);
+            if (uiComponent != null) {
+                uiComponent.transform.SetParent(_instanceUIParents[type]);
+                _instanceUIs.Add(uiName, uiComponent.gameObject); // dict에 추가
+                EventBus.Publish(new UIOpenedNotificationEvent(uiName, type, uiComponent.gameObject));
+            }
             return uiComponent;
         }
 
-        /// <summary>
-        /// UI Popup에 생성
-        /// </summary>
-
-        public async UniTask<T> OpenPopupAsync<T>(UIName uiName, int sortingOrder = -1) where T : Component {
-            var uiInfo = _uiConfig.GetUIInfo(uiName);
-            if (uiInfo == null) return null;
-
-            var uiComponent = await _uiService.LoadUIAsync<T>(uiInfo.addressableKey);
+        private async UniTask<T> InstanceHudUI<T>(UIName uiName) where T : Component {
+            T uiComponent = await _uiService.LoadUIAsync<T>(uiName);
             if (uiComponent != null) {
-                uiComponent.transform.SetParent(_popupParent, false);
-                _activeUIs[uiName] = uiComponent.gameObject;
-                _activePopups.Add(uiName);
-                SetSortOrder(uiComponent.gameObject, sortingOrder);
-                OnPopupOpenedEvent.OnNext(uiName);
+                if (!_instanceHudUIs.ContainsKey(uiName)) _instanceHudUIs[uiName] = new List<GameObject>();
+                _instanceHudUIs[uiName].Add(uiComponent.gameObject); // Object 추가
+                uiComponent.transform.SetParent(_instanceUIParents[UIType.HUD]);
+                EventBus.Publish(new UIOpenedNotificationEvent(uiName, UIType.HUD, uiComponent.gameObject));
             }
-
+           
             return uiComponent;
         }
 
+
         /// <summary>
-        /// UI에 Order 추가
+        /// CloseUI 제거
         /// </summary>
-        /// <param name="sortingOrder"> -1 예외</param>
-        public void SetSortOrder(GameObject obj, int sortingOrder) {
-            if (sortingOrder == -1) return;
-            Canvas subCanvas = obj.GetComponent<Canvas>() ?? obj.AddComponent<Canvas>();
-            subCanvas.overrideSorting = true;
-            subCanvas.sortingOrder = sortingOrder;
+        /// <param name="uiName"></param>
+
+        private void CloseUI(UIName uiName) {
+            if (!_instanceUIs.TryGetValue(uiName, out var uiObj)) {
+                LogUINotFoundError();
+                return;
+            }
+            GameObject.Destroy(uiObj);
+            _instanceUIs.Remove(uiName);
+            _uiService.ReleaseUI(uiName);
+            EventBus.Publish(new UIClosedNotificationEvent(uiName));
         }
 
-        public void CloseUI(UIName uiName) {
-            if (_activeUIs.TryGetValue(uiName, out var uiObject)) {
-                _uiService.ReleaseUI(uiObject);
-                _activeUIs.Remove(uiName);
-                _activePopups.Remove(uiName);
+        /// <summary>
+        /// HUD ui 제거
+        /// </summary>
+        private void CloseHudUI(UIName uiName, GameObject hudUiObj) {
+            if (!_instanceHudUIs.ContainsKey(uiName)) {
+                LogUINotFoundError();
+                return;
+            }
+            _instanceHudUIs[uiName].Remove(hudUiObj);
+            GameObject.Destroy(hudUiObj);
+            EventBus.Publish(new UIClosedNotificationEvent(uiName));
+            if (_instanceHudUIs[uiName].Count <= 0) {
+                _uiService.ReleaseUI(uiName);
             }
         }
+
+        private void LogUINotFoundError() {
+            GameDebug.LogError("존재 하지 않는 UI 삭제 시도");
+        }
+        #endregion
+
+        #region 편의 메서드
+        /// <summary>
+        /// UI 생성 HUD 일경우 여러개 생성 가능
+        /// </summary>
+        public async UniTask<T> CreateUIAsync<T>(UIName uiName) where T : Component {
+            UIType type = _uiTypeMappingDict[uiName];
+            switch (type) {
+                case UIType.HUD:
+                return await InstanceHudUI<T>(uiName);
+                default:
+                return await InstanceUI<T>(type, uiName);
+            }
+        }
+
+        /// <summary>
+        /// UI 제거 hudUIObj가 존재할경우 찾아서 제거
+        /// </summary>
+        public void CloseUI(UIName uiName, GameObject hudUIObj = null) {
+            if (hudUIObj != null) {
+                // HUD UI 처리
+                CloseHudUI(uiName, hudUIObj);
+            } else {
+                // 일반 UI 처리
+                CloseUI(uiName);
+            }
+        }
+        #endregion
 
        
     }

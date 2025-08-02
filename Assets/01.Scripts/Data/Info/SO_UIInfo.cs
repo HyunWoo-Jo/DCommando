@@ -10,5 +10,4 @@ namespace Game.Data {
         public int sortOrder;          // 정렬 순서
 
     }
-
 }

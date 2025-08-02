@@ -14,25 +14,18 @@ namespace Game.ViewModels
         /// <summary>
         /// Screen UI 열기
         /// </summary>
-        public async UniTask<T> OpenScreenAsync<T>(UIName uiName) where T : Component
+        public async UniTask<T> OpenUIAsync<T>(UIName uiName) where T : Component
         {
-            return await _uiSystem.OpenScreenAsync<T>(uiName);
+            return await _uiSystem.CreateUIAsync<T>(uiName);
         }
 
-        /// <summary>
-        /// Popup UI 열기
-        /// </summary>
-        public async UniTask<T> OpenPopupAsync<T>(UIName uiName) where T : Component
-        {
-            return await _uiSystem.OpenPopupAsync<T>(uiName);
-        }
 
         /// <summary>
         /// UI 닫기
         /// </summary>
-        public void CloseUI(UIName uiName)
+        public void CloseUI(UIName uiName, GameObject hudUiObj = null)
         {
-            _uiSystem.CloseUI(uiName);
+            _uiSystem.CloseUI(uiName, hudUiObj);
         }
 
     }

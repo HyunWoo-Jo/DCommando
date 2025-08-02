@@ -63,7 +63,6 @@ namespace Game.Services {
         public async UniTask<GameObject> LoadUIGameObjectAsync(UIName uiName) {
             return await LoadDirectUIGameObjectAsync(uiName);
         }
-
         #endregion
 
         #region 직접 로드
@@ -114,6 +113,8 @@ namespace Game.Services {
                 throw;
             }
         }
+
+        
 
         #endregion
 
