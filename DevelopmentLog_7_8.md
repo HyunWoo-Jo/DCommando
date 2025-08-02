@@ -3,7 +3,8 @@
 - [2025-07-26 - 프로젝트 계층 구조 설계](#1) 
 - [2025-07-28 - Gold, Input, Move, UI Manager, DI 구현](#2)
 - [2025-07-29 - Event Bus, Crystal, Time Manager, GameDebug 구현](#3)
-- [2025.07.30 - Camera 구현](#4)
+- [2025-07-30 - Camera 구현](#4)
+- [2025-08-02 - Health UI 시스템, UISystem 수정](#5)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -378,4 +379,76 @@ flowchart TD
 - 이벤트 타입 처리
 - Policy 기반 검증
 
+---
+<a id=5><a/>
+# 📅 2025-08-02
+## 🎯 Health UI 시스템, UISystem 수정
+
+#### 1. Health UI 시스템 구현
+- **`HealthModel`**: R3 ReactiveProperty 기반 체력 관리, Factory 패턴
+- **`HealthViewModel`**: Model 데이터 UI 바인딩, 저체력 임계값 30% 처리  
+- **`HealthView`**: 월드 좌표 추적 HUD, DOTween 애니메이션, IHealthInjecter 구현
+- **`HealthComponent`**: EventBus UI 생성 요청, Model Factory 생성
+- **`IHealthInjecter`**: Health UI-Model 연결 계약 인터페이스
+- **기술 요소**: EventBus -> UIManager -> UIViewModel -> UISystem
+- **제한사항**: 저체력 30%, 부활 최소 체력 1
+
+#### 2. UISystem 수정
+- **`UISystem`**: UI 계층별 Canvas 관리, HUD 다중 생성 지원
+- **주요 특징**: HUD/Screen/Popup/Overlay 분리, EventBus 알림
+- **기술 요소**: Canvas Sorting Order -> 자동 부모 설정
+- **제한사항**: HUD 다중, 나머지 단일 생성
+
+---
+### Health UI 시스템 상세
+
+```mermaid
+flowchart TD
+    A[HealthComponent] --1.생성 요청--> B[HealthModel Factory]
+    B --> C[HealthModel]
+    A --2.Inject Model, Owner Tr--> D[EventBus UICreationEvent]
+    D --> E[UIManager]
+    E --3.System에 생성 요청<br>생성후 Inject--> I[HealthView]
+    I --4.생성요청<br>생성후 Inject--> J[HealthViewModel Factory]
+    J --> K[HealthViewModel]
+    I --> L[월드 좌표 추적]
+    I --> M[DOTween 애니메이션]
+```
+
+**주요 기능:**
+- 실시간 월드 좌표 추적 HUD UI
+- 체력 변화 DOTween 애니메이션 (변화량에 따른 지속시간)
+- 저체력/사망 상태별 색상 변경
+- Context Menu 테스트 기능
+
+**주요 구성 요소:**
+#### 1. HealthModel (Game.Models)
+- R3 ReactiveProperty로 체력 상태 관리
+- TakeDamage, Heal, Revive 메서드 제공
+- Factory 패턴으로 Zenject 생성
+
+#### 2. IHealthInjecter (Game.Core)
+- Health UI와 Model 연결 계약 인터페이스
+- HealthComponent에서 EventBus를 통해 호출
+- GameObject와 offset으로 UI 위치 설정
+
+#### 3. HealthViewModel (Game.ViewModels)
+- Model 데이터를 UI 바인딩용으로 변환
+- 체력 텍스트, 비율, 저체력 상태 관리
+- CompositeDisposable로 구독 관리
+
+#### 4. HealthView (Game.UI)
+- 월드 좌표 실시간 추적 HUD
+- DOTween 체력바 애니메이션
+- IHealthInjecter 구현으로 Model 주입
+
+#### 5. HealthComponent (Game.Systems)
+- EventBus로 UI 생성 요청
+- HealthModel Factory로 모델 생성
+- offset과 UI 사용 여부 설정
+
+---
+### 📋 다음 개발 예정 사항
+- Firebase Crystal 연동
+- Exp 시스템 구현
 ---
