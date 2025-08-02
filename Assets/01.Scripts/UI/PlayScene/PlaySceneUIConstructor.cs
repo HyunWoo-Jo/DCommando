@@ -8,7 +8,7 @@ namespace Game.UI {
     /// Play Scene
     /// </summary>
     public class PlaySceneUIConstructor : MonoBehaviour {
-        [SerializeField] private UI_Manager _manager;
+        [SerializeField] private UIManager _manager;
         private void Awake() {
 #if UNITY_EDITOR
             Assert.IsNotNull(_manager);

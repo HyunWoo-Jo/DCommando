@@ -14,14 +14,11 @@ namespace Game.UI
     /// UI 매니저 - ViewModel을 통한 UI 생성 및 관리
     /// 이 컴포넌트는 Main Cavnas에 달려야함
     /// </summary>
-    public class UI_Manager : MonoBehaviour
+    public class UIManager : MonoBehaviour
     {
         [Inject] private UIViewModel _viewModel;
 
-        private static UI_Manager _instance;
-        public static UI_Manager Instance => _instance;
-
-        private Dictionary<UIName, UIAnchor> _uiAnchorDictionary = new();
+        private Dictionary<UIName, Vector3> _uiAnchorPosDictionary = new();
 
         private readonly CompositeDisposable _disposables = new();
 
@@ -30,8 +27,10 @@ namespace Game.UI
             var anchorList = GetComponentsInChildren<UIAnchor>();
 
             foreach (var anchor in anchorList) {
-                _uiAnchorDictionary.Add(anchor.Ui_Name, anchor);
+                _uiAnchorPosDictionary.Add(anchor.Ui_Name, anchor.transform.position);
+                Destroy(anchor.gameObject);
             }
+           
             _disposables.Add(EventBus.Subscribe<UICreationEvent>(CreationEvent));
             _disposables.Add(EventBus.Subscribe<UICloseEvent>(CloseEvent));
         }
@@ -57,8 +56,7 @@ namespace Game.UI
         }
 
         public void CloseEvent(UICloseEvent closeEvent) {
-            _viewModel.CloseUI(closeEvent.uiName);
-
+            _viewModel.CloseUI(closeEvent.uiName, GameObject obj);
         }
 
 
@@ -93,8 +91,8 @@ namespace Game.UI
         /// <param name="uiName"></param>
         /// <param name="pos"></param>
         public void MoveToAnchor(UIName uiName, Transform pos) {
-            if(_uiAnchorDictionary.TryGetValue(uiName, out var ancher)) {
-                pos.position = ancher.AnchorTransform.position;
+            if(_uiAnchorPosDictionary.TryGetValue(uiName, out var anchorPos)) {
+                pos.position = anchorPos;
             }
         }
 
@@ -118,9 +116,9 @@ namespace Game.UI
         /// <summary>
         /// UI 닫기
         /// </summary>
-        public void CloseUI(UIName uiName)
+        public void CloseUI(UIName uiName, GameObject uiObj)
         {
-            _viewModel.CloseUI(uiName);
+            _viewModel.CloseUI(uiName, uiObj);
         }
 
     }
