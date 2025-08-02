@@ -57,11 +57,10 @@ namespace Game.Systems {
         /// </summary>
         private void SetupInstanceUIParents() {
             var canvas = FindOrCreateCanvas();
-
-            _instanceUIParents[UIType.Screen] = CreateUILayer(canvas.transform, "Screen", 10);
-            _instanceUIParents[UIType.HUD] = CreateUILayer(canvas.transform, "HUD", 100);
-            _instanceUIParents[UIType.Popup] = CreateUILayer(canvas.transform, "Popup", 200);
-            _instanceUIParents[UIType.Overlay] = CreateUILayer(canvas.transform, "Overlay", 300);
+            _instanceUIParents[UIType.HUD] = CreateUILayer(canvas.transform, "HUD", 10, false);
+            _instanceUIParents[UIType.Screen] = CreateUILayer(canvas.transform, "Screen", 200);
+            _instanceUIParents[UIType.Popup] = CreateUILayer(canvas.transform, "Popup", 300);
+            _instanceUIParents[UIType.Overlay] = CreateUILayer(canvas.transform, "Overlay", 400);
         }
 
 
@@ -77,13 +76,15 @@ namespace Game.Systems {
             return canvas;
         }
 
-        private Transform CreateUILayer(Transform parent, string layerName, int baseSortingOrder) {
+        private Transform CreateUILayer(Transform parent, string layerName, int baseSortingOrder, bool isRaycast = true) {
             var layerGO = new GameObject($"InstanceUI_{layerName}");
             layerGO.transform.SetParent(parent, false);         
             var layerCanvas = layerGO.AddComponent<Canvas>();
             layerCanvas.overrideSorting = true;
             layerCanvas.sortingOrder = baseSortingOrder;
-            layerGO.AddComponent<GraphicRaycaster>();
+
+            if(isRaycast)
+                layerGO.AddComponent<GraphicRaycaster>();
 
             // Resize
             RectTransform rect = layerGO.GetComponent<RectTransform>();

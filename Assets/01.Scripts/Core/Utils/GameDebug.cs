@@ -17,7 +17,7 @@ namespace Game.Core {
         [Conditional("UNITY_EDITOR")]
         [Conditional("DEVELOPMENT_BUILD")]
         public static void LogWarning(object message) {
-            Debug.LogWarning(message);
+            Debug.LogWarning(message); 
         }
         [Conditional("UNITY_EDITOR")]
         [Conditional("DEVELOPMENT_BUILD")]

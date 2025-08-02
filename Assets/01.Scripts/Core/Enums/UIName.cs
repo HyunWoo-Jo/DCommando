@@ -10,6 +10,7 @@ namespace Game.Core
         Crystal_UI,
         Pause_UI,
         PausePanel_UI,
+        Health_UI,
 
     }
 }

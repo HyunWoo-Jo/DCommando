@@ -46,7 +46,7 @@ namespace Game.ViewModels {
             Container.BindInterfacesAndSelfTo<GoldViewModel>().AsCached();
             Container.BindInterfacesAndSelfTo<PausePanelViewModel>().AsCached();
 
-            Container.BindInterfacesAndSelfTo<HealthUIViewModel>().AsTransient();
+            Container.BindFactory<HealthViewModel, HealthViewModel.Factory>();
         }
 
 

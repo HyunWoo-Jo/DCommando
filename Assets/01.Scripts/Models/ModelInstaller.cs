@@ -45,7 +45,7 @@ namespace Game.Models
         /// 플레이 씬에서 사용하는 모델 바인딩
         /// </summary>
         private void BindPlaySceneModel() {
-            Container.Bind<HealthUIModel>().AsTransient();
+            Container.BindFactory<HealthModel, HealthModel.Factory>();
         }
 
         /// <summary>

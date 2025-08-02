@@ -18113,6 +18113,7 @@ GameObject:
   - component: {fileID: 3868037426147064725}
   - component: {fileID: 1581651869253807354}
   - component: {fileID: 7735736051104636708}
+  - component: {fileID: 7735736051104636709}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -18135,6 +18136,20 @@ MonoBehaviour:
   _characterMoveData:
     moveSpeed: 3
     rotationSpeed: 20
+--- !u!114 &7735736051104636709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7735736051104636707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15eb0b66593180a439aae621c9bf1b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Systems::Game.Systems.HealthComponent
+  _offset: {x: 0, y: 1}
+  _isUseUI: 1
 --- !u!1 &7753701071391436217
 GameObject:
   m_ObjectHideFlags: 0

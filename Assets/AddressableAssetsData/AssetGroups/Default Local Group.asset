@@ -40,6 +40,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4a2a23b8d743f54988cefac19c5f769
+    m_Address: Assets/02.Prefabs/UI/Health_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 57fa845417da2bf4f9ae32ecf3336972, type: 2}
   m_SchemaSet:
