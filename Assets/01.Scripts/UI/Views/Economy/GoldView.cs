@@ -17,15 +17,10 @@ namespace Game.UI
         [Header("UI 컴포넌트")]
         [SerializeField] private TextMeshProUGUI _goldText;
 
-#if UNITY_EDITOR
-        [SerializeField] private Button _testAddButton;
-        [SerializeField] private Button _testSpendButton;
-#endif
 
         private void Awake() {
 #if UNITY_EDITOR // Assertion
             RefAssert();
-            TestBind();
 #endif
 
         }
@@ -61,24 +56,22 @@ namespace Game.UI
 
 
 #if UNITY_EDITOR
-        private void TestBind() {
-            // 버튼 이벤트 바인딩
-            _testAddButton?.onClick.AddListener(() => OnTestAddGoldClicked());
-            _testSpendButton?.onClick.AddListener(() => OnTestSpendGoldClicked());
-        }
+
 
         /// <summary>
         /// Test용 
         /// </summary>
+        [ContextMenu("AddGold 100")]
         private void OnTestAddGoldClicked()
         {
              _viewModel.AddGold(100);
         }
-        
+        [ContextMenu("SendGold 50")]
         private void OnTestSpendGoldClicked()
         {
              _viewModel.SpendGold(50);
         }
+
 #endif
       
     }

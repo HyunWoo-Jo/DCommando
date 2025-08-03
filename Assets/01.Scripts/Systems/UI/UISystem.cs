@@ -17,7 +17,7 @@ namespace Game.Systems {
     /// UI 관리하는 System
     /// </summary>
     [DefaultExecutionOrder(-50)]
-    public class UISystem {
+    public class UISystem : IDisposable {
         [Inject] private readonly IUIService _uiService;
         [Inject] private readonly SO_UIConfig _uiConfig;
 
@@ -31,6 +31,30 @@ namespace Game.Systems {
         public void Initialize() {
             SetupInstanceUIParents();
             InitializeUIService();
+        }
+       
+        public void Dispose() {
+            // 일반 단일 생성 UI 제거
+            foreach (var kvp in _instanceUIs) {
+                if (kvp.Value != null) {
+                    UnityEngine.Object.Destroy(kvp.Value);
+                }
+            }
+            _instanceUIs.Clear();
+
+            // 다중 생성 HUD UI 제거
+            foreach (var kvp in _instanceHudUIs) {
+                if (kvp.Value != null) {
+                    foreach (var gameObject in kvp.Value) {
+                        if (gameObject != null) {
+                            UnityEngine.Object.Destroy(gameObject);
+                        }
+                    }
+                    kvp.Value.Clear();
+                }
+            }
+            _instanceHudUIs.Clear();
+            _uiService.ReleaseAll();
         }
         #endregion
 
@@ -190,6 +214,6 @@ namespace Game.Systems {
         }
         #endregion
 
-       
+
     }
 }

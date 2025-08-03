@@ -27,13 +27,20 @@ namespace Game.Systems {
         }
 
         private void BindSystem() {
-            Container.Bind<IUpdater>().To<Updater>().FromNewComponentOnNewGameObject().AsSingle();
 
-            Container.BindInterfacesAndSelfTo<UISystem>().AsSingle();
+            GameObject obj = new GameObject("Systems");
 
-            Container.BindInterfacesAndSelfTo<CameraSystem>().AsSingle();
+            DontDestroyOnLoad(obj);
 
-            Container.BindInterfacesAndSelfTo<CrystalSystem>().AsSingle();
+            Container.Bind<GameInitSystem>().FromNewComponentOn(obj).AsSingle().NonLazy();
+
+            Container.Bind<IUpdater>().To<Updater>().FromNewComponentOn(obj).AsSingle().NonLazy();
+
+            Container.BindInterfacesAndSelfTo<UISystem>().AsSingle().NonLazy();
+
+            Container.BindInterfacesAndSelfTo<CameraSystem>().AsSingle().NonLazy();
+
+            Container.BindInterfacesAndSelfTo<CrystalSystem>().AsSingle().NonLazy();
         }
 
         /// <summary>

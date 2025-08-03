@@ -28,6 +28,8 @@ namespace Game.Services
         /// 네트워크 서비스 바인딩
         /// </summary>
         private void BindNetworkServices() {
+            Container.Bind<INetworkService>().To<FirebaseService>().AsSingle().NonLazy();
+
             Container.Bind<ICrystalService>().To<CrystalService>().AsSingle();
             Container.Bind<IGoldService>().To<GoldService>().AsSingle();
         }
