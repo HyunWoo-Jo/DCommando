@@ -5,6 +5,7 @@
 - [2025-07-29 - Event Bus, Crystal, Time Manager, GameDebug 구현](#3)
 - [2025-07-30 - Camera 구현](#4)
 - [2025-08-02 - Health UI 시스템, UISystem 수정](#5)
+- [2025-08-03 -  Firebase 통신, 크리스탈, 경험치 시스템 구현](#6)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -380,7 +381,7 @@ flowchart TD
 - Policy 기반 검증
 
 ---
-<a id=5><a/>
+<a id=5></a>
 # 📅 2025-08-02
 ## 🎯 Health UI 시스템, UISystem 수정
 
@@ -451,4 +452,68 @@ flowchart TD
 ### 📋 다음 개발 예정 사항
 - Firebase Crystal 연동
 - Exp 시스템 구현
+---
+<a id=6></a>
+# 📅 2025-08-03
+## 🎯 Firebase 통신, 크리스탈, 경험치 시스템 구현
+
+#### 1. Firebase 통신 시스템 구현
+- **`FirebaseService`**: Firebase Database 연동 및 크리스탈 데이터 관리
+- **주요 특징**: 게스트 계정 자동 생성, 실시간 토큰 검증
+- **기술 요소**: UniTask 비동기 처리 -> JsonUtility 직렬화
+- **제한사항**: 30초 연결 타임아웃, 음수 방지 로직
+
+#### 2. 네트워크 서비스 인터페이스 구현  
+- **`INetworkService`**: Firebase 서비스 추상화 인터페이스
+- **특징**: IsReady 상태 관리, WaitUntilReadyAsync 대기 메서드
+- **기술 요소**: 의존성 분리 -> 테스트 가능한 구조
+
+#### 3. 크리스탈 서비스 구현
+- **`CrystalService`**: 무료/유료 크리스탈 분리 관리  
+- **주요 기능**: AddFreeCrystal, AddPaidCrystal, SpendCrystal, LogCrystal
+- **기술 요소**: Firebase 연동 -> 로그 시스템 통합
+- **제한사항**: 네트워크 연결 필수, 실패시 false 반환
+
+#### 4. 경험치 시스템 구현
+- **`ExpSystem`**: 경험치 획득, 레벨업, 최대레벨 처리
+- **특징**: 연속 레벨업 지원, 초과 경험치 자동 계산
+- **기술 요소**: EventBus 이벤트 -> 외부 시스템 연동
+- **제한사항**: 최대 레벨 100, 설정 기반 경험치 공식
+
+#### 5. 경험치 이벤트 시스템 구현
+- **`ExpEvents`**: ExpGainedEvent, LevelUpEvent, MaxLevelReachedEvent 등
+- **특징**: readonly struct 구조, 불변성 보장
+- **기술 요소**: EventBus 패턴 -> 시스템간 느슨한 결합
+
+---
+### 경험치 시스템 상세
+```mermaid
+flowchart LR
+    A[ExpRewardEvent] --> B[ExpSystem.GainExp]
+    B --> C{레벨업 가능?}
+    C -->|Yes| D[LevelUp 처리]
+    C -->|No| E[ExpChangedEvent]
+    D --> F[ExpGainedEvent]
+    D --> G[LevelUpEvent]
+    F --> H[ExpViewModel]
+    G --> H
+    E --> H
+    H --> I[ExpView UI 업데이트]
+```
+
+**주요 기능:**
+- 외부 이벤트 기반 경험치 획득 (몬스터 처치, 퀘스트 완료 등)
+- 연속 레벨업 지원으로 대량 경험치 처리 가능
+- 초과 경험치 자동 이월 및 최대레벨 도달시 경험치 0 고정
+- DOTween 기반 레벨업 애니메이션 (경험치바 채우기 → 초기화 → 새 레벨 표시)
+
+**주요 구성 요소:**
+#### 1. ExpModel (ReactiveProperty)
+- 현재 경험치, 레벨, 최대 경험치, 최대 레벨 관리
+#### 2. ExpSystem (비즈니스 로직)  
+- 경험치 획득, 레벨업 계산, 이벤트 발행
+#### 3. ExpViewModel (UI 바인딩)
+- 레벨 텍스트 포맷팅, 진행률 계산
+#### 4. ExpView (UI 표현)
+- 경험치바 애니메이션, 레벨업 시퀀스
 ---
