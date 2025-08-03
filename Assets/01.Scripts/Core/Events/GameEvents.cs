@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Game.Core {
+namespace Game.Core.Event {
 
     /// <summary>
     /// 게임 정지 이벤트

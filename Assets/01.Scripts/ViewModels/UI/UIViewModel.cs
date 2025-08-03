@@ -14,9 +14,9 @@ namespace Game.ViewModels
         /// <summary>
         /// Screen UI 열기
         /// </summary>
-        public async UniTask<T> OpenUIAsync<T>(UIName uiName) where T : Component
+        public async UniTask<T> OpenUIAsync<T>(int id, UIName uiName) where T : Component
         {
-            return await _uiSystem.CreateUIAsync<T>(uiName);
+            return await _uiSystem.CreateUIAsync<T>(id, uiName);
         }
 
 

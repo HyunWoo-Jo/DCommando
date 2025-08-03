@@ -31,8 +31,8 @@ namespace Game.UI
                 Destroy(anchor.gameObject);
             }
            
-            _disposables.Add(EventBus.Subscribe<UICreationEvent>(CreationEvent));
-            _disposables.Add(EventBus.Subscribe<UICloseEvent>(CloseEvent));
+            EventBus.Subscribe<UICreationEvent>(CreationEvent).AddTo(_disposables);
+            EventBus.Subscribe<UICloseEvent>(CloseEvent).AddTo(_disposables);
         }
         private void OnDestroy() {
             _disposables?.Dispose();
@@ -40,8 +40,7 @@ namespace Game.UI
 
         public async void CreationEvent(UICreationEvent creationEvent) {
             GameDebug.Log($"{creationEvent.uiName} Creation Event 발생");
-            Transform tr = await OpenUIMoveToAnchorAsync<Transform>(creationEvent.uiName);
-            creationEvent.OnCreation?.Invoke(tr.gameObject);
+            Transform tr = await OpenUIMoveToAnchorAsync<Transform>(creationEvent.id, creationEvent.uiName);
         }
 
         public void CloseEvent(UICloseEvent closeEvent) {
@@ -52,8 +51,8 @@ namespace Game.UI
         /// <summary>
         /// 생성 이동
         /// </summary>
-        public async UniTask<T> OpenUIMoveToAnchorAsync<T>(UIName uiName) where T : Component {
-            T t = await OpenUIAsync<T>(uiName);
+        public async UniTask<T> OpenUIMoveToAnchorAsync<T>(int id, UIName uiName) where T : Component {
+            T t = await OpenUIAsync<T>(id, uiName);
             if(t == null) {
                 GameDebug.Log($"{uiName.ToString()} 생성 실패");
                 return t;
@@ -78,9 +77,9 @@ namespace Game.UI
         /// <summary>
         /// UI 열기
         /// </summary>
-        public async UniTask<T> OpenUIAsync<T>(UIName uiName) where T : Component
+        public async UniTask<T> OpenUIAsync<T>(int id, UIName uiName) where T : Component
         {
-            return await _viewModel.OpenUIAsync<T>(uiName);
+            return await _viewModel.OpenUIAsync<T>(id, uiName);
         }
         
         

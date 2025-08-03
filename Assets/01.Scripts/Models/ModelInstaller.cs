@@ -39,6 +39,7 @@ namespace Game.Models
             Container.Bind<PlayerMoveModel>().AsCached();
             Container.Bind<InputModel>().AsCached();
             Container.Bind<GoldModel>().AsCached();   
+            Container.Bind<ExpModel>().AsCached();
         }
 
         /// <summary>

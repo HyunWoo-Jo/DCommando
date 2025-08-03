@@ -11,6 +11,6 @@ namespace Game.Core
         Pause_UI,
         PausePanel_UI,
         Health_UI,
-
+        Exp_UI,
     }
 }

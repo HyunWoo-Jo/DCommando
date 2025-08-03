@@ -61,6 +61,7 @@ namespace Game.Systems {
 
         private void BindPlayerSystem() {
             Container.BindInterfacesAndSelfTo<PlayerMoveSystem>().AsCached().NonLazy();
+            Container.Bind<ExpSystem>().AsCached().NonLazy();
         }
 
 

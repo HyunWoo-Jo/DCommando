@@ -43,24 +43,24 @@ namespace Game.UI
 
         private void Bind() {
             // 드래그 시작 감지 (StartPosition 변화)
-            _viewModel.StartPosition
+            _viewModel.RORP_StartPosition
                 .Skip(1) // 초기값 무시
                 .Where(pos => pos != Vector2.zero)
                 .Subscribe(OnInputStart)
                 .AddTo(this);
             
             // 드래그 방향 업데이트
-            _viewModel.DragDirection
+            _viewModel.RORP_DragDirection
                 .Subscribe(OnDragDirectionChanged)
                 .AddTo(this);
                 
             // 이동 상태에 따른 컨트롤러 표시/숨김
-            _viewModel.IsMoving
+            _viewModel.RORP_IsMoving
                 .Subscribe(OnMovingStateChanged)
                 .AddTo(this);
                 
             // 입력 타입 감지로 종료 감지
-            _viewModel.InputType
+            _viewModel.RORP_InputType
                 .Where(type => type == Core.InputType.End)
                 .Subscribe(_ => OnInputEnd())
                 .AddTo(this);
@@ -75,7 +75,7 @@ namespace Game.UI
         
         // 입력 종료 시
         private void OnInputEnd() {
-            if (!_viewModel.IsMoving.CurrentValue) {
+            if (!_viewModel.RORP_IsMoving.CurrentValue) {
                 _isControllerActive = false;
                 SetControllerVisibility(false);
                 ResetControllerPosition();

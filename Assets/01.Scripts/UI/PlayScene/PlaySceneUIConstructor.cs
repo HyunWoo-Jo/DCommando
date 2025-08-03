@@ -3,24 +3,20 @@ using Game.Core;
 using Zenject;
 using UnityEngine.Assertions;
 using Cysharp.Threading.Tasks;
+using Game.Core.Event;
 namespace Game.UI {
     /// <summary>
     /// Play Scene
     /// </summary>
     public class PlaySceneUIConstructor : MonoBehaviour {
-        [SerializeField] private UIManager _manager;
         private void Awake() {
-#if UNITY_EDITOR
-            Assert.IsNotNull(_manager);
-#endif
+            int id = gameObject.GetInstanceID();
             // UI 생성, 이동
-            _ = _manager.OpenUIMoveToAnchorAsync<GoldView>(UIName.Gold_UI);
-
-            _ = _manager.OpenUIMoveToAnchorAsync<CrystalView>(UIName.Crystal_UI);
-
-            _ = _manager.OpenUIMoveToAnchorAsync<ControllerView>(UIName.MoveController_UI);
-
-            _ = _manager.OpenUIMoveToAnchorAsync<PauseButtonUI>(UIName.Pause_UI);
+            EventBus.Publish(new UICreationEvent(id, UIName.Gold_UI));
+            EventBus.Publish(new UICreationEvent(id, UIName.Crystal_UI));
+            EventBus.Publish(new UICreationEvent(id, UIName.MoveController_UI));
+            EventBus.Publish(new UICreationEvent(id, UIName.Pause_UI));
+            EventBus.Publish(new UICreationEvent(id, UIName.Exp_UI));
         }
     }
 

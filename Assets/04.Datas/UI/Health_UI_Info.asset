@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.SO_UIInfo
   uiName: 6
   addressableKey: Assets/02.Prefabs/UI/Health_UI.prefab
-  uiType: 2
+  uiType: 3
   sortOrder: 0

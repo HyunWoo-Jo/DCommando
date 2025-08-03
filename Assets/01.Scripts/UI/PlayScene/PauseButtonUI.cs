@@ -14,7 +14,7 @@ namespace Game.UI {
 
         private void OnPause() {
             GameTime.Pause();
-            EventBus.Publish(new UICreationEvent(UIName.PausePanel_UI, null));
+            EventBus.Publish(new UICreationEvent(gameObject.GetInstanceID(), UIName.PausePanel_UI));
         }
     }
 }

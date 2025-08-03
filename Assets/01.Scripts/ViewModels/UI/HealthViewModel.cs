@@ -1,4 +1,4 @@
-using R3;
+﻿using R3;
 using System;
 using Zenject;
 using Game.Models;
@@ -10,27 +10,23 @@ namespace Game.ViewModels {
         public class Factory : PlaceholderFactory<HealthViewModel> { }
 
         private HealthModel _healthModel; // 외부에서 주입
-
         // 상수
         private const float LOW_HEALTH_THRESHOLD = 0.3f;
 
-        // ReactiveProperty: R
-        private readonly ReactiveProperty<string> RP_healthText = new();
-        private readonly ReactiveProperty<float> RP_healthRatio = new();
-        private readonly ReactiveProperty<bool> RP_isLowHealth = new();
+        // Model 데이터 직접 노출
+        public ReadOnlyReactiveProperty<int> RORP_CurrentHp => _healthModel?.RORP_CurrentHp;
+        public ReadOnlyReactiveProperty<int> RORP_MaxHp => _healthModel?.RORP_MaxHp;
+        public ReadOnlyReactiveProperty<bool> RORP_IsDead => _healthModel?.RORP_IsDead;
+        public bool IsDead => _healthModel?.RORP_IsDead.CurrentValue ?? false;
+        public float HpRatio => _healthModel?.GetHpRatio() ?? 0f;
 
         // 읽기 전용 프로퍼티
-        public ReadOnlyReactiveProperty<string> HealthText => RP_healthText;
-        public ReadOnlyReactiveProperty<float> HealthRatio => RP_healthRatio;
-        public ReadOnlyReactiveProperty<bool> IsLowHealth => RP_isLowHealth;
-
-        // Model의 데이터를 직접 노출
-        public ReadOnlyReactiveProperty<int> CurrentHp => _healthModel?.RORP_CurrentHp;
-        public ReadOnlyReactiveProperty<int> MaxHp => _healthModel?.RORP_MaxHp;
-        public ReadOnlyReactiveProperty<bool> IsDead => _healthModel?.RORP_IsDead;
+        public ReadOnlyReactiveProperty<string> RORP_HealthText { get; private set; }
+        public ReadOnlyReactiveProperty<float> RORP_HealthRatio { get; private set; }
+        public ReadOnlyReactiveProperty<bool> RORP_IsLowHealth { get; private set; }
 
 
-        private CompositeDisposable _compositeDisposable = new();
+        private CompositeDisposable _disposable = new();
 
         // 초기화 HealthView에서 호출
         public void Initialize(object healthModel) {
@@ -40,36 +36,44 @@ namespace Game.ViewModels {
                 GameDebug.LogError("healthModel에 잘못된 Model을 넣었습니다.");
             }
 
-            // 데이터 변화 구독
-            SubscribeToHealthChanges();
+            // 체력 텍스트 변경
+            RORP_HealthText = Observable.CombineLatest(
+                    _healthModel.RORP_CurrentHp,
+                    _healthModel.RORP_MaxHp,
+                    (current, max) => FormatHealthText(current, max))
+                .ThrottleLastFrame(1)
+                .ToReadOnlyReactiveProperty()
+                .AddTo(_disposable);
 
-            // 초기 UI 업데이트
-            UpdateUI();
+            // 체력 비율 변경
+            RORP_HealthRatio = Observable.CombineLatest(
+                    _healthModel.RORP_CurrentHp,
+                    _healthModel.RORP_MaxHp,
+                    (current, max) => HpRatio)
+                .ThrottleLastFrame(1)
+                .ToReadOnlyReactiveProperty()
+                .AddTo(_disposable);
+
+            // 저체력 상태 변경
+            RORP_IsLowHealth = Observable.CombineLatest(
+                    _healthModel.RORP_CurrentHp,
+                    _healthModel.RORP_MaxHp,
+                    _healthModel.RORP_IsDead,
+                    (current, max, isDead) => CalculateIsLowHealth(current, max, isDead))
+                .ThrottleLastFrame(1)
+                .ToReadOnlyReactiveProperty()
+                .AddTo(_disposable);
         }
         // 해제 HealthView에서 호출
         public void Dispose() {
-            _compositeDisposable?.Dispose();
+            _disposable?.Dispose();
         }
 
-        // 체력 변화 구독
-        private void SubscribeToHealthChanges() {
-            // 현재 체력 변화 구독
-            _healthModel.RORP_CurrentHp
-                .Subscribe(_ => UpdateUI())
-                .AddTo(_compositeDisposable);
 
-            // 최대 체력 변화 구독
-            _healthModel.RORP_MaxHp.
-                Subscribe(_ => UpdateUI())
-                .AddTo(_compositeDisposable);
 
-            // 사망 상태 변화 구독
-            _healthModel.RORP_IsDead
-                .Subscribe(_ => UpdateUI())
-                .AddTo(_compositeDisposable);
-        }
-
-        // Model 메서드 위임
+        /// <summary>
+        /// Model 메서드 위임
+        /// </summary>
         public void TakeDamage(int damage) {
             _healthModel?.TakeDamage(damage);
         }
@@ -90,33 +94,23 @@ namespace Game.ViewModels {
             _healthModel?.Revive(reviveHp);
         }
 
-        public float GetHpRatio() {
-            return _healthModel?.GetHpRatio() ?? 0f;
+        /// <summary>
+        /// 체력 텍스트 포맷팅
+        /// </summary>
+        private string FormatHealthText(int current, int max) {
+            return $"{current}/{max}";
         }
 
-        // UI 업데이트
-        private void UpdateUI() {
-            if (_healthModel == null) return;
+        /// <summary>
+        /// 저체력 상태 계산
+        /// </summary>
+        private bool CalculateIsLowHealth(int current, int max, bool isDead) {
+            if (isDead || current <= 0 || max <= 0) return false;
 
-            var current = _healthModel.RORP_CurrentHp.CurrentValue;
-            var max = _healthModel.RORP_MaxHp.CurrentValue;
-            var ratio = _healthModel.GetHpRatio();
-
-            // 체력 텍스트 업데이트
-            RP_healthText.Value = $"{current}/{max}";
-
-            // 체력 비율 업데이트
-            RP_healthRatio.Value = ratio;
-
-            // 저체력 상태 업데이트
-            RP_isLowHealth.Value = ratio <= LOW_HEALTH_THRESHOLD && current > 0 && !_healthModel.RORP_IsDead.CurrentValue;
+            float ratio = (float)current / max;
+            return ratio <= LOW_HEALTH_THRESHOLD;
         }
 
-        // 데이터 변경 알림
-        public void Notify() {
-            UpdateUI();
-        }
 
-       
     }
 }

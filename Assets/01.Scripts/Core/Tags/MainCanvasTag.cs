@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace Game.Core
 {
     /// <summary>
-    /// MainCanvas¸¦ ³ªÅ¸³»´Â ÅÂ±×
+    /// MainCanvasë¥¼ ë‚˜íƒ€ë‚´ëŠ” íƒœê·¸
     /// </summary>
     public class MainCanvasTag : MonoBehaviour {
 

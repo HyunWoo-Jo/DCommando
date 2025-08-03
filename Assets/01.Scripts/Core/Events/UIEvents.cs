@@ -8,11 +8,11 @@ namespace Game.Core.Event {
     /// UI 생성 요청 이벤트
     /// </summary>
     public readonly struct UICreationEvent {
+        public readonly int id;
         public readonly UIName uiName;
-        public readonly Action<GameObject> OnCreation; // 생성 되면 수행될 작업
-        public UICreationEvent(UIName name, Action<GameObject> onCreatedHandle) {
+        public UICreationEvent(int id, UIName name) {
+            this.id = id;
             uiName = name;
-            OnCreation = onCreatedHandle;
         }
     }
     /// <summary>
@@ -36,11 +36,13 @@ namespace Game.Core.Event {
     /// UI가 성공적으로 열렸을 때 발생하는 이벤트
     /// </summary>  
     public readonly struct UIOpenedNotificationEvent {
+        public readonly int id; // 누가 발행한 이벤트인지
         public readonly UIName uiName;
         public readonly UIType uiType;
         public readonly GameObject uiObject;
 
-        public UIOpenedNotificationEvent(UIName uiName, UIType uiType, GameObject uiObject) {
+        public UIOpenedNotificationEvent(int id,UIName uiName, UIType uiType, GameObject uiObject) {
+            this.id = id;
             this.uiName = uiName;
             this.uiType = uiType;
             this.uiObject = uiObject;

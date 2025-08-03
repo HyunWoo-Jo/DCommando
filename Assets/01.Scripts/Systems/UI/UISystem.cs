@@ -59,8 +59,9 @@ namespace Game.Systems {
             var canvas = FindOrCreateCanvas();
             _instanceUIParents[UIType.HUD] = CreateUILayer(canvas.transform, "HUD", 10, false);
             _instanceUIParents[UIType.Screen] = CreateUILayer(canvas.transform, "Screen", 200);
-            _instanceUIParents[UIType.Popup] = CreateUILayer(canvas.transform, "Popup", 300);
-            _instanceUIParents[UIType.Overlay] = CreateUILayer(canvas.transform, "Overlay", 400);
+            _instanceUIParents[UIType.DynamicScreen] = CreateUILayer(canvas.transform, "DynamicScreen", 300);
+            _instanceUIParents[UIType.Popup] = CreateUILayer(canvas.transform, "Popup", 400);
+            _instanceUIParents[UIType.Overlay] = CreateUILayer(canvas.transform, "Overlay", 500);
         }
 
 
@@ -97,7 +98,7 @@ namespace Game.Systems {
         #endregion
 
         #region InstanceUI 관리
-        private async UniTask<T> InstanceUI<T>(UIType type, UIName uiName) where T : Component {
+        private async UniTask<T> InstanceUI<T>(int id, UIType type, UIName uiName) where T : Component {
             if (_instanceUIs.ContainsKey(uiName)) {
                 GameDebug.LogError($"{uiName.ToString()} 중복 생성 불가능한 UI");
                 return null;
@@ -106,18 +107,18 @@ namespace Game.Systems {
             if (uiComponent != null) {
                 uiComponent.transform.SetParent(_instanceUIParents[type]);
                 _instanceUIs.Add(uiName, uiComponent.gameObject); // dict에 추가
-                EventBus.Publish(new UIOpenedNotificationEvent(uiName, type, uiComponent.gameObject));
+                EventBus.Publish(new UIOpenedNotificationEvent(id, uiName, type, uiComponent.gameObject));
             }
             return uiComponent;
         }
 
-        private async UniTask<T> InstanceHudUI<T>(UIName uiName) where T : Component {
+        private async UniTask<T> InstanceHudUI<T>(int id, UIName uiName) where T : Component {
             T uiComponent = await _uiService.LoadUIAsync<T>(uiName);
             if (uiComponent != null) {
                 if (!_instanceHudUIs.ContainsKey(uiName)) _instanceHudUIs[uiName] = new List<GameObject>();
                 _instanceHudUIs[uiName].Add(uiComponent.gameObject); // Object 추가
                 uiComponent.transform.SetParent(_instanceUIParents[UIType.HUD]);
-                EventBus.Publish(new UIOpenedNotificationEvent(uiName, UIType.HUD, uiComponent.gameObject));
+                EventBus.Publish(new UIOpenedNotificationEvent(id, uiName, UIType.HUD, uiComponent.gameObject));
             }
            
             return uiComponent;
@@ -165,13 +166,13 @@ namespace Game.Systems {
         /// <summary>
         /// UI 생성 HUD 일경우 여러개 생성 가능
         /// </summary>
-        public async UniTask<T> CreateUIAsync<T>(UIName uiName) where T : Component {
+        public async UniTask<T> CreateUIAsync<T>(int id, UIName uiName) where T : Component {
             UIType type = _uiTypeMappingDict[uiName];
             switch (type) {
                 case UIType.HUD:
-                return await InstanceHudUI<T>(uiName);
+                return await InstanceHudUI<T>(id, uiName);
                 default:
-                return await InstanceUI<T>(type, uiName);
+                return await InstanceUI<T>(id, type, uiName);
             }
         }
 

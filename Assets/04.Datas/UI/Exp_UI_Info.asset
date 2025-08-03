@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8fa44bf124d6d1547925fc1bb6bc9d66, type: 3}
-  m_Name: PausePanel_UI_Info
+  m_Name: Exp_UI_Info
   m_EditorClassIdentifier: Game.Data::Game.Data.SO_UIInfo
-  uiName: 5
-  addressableKey: Assets/02.Prefabs/UI/PausePanel_UI.prefab
-  uiType: 1
+  uiName: 7
+  addressableKey: Assets/02.Prefabs/UI/Exp_UI.prefab
+  uiType: 0
   sortOrder: 0
