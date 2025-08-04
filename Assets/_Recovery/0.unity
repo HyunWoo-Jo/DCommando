@@ -335,7 +335,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1, y: -1168}
+  m_AnchoredPosition: {x: 252, y: 1170}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &478599416
@@ -18217,10 +18217,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15eb0b66593180a439aae621c9bf1b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Systems::Game.Systems.HealthComponent
-  _healthData:
-    maxHp: 40
-    currentHp: 40
-    isDead: 0
   _offset: {x: 0, y: 1}
   _isUseUI: 1
 --- !u!1 &7753701071391436217

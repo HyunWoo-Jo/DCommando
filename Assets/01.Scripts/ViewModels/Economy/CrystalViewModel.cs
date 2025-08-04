@@ -14,9 +14,13 @@ namespace Game.ViewModels
         [Inject] private SO_CrystalStyle _crystalStyle;
         
         private CompositeDisposable _disposables = new();
+        
+        // Model 
         public ReadOnlyReactiveProperty<int> RORP_TotalCrystal => _crystalModel.RORP_CurrentCrystal; 
         public ReadOnlyReactiveProperty<int> RORP_FreeCrystal => _crystalModel.RORP_FreeCrystal;
         public ReadOnlyReactiveProperty<int> RORP_PaidCrystal => _crystalModel.RORP_PaidCrystal;
+
+        // 내부 변환 데이터
         public ReadOnlyReactiveProperty<string> RORP_TotalCrystalDisplayText { get; private set; }
         public ReadOnlyReactiveProperty<string> RORP_FreeCrystalDisplayText { get; private set; }
         public ReadOnlyReactiveProperty<string> RORP_PaidCrystalDisplayText { get; private set; }
@@ -67,6 +71,12 @@ namespace Game.ViewModels
         /// Zenject에서 관리
         /// </summary>
         public void Dispose() {
+            RORP_TotalCrystalDisplayText?.Dispose();
+            RORP_FreeCrystalDisplayText?.Dispose();
+            RORP_PaidCrystalDisplayText?.Dispose();
+            RORP_TotalCrystalColor?.Dispose();
+            RORP_FreeCrystalColor?.Dispose();
+            RORP_PaidCrystalColor?.Dispose();
             _disposables?.Dispose();
             _disposables = null;
         }

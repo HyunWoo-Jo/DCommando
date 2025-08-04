@@ -1,147 +1,269 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using R3;
 using TMPro;
-using Game.ViewModels;
-using UnityEngine.Assertions;
-using Game.Core;
+using R3;
 using Zenject;
 using DG.Tweening;
 
-namespace Game.UI
-{
-    public class HealthView : MonoBehaviour, IHealthInjecter {
-        [Inject] private readonly HealthViewModel.Factory _viewModelFactory;
-        private HealthViewModel _viewModel; // 외부에서 주입
+using Game.ViewModels;
+using Game.Core;
 
-        [Header("Unity 레퍼")]
+namespace Game.UI.Views {
+    public class HealthView : MonoBehaviour, IHealthInitializable {
+        [Inject] private HealthViewModel _healthViewModel;
+
+        [Header("Unity 레퍼런스")]
         [SerializeField] private TextMeshProUGUI _healthText;
         [SerializeField] private Image _healthBarFill;
+        [SerializeField] private GameObject _healthBarObject;
+
+        [Header("색상 설정")]
         [SerializeField] private Color _normalHealthColor = Color.green;
-        [SerializeField] private Color _lowHealthColor = Color.red;
+        [SerializeField] private Color _lowHealthColor = Color.yellow;
+        [SerializeField] private Color _criticalHealthColor = Color.red;
         [SerializeField] private Color _deadHealthColor = Color.black;
+
+        [Header("애니메이션 설정")]
+        [SerializeField] private float _barAnimationDuration = 0.3f;
+        [SerializeField] private float _colorAnimationDuration = 0.2f;
+        [SerializeField] private Ease _animationEase = Ease.OutQuart;
 
         // Data
         private float _lastRatio = 1f;
-        private const float DURATION_SCALE = 6f;
-        // owner
+        private Color _lastColor;
+        private CompositeDisposable _disposables = new();
+
+        // Owner 정보
         private Transform _ownerTr;
         private Vector3 _uiOffset;
+        private int _ownerID;
+
+
+        // Tweens;
+        private Tween _lowHealthBlinkTween;
 
         /// <summary>
-        /// Systems.HealthComponent에서 EventBus를 통해 주입
+        /// HealthComponent에서 EventBus를 통해 주입
         /// </summary>
-        public void InjectHealth(object healthModel, GameObject obj, Vector2 offset) {
+        public void InitHealth(GameObject obj, Vector2 offset) {
             _ownerTr = obj.transform;
             _uiOffset = offset;
+            _ownerID = obj.GetInstanceID();
+            _lastColor = _normalHealthColor;
 
-            // UI 위치 변경 구독
+            // UI 위치 업데이트 구독
             Observable.EveryValueChanged(_ownerTr, tr => tr.position)
+                .Where(_ => _ownerTr != null)
                 .Subscribe(pos => UpdateWorldToScreen(pos))
-                .AddTo(this);
-                
+                .AddTo(_disposables);
 
-            // Model은 Systems.HealthComponent에서 생성
-            _viewModel = _viewModelFactory.Create(); // ViewModel 생성
-            _viewModel.Initialize(healthModel);
             Bind();
         }
-
         private void OnDestroy() {
-            _viewModel?.Dispose();
+            // 애니메이션 정리
+            
+            _healthBarFill?.DOKill();
+            _healthBarObject?.transform.DOKill();
+           
+            // 구독 정리
+            _disposables?.Dispose();
         }
 
         /// <summary>
-        /// UI 바인딩
+        /// 데이터 바인딩
         /// </summary>
         private void Bind() {
             // 체력 텍스트 바인딩
-            if (_healthText != null) {
-                _viewModel.RORP_HealthText
-                    .Subscribe(text => _healthText.text = text)
-                    .AddTo(this);
-            }
+            _healthViewModel.GetHealthDisplayTextProperty(_ownerID)?
+                .Subscribe(UpdateHealthText)
+                .AddTo(_disposables);
 
-            // 체력 바 바인딩
-            if (_healthBarFill != null) {
-                _viewModel.RORP_HealthRatio
-                    .Subscribe(AnimateHealthBar)
-                    .AddTo(this);
-            }
+            // 체력 비율 바인딩 (애니메이션)
+            _healthViewModel.GetHealthRatioProperty(_ownerID)?
+                .Subscribe(UpdateHealthBar)
+                .AddTo(_disposables);
 
-            // 저체력 상태에 따른 색상 변경
-            if (_healthBarFill != null) {
-                _viewModel.RORP_IsLowHealth
-                    .Subscribe(isLowHealth => UpdateHealthBarColor(isLowHealth))
-                    .AddTo(this);
-            }
+            // 체력 색상 바인딩 (부드러운 전환)
+            _healthViewModel.GetHealthRatioProperty(_ownerID)?
+                .Subscribe(UpdateHealthColor)
+                .AddTo(_disposables);
 
-            // 사망 상태에 따른 색상 변경
-            _viewModel.RORP_IsDead
-                .Subscribe(isDead => UpdateDeadState(isDead))
-                .AddTo(this);
+            // 사망 상태 바인딩
+            _healthViewModel.GetIsDeadProperty(_ownerID)?
+                .Subscribe(UpdateDeathState)
+                .AddTo(_disposables);
+
+            // 저체력 상태 바인딩 (추가 효과용)
+            _healthViewModel.GetLowHealthProperty(_ownerID)?
+                .Subscribe(UpdateLowHealthEffect)
+                .AddTo(_disposables);
+
+            // 알림 구독
+            _healthViewModel.OnHealthNotification
+                .Subscribe(OnHealthNotification)
+                .AddTo(_disposables);
         }
 
+        #region UI 업데이트 메서드
+        /// <summary>
+        /// 체력 텍스트 업데이트
+        /// </summary>
+        private void UpdateHealthText(string healthText) {
+            if (_healthText != null) {
+                _healthText.text = healthText;
+            }
+        }
 
         /// <summary>
-        /// 체력바 색상 업데이트
+        /// 체력 바 업데이트 (애니메이션)
         /// </summary>
-        private void UpdateHealthBarColor(bool isLowHealth) {
-            if (_healthBarFill != null && !_viewModel.IsDead) {
-                _healthBarFill.color = isLowHealth ? _lowHealthColor : _normalHealthColor;
+        private void UpdateHealthBar(float ratio) {
+            if (_healthBarFill == null) return;
+
+            // 애니메이션으로 부드럽게 변경
+            _healthBarFill.DOFillAmount(ratio, _barAnimationDuration)
+                .SetEase(_animationEase)
+                .OnComplete(() => _lastRatio = ratio);
+        }
+
+        /// <summary>
+        /// 체력 색상 업데이트 (부드러운 전환)
+        /// </summary>
+        private void UpdateHealthColor(float ratio) {
+            if (_healthBarFill == null) return;
+            Debug.Log(ratio);
+            // 추후 스타일로 변경
+            Color targetColor;
+            if (ratio == 0) {
+                targetColor = _deadHealthColor;
+            } else if (ratio <= 0.1f) {
+                targetColor = _criticalHealthColor;
+            } else if(ratio <= 0.3f) {
+                targetColor = _lowHealthColor;
+            } else {
+                targetColor = _normalHealthColor;
+            }
+
+            if (_lastColor != targetColor) {
+                // 색상 애니메이션
+                _healthBarFill.DOColor(targetColor, _colorAnimationDuration)
+                    .SetEase(_animationEase)
+                    .OnComplete(() => _lastColor = targetColor);
+                _lastColor = targetColor;
             }
         }
 
         /// <summary>
         /// 사망 상태 업데이트
         /// </summary>
-        private void UpdateDeadState(bool isDead) {
-            if (_healthBarFill != null && isDead) {
-                _healthBarFill.color = _deadHealthColor;
-            } else if (_healthBarFill != null && !isDead) {
-                // 사망 상태가 아닐 때는 저체력 상태에 따라 색상 결정
-                UpdateHealthBarColor(_viewModel.RORP_IsLowHealth.CurrentValue);
+        private void UpdateDeathState(bool isDead) {
+            if (_healthBarObject != null) {
+                // 사망 시 체력바 숨김 또는 특별한 표시
+                if (isDead) {
+                    _healthBarFill.color = _deadHealthColor;
+                    // 사망 애니메이션 (예: 페이드 아웃)
+                    _healthBarObject.transform.DOScale(0.8f, 0.3f)
+                        .SetEase(Ease.InBack);
+                } else {
+                    // 부활 시 원래 크기로
+                    _healthBarObject.transform.DOScale(1f, 0.3f)
+                        .SetEase(Ease.OutBack);
+                }
             }
         }
+
         /// <summary>
-        /// Tween 애니메이션 바
+        /// 저체력 효과 업데이트
         /// </summary>
-        private void AnimateHealthBar(float targetRatio) {
-            _healthBarFill.DOKill();
+        private void UpdateLowHealthEffect(bool isLowHealth) {
+            if (_healthBarFill == null) return;
 
-            float duration = Mathf.Abs(targetRatio - _lastRatio) * DURATION_SCALE;
-            Ease easeType = targetRatio < _lastRatio ? Ease.OutQuart : Ease.InOutQuad;
-
-            _healthBarFill.DOFillAmount(targetRatio, duration)
-                .SetEase(easeType)
-                .OnComplete(() => _lastRatio = targetRatio);
+            if (isLowHealth) {
+                // 저체력 시 깜빡이는 효과
+                _lowHealthBlinkTween = _healthBarFill.DOFade(0.5f, 0.5f)
+                    .SetLoops(-1, LoopType.Yoyo)
+                    .SetEase(Ease.InOutSine);
+            } else {
+                // 깜빡임 중지
+                _lowHealthBlinkTween?.Kill();
+                _healthBarFill.DOFade(1f, 0.2f);
+            }
         }
+
         /// <summary>
-        /// UI 위치 업데이트
+        /// 월드 좌표를 스크린 좌표로 변환
         /// </summary>
         private void UpdateWorldToScreen(Vector3 worldPos) {
+            if (Camera.main == null) return;
+
             Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos + _uiOffset);
             transform.position = screenPos;
         }
+        #endregion
 
+        #region 이벤트 핸들러
+        /// <summary>
+        /// 체력 알림 처리
+        /// </summary>
+        private void OnHealthNotification(string message) {
+            Debug.Log($"[HealthView {_ownerID}] {message}");
+        }
+        #endregion
+
+        #region 외부 인터페이스
+        /// <summary>
+        /// 데미지 처리
+        /// </summary>
+        public void TakeDamage(int damage) {
+            _healthViewModel.TakeDamage(_ownerID, damage);
+        }
+
+        /// <summary>
+        /// 치료 처리
+        /// </summary>
+        public void Heal(int healAmount) {
+            _healthViewModel.Heal(_ownerID, healAmount);
+        }
+
+        /// <summary>
+        /// 부활 처리
+        /// </summary>
+        public void Revive(int reviveHp = -1) {
+            _healthViewModel.Revive(_ownerID, reviveHp);
+        }
+
+        /// <summary>
+        /// 최대 체력 설정
+        /// </summary>
+        public void SetMaxHp(int maxHp) {
+            _healthViewModel.SetMaxHp(_ownerID, maxHp);
+        }
+        #endregion
+
+
+        #region 에디터 테스트 메서드
 #if UNITY_EDITOR
-        // 테스트용 메서드들 (Inspector에서 호출 가능)
-        [ContextMenu("Take Damage 10")]
+        [ContextMenu("Test Take Damage (10)")]
         private void TestTakeDamage() {
-            GameDebug.Log("Damage 10");
-            _viewModel?.TakeDamage(10);
+            TakeDamage(10);
         }
 
-        [ContextMenu("Heal 20")]
+        [ContextMenu("Test Heal (20)")]
         private void TestHeal() {
-            GameDebug.Log("Heal 20");
-            _viewModel?.Heal(20);
+            Heal(20);
         }
 
-        [ContextMenu("Revive")]
+        [ContextMenu("Test Revive")]
         private void TestRevive() {
-            _viewModel?.Revive();
+            Revive();
         }
+
+        [ContextMenu("Test Set Max HP (150)")]
+        private void TestSetMaxHp() {
+            SetMaxHp(150);
+        }
+
 #endif
+        #endregion
     }
 }

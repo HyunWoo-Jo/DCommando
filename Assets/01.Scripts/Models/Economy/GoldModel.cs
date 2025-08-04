@@ -1,15 +1,22 @@
 ﻿using R3;
-
+using System;
 namespace Game.Models
 {
-    public class GoldModel
+    public class GoldModel : IDisposable 
     {
         private readonly ReactiveProperty<int> RP_currentGold = new(0);
         private readonly ReactiveProperty<int> RP_maxGold = new(999999);
         
         public ReadOnlyReactiveProperty<int> RORP_CurrentGold => RP_currentGold;
         public ReadOnlyReactiveProperty<int> RORP_MaxGold => RP_maxGold;
-        
+
+
+        public void Dispose() {
+            RP_currentGold.Dispose();
+            RP_maxGold.Dispose();
+        }
+
+
         public void SetGold(int amount)
         {
             RP_currentGold.Value = amount;

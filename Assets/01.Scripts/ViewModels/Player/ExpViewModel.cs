@@ -24,9 +24,7 @@ namespace Game.ViewModels {
 
         private CompositeDisposable _disposable = new();
 
-        /// <summary>
-        /// 초기화 ExpView에서 호출 zenject에서 관리
-        /// </summary>
+        #region Zenject 에서 관리
         public void Initialize() {
             // 레벨 변경
             RORP_LevelText = _expModel.RORP_CurrentLevel
@@ -43,14 +41,13 @@ namespace Game.ViewModels {
                 .AddTo(_disposable);
         }
 
-        /// <summary>
-        /// 해제 zenject에서 관리
-        /// </summary>
-        public void Dispose() {
+        public void Dispose() { 
+            RORP_LevelText?.Dispose();
+            RORP_ExpProgress?.Dispose();
             _disposable?.Dispose();
         }
 
-
+        #endregion
 
         /// <summary>
         /// 다음 레벨까지 필요한 경험치 조회

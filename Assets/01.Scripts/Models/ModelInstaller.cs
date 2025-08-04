@@ -20,7 +20,7 @@ namespace Game.Models
                 case SceneName.Play:
                 BindPlayerModels();
                 BindGameModels();
-                BindPlaySceneModel();
+                BindCombatSceneModel();
                 break;
             }
             Debug.Log(GetType().Name + " Bind 완료");
@@ -28,32 +28,32 @@ namespace Game.Models
 
         // 전체에서 사용되는 바인딩
         private void BindModel() {
-            Container.Bind<CameraModel>().AsSingle();
-            Container.Bind<CrystalModel>().AsSingle();
+            Container.BindInterfacesAndSelfTo<CameraModel>().AsSingle();
+            Container.BindInterfacesAndSelfTo<CrystalModel>().AsSingle();
         }
 
         /// <summary>
         /// 플레이어 관련 모델 바인딩
         /// </summary>
         private void BindPlayerModels() {
-            Container.Bind<PlayerMoveModel>().AsCached();
-            Container.Bind<InputModel>().AsCached();
-            Container.Bind<GoldModel>().AsCached();   
-            Container.Bind<ExpModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<PlayerMoveModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<InputModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<GoldModel>().AsCached();   
+            Container.BindInterfacesAndSelfTo<ExpModel>().AsCached();
         }
 
         /// <summary>
-        /// 플레이 씬에서 사용하는 모델 바인딩
+        /// 전투 관련 모델 바인딩
         /// </summary>
-        private void BindPlaySceneModel() {
-            Container.BindFactory<HealthModel, HealthModel.Factory>();
+        private void BindCombatSceneModel() {
+            Container.BindInterfacesAndSelfTo<HealthModel>().AsCached();
         }
 
         /// <summary>
         /// 게임 관련 모델 바인딩
         /// </summary>
         private void BindGameModels() {
-            Container.Bind<UIModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<UIModel>().AsCached();
             
         }
 

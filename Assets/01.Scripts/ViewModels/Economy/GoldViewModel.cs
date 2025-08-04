@@ -22,6 +22,7 @@ namespace Game.ViewModels
         public ReadOnlyReactiveProperty<Color> RORP_GoldColor { get; private set; }
 
 
+        #region Zenject 관리
         public void Initialize() {
             RORP_GoldText = _goldModel.RORP_CurrentGold
                 .ThrottleLastFrame(1)
@@ -37,8 +38,12 @@ namespace Game.ViewModels
                 .AddTo(_disposables);
 
         }
-
-
+        public void Dispose() {
+            RORP_GoldText?.Dispose();
+            RORP_GoldColor?.Dispose();
+            _disposables?.Dispose();
+        }
+        #endregion
         public Color GetColorForAmount(int amount) => _goldStyle.GetColorForAmount(amount);
 
         public string FormatGoldAmount(int amount) => _goldStyle.FormatGoldAmount(amount);
@@ -57,9 +62,6 @@ namespace Game.ViewModels
             return _goldSystem.CanSpend(amount);
         }
 
-        // Zenject에서 관리
-        public void Dispose() {
-            _disposables?.Dispose();
-        }
+      
     }
 }

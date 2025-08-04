@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using R3;
+using System;
 namespace Game.Model {
-    public class CameraModel {
+    public class CameraModel : IDisposable {
         // Camera 상태
         private readonly ReactiveProperty<Vector3> RP_targetPosition = new();
         private readonly ReactiveProperty<float> RP_currentZoom = new();
@@ -9,6 +10,16 @@ namespace Game.Model {
         private readonly ReactiveProperty<Transform> RP_followTarget = new();
         private readonly ReactiveProperty<bool> RP_isShaking = new();
         private readonly ReactiveProperty<Vector3> RP_shakeOffset = new();
+
+        // Zenject에서 관리
+        public void Dispose() {
+            RP_targetPosition?.Dispose();
+            RP_currentZoom?.Dispose();
+            RP_isFollowing?.Dispose();
+            RP_followTarget?.Dispose();
+            RP_isShaking?.Dispose();
+            RP_shakeOffset?.Dispose();
+        }
 
         // Properties
         public ReadOnlyReactiveProperty<Vector3> RORP_TargetPosition => RP_targetPosition.ToReadOnlyReactiveProperty();
@@ -25,5 +36,7 @@ namespace Game.Model {
         public void SetFollowTarget(Transform target) => RP_followTarget.Value = target;
         public void SetShaking(bool isShaking) => RP_isShaking.Value = isShaking;
         public void SetShakeOffset(Vector3 offset) => RP_shakeOffset.Value = offset;
+
+        
     }
 }

@@ -2,13 +2,14 @@
 using R3;
 using System;
 using Game.Core;
+using Zenject;
 
 namespace Game.Models
 {
     /// <summary>
     /// Input 상태 모델
     /// </summary>
-    public class InputModel
+    public class InputModel : IDisposable
     {
         private readonly ReactiveProperty<InputType> RP_inputType = new(InputType.None, AlwaysFalseComparer<InputType>.Instance);
         private readonly ReactiveProperty<Vector2> RP_currentPosition = new(Vector2.zero);
@@ -25,22 +26,34 @@ namespace Game.Models
         public ReadOnlyReactiveProperty<float> RORP_DragDistance { get; private set; }
         
         private CompositeDisposable _disposables = new();
-        
-        public InputModel()
-        {
-            // 드래그 방향 계산
-             RORP_DragDirection = Observable.CombineLatest(RP_currentPosition, RP_startPosition)
+
+        #region Zenject 관리;
+        [Inject]
+        public void Initialize() {
+            RORP_DragDirection = Observable.CombineLatest(RP_currentPosition, RP_startPosition)
                 .Select(positions => (positions[0] - positions[1]).normalized)
                 .ToReadOnlyReactiveProperty()
                 .AddTo(_disposables);
-            
+
             // 드래그 거리 계산
             RORP_DragDistance = Observable.CombineLatest(RP_currentPosition, RP_startPosition)
                 .Select(positions => Vector2.Distance(positions[0], positions[1]))
                 .ToReadOnlyReactiveProperty()
                 .AddTo(_disposables);
         }
-        
+
+        public void Dispose() {
+            RP_inputType?.Dispose();
+            RP_currentPosition?.Dispose();
+            RP_startPosition?.Dispose();
+            RP_clickStartTime?.Dispose();
+
+            RORP_DragDirection?.Dispose();
+            RORP_DragDistance?.Dispose();
+            _disposables?.Dispose();
+        }
+        #endregion
+
         public void SetInputType(InputType inputType)
         {
             RP_inputType.Value = inputType;
@@ -66,9 +79,5 @@ namespace Game.Models
             return RP_clickStartTime.Value > 0 ? Time.time - RP_clickStartTime.Value : 0f;
         }
         
-        public void Dispose()
-        {
-            _disposables?.Dispose();
-        }
     }
 }

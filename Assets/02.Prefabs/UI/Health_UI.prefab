@@ -62,9 +62,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.UI::Game.UI.HealthView
   _healthText: {fileID: 0}
   _healthBarFill: {fileID: 3213637091499284667}
+  _healthBarObject: {fileID: 0}
   _normalHealthColor: {r: 1, g: 0.14503704, b: 0, a: 1}
   _lowHealthColor: {r: 0.5660378, g: 0.05161974, b: 0.05161974, a: 1}
+  _criticalHealthColor: {r: 0.28930807, g: 0, b: 0, a: 1}
   _deadHealthColor: {r: 0, g: 0, b: 0, a: 1}
+  _barAnimationDuration: 0.3
+  _colorAnimationDuration: 0.2
+  _animationEase: 12
 --- !u!1 &2309155706755007888
 GameObject:
   m_ObjectHideFlags: 0

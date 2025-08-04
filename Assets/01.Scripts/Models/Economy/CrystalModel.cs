@@ -1,11 +1,12 @@
 ﻿using R3;
+using System;
 
 namespace Game.Models
 {
     /// <summary>
     /// 크리스탈 재화 데이터 모델
     /// </summary>
-    public class CrystalModel
+    public class CrystalModel : IDisposable
     {
         private readonly ReactiveProperty<int> RP_currentCrystal = new(0);
         private readonly ReactiveProperty<int> RP_maxCrystal = new(9999999);
@@ -17,6 +18,14 @@ namespace Game.Models
         public ReadOnlyReactiveProperty<int> RORP_FreeCrystal => RP_freeCrystal;
         public ReadOnlyReactiveProperty<int> RORP_PaidCrystal => RP_paidCrystal;
         
+        // Zenject에서 관리
+        public void Dispose() {
+            RP_currentCrystal?.Dispose();
+            RP_maxCrystal?.Dispose();
+            RP_freeCrystal?.Dispose();
+            RP_paidCrystal?.Dispose();
+        }
+
         /// <summary>
         /// 크리스탈 설정 (전체)
         /// </summary>

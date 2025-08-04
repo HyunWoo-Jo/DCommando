@@ -14,13 +14,14 @@ namespace Game.Systems {
 
         public override void InstallBindings() {
             BindSystem();
+            BindCombatSystems();
             switch (_sceneName) {
                 case SceneName.MainLobby:
                 break;
                 case SceneName.Play:
                 BindInputStrategies();
                 BindGameplaySystems();
-                BindPlayerSystem();
+                BindPlayerSystems();
                 break;
             }
             Debug.Log(GetType().Name + " Bind 완료");
@@ -66,17 +67,17 @@ namespace Game.Systems {
             Container.BindInterfacesAndSelfTo<GoldSystem>().AsCached();
         }
 
-        private void BindPlayerSystem() {
+        private void BindPlayerSystems() {
             Container.BindInterfacesAndSelfTo<PlayerMoveSystem>().AsCached().NonLazy();
-            Container.Bind<ExpSystem>().AsCached().NonLazy();
+            Container.BindInterfacesAndSelfTo<ExpSystem>().AsCached().NonLazy();
         }
 
 
         /// <summary>
         /// 전투 시스템 바인딩
         /// </summary>
-        private void BindBattleSystems() {
-
+        private void BindCombatSystems() {
+            Container.BindInterfacesAndSelfTo<HealthSystem>().AsCached().NonLazy();
         }
 
     }

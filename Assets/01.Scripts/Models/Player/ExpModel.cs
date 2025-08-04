@@ -1,7 +1,7 @@
 ﻿using R3;
-
+using System;
 namespace Game.Models {
-    public class ExpModel {
+    public class ExpModel : IDisposable {
         private readonly ReactiveProperty<int> RP_currentExp = new(0);
         private readonly ReactiveProperty<int> RP_currentLevel = new(1);
         private readonly ReactiveProperty<int> RP_maxExp = new(100);
@@ -12,6 +12,15 @@ namespace Game.Models {
         public ReadOnlyReactiveProperty<int> RORP_MaxExp => RP_maxExp;
         public ReadOnlyReactiveProperty<int> RORP_MaxLevel => RP_maxLevel;
 
+        #region Zenject 관리
+        public void Dispose() {
+            RP_currentExp?.Dispose();
+            RP_currentLevel?.Dispose();
+            RP_maxExp?.Dispose();
+            RP_maxLevel?.Dispose();
+        }
+
+        #endregion
         public void SetExp(int amount) {
             RP_currentExp.Value = amount;
         }
