@@ -4,8 +4,9 @@
 - [2025-07-28 - Gold, Input, Move, UI Manager, DI 구현](#2)
 - [2025-07-29 - Event Bus, Crystal, Time Manager, GameDebug 구현](#3)
 - [2025-07-30 - Camera 구현](#4)
-- [2025-08-02 - Health UI 시스템, UISystem 수정](#5)
-- [2025-08-03 -  Firebase 통신, 크리스탈, 경험치 시스템 구현](#6)
+- [2025-08-02 - ~Health UI 시스템~ -> 중앙화, UISystem 수정](#5)
+- [2025-08-03 - Firebase 통신, 크리스탈, 경험치 시스템 구현](#6)
+- [2025-08-04 - Health System 중앙화 구현](#7)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -383,7 +384,7 @@ flowchart TD
 ---
 <a id=5></a>
 # 📅 2025-08-02
-## 🎯 Health UI 시스템, UISystem 수정
+## 🎯 ~Health UI 시스템~ -> 중앙화로 변경, UISystem 수정
 
 #### 1. Health UI 시스템 구현
 - **`HealthModel`**: R3 ReactiveProperty 기반 체력 관리, Factory 패턴
@@ -516,4 +517,70 @@ flowchart LR
 - 레벨 텍스트 포맷팅, 진행률 계산
 #### 4. ExpView (UI 표현)
 - 경험치바 애니메이션, 레벨업 시퀀스
+---
+<a id=7> </a>
+# 📅 2025-08-04
+## 🎯 Health System 중앙화 구현
+
+#### 1. HealthSystem 통합 구현
+- **`HealthSystem`**: 개별 ViewModel/Model을 하나의 중앙 시스템으로 통합
+- **변경사항**: 분산된 개별 관리 -> 단일 HealthSystem + HealthModel 구조
+- **기술 요소**: HealthSystem -> HealthModel -> CharacterEvents -> UI 동기화
+- **관리방식**: Dictionary 기반 다중 캐릭터 통합 관리
+
+#### 2. CharacterEvents 이벤트 드리븐 구현
+- **`CharacterEvents`**: 이벤트로 완전한 디커플링
+- **기술 요소**: 생명주기 -> 데미지/치료 -> 설정 변경 이벤트
+
+#### 3. HealthViewModel 단순화 구현
+- **`HealthViewModel`**: 개별 로직 제거, ReactiveProperty 중심 UI 바인딩
+- **변경사항**: 복잡한 개별 관리 로직 -> HealthSystem 위임 + UI 전용
+- **기술 요소**: HealthModel ReactiveProperty -> UI 데이터 변환
+
+#### 4. HealthView UI 최적화 구현
+- **`HealthView`**: DOTween 기반 부드러운 체력바 애니메이션
+- **특징**: EventBus 구독으로 실시간 UI 업데이트
+- **기술 요소**: WorldToScreen UI 추적 + 색상/애니메이션 시스템
+
+---
+### Health System 중앙화 구조 상세
+
+**주요 기능:**
+- **기존**: 캐릭터별 개별 ViewModel/Model 분산 관리
+- **변경**: 하나의 HealthSystem + HealthModel로 통합 중앙화
+- characterID 기반 Dictionary 통합 관리
+- ReactiveProperty 기반 실시간 UI 동기화
+
+**주요 구성 요소:**
+#### 1. HealthSystem (System)
+- 모든 체력 로직을 중앙 집중화
+- HealthModel 통한 데이터 관리 위임
+- CharacterEvents 발행으로 시스템 간 디커플링
+- 검증/로깅 등 비즈니스 로직 처리 -> 추후 Policy로 분리 예정
+
+#### 2. HealthModel (Model)
+- Dictionary<int, ReactiveProperty<HealthData>> 기반 데이터 관리
+- 개별 캐릭터별 ReactiveProperty 제공
+- 데이터 변경 시 자동 알림 시스템
+
+#### 3. CharacterEvents (Event)
+- CharacterRegistered/Unregistered: 생명주기 관리
+- DamageTaken/CharacterDeath: 데미지 처리
+- Healed/Revived: 치료/부활 처리
+- MaxHpChanged/HpSet: 직접 설정 변경
+
+#### 4. HealthViewModel (ViewModel)
+- HealthModel ReactiveProperty 구독
+- UI 전용 데이터 변환 (텍스트 포맷, 비율)
+- HealthSystem 메서드 위임 호출
+
+#### 5. HealthView (View)
+- DOTween 기반 부드러운 애니메이션
+- WorldToScreen 좌표 변환으로 3D 오브젝트 추적
+- 색상 변화/깜빡임 등 시각적 피드백
+
+---
+### 📋 다음 개발 예정 사항
+- 전투 시스템 개발
+- HealthSystem 검증/로깅 등 비즈니스 로직 처리 -> Policy로 변경
 ---
