@@ -25,6 +25,7 @@ namespace Game.Core
         private void BindStyle() {
            Container.Bind<SO_CrystalStyle>().FromScriptableObjectResource("Styles/CrystalStyle").AsSingle();
            Container.Bind<SO_GoldStyle>().FromScriptableObjectResource("Styles/GoldStyle").AsSingle();
+           Container.Bind<SO_DamageUIStyle>().FromScriptableObjectResource("Styles/DamageUIStyle").AsSingle();
         }
 
     }

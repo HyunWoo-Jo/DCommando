@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using Game.Model;
-using Zenject;
 using Game.Models;
+using Zenject;
 using UnityEngine.EventSystems;
 using Game.Core.Event;
 using Game.Core;
@@ -14,14 +13,23 @@ namespace Game.Systems {
 
         [SerializeField] private HealthData _healthData;
 
-        [Inject] private readonly HealthModel _healthModel;
         [Inject] private readonly HealthSystem _healthSystem;
 
         [SerializeField] private Vector2 _offset;
         [SerializeField] private bool _isUseUI = true; // UI 사용 여부
-        
+
+        private GameObject _uiObject;
 
         private IDisposable _disposable;
+
+        // 해제
+        private void OnDestroy() {
+            _healthSystem.UnregisterCharacter(gameObject.GetInstanceID());
+            _disposable?.Dispose();
+            if (_uiObject != null) {
+                EventBus.Publish(new UICloseEvent(gameObject.GetInstanceID(), UIName.Health_UI, _uiObject));
+            }
+        }
 
         private void Start() {
             int id = gameObject.GetInstanceID();
@@ -35,8 +43,13 @@ namespace Game.Systems {
             
         }
 
+        /// <summary>
+        /// UI 생성시 호출
+        /// </summary>
+        /// <param name="openEvent"></param>
         private void OnOpenHealthUI(UIOpenedNotificationEvent openEvent) {
             if (openEvent.id == gameObject.GetInstanceID() && openEvent.uiName == UIName.Health_UI) {
+                _uiObject = openEvent.uiObject;
                 openEvent.uiObject.GetComponent<IHealthInitializable>().InitHealth(this.gameObject, _offset);
                 _disposable?.Dispose();
             }

@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Game.Data;
-using Game.Model;
 using Game.Policies;
 using Game.Services;
 using R3;
@@ -9,7 +8,7 @@ using System;
 using UnityEngine;
 using Zenject;
 using Game.Core.Event;
-using UnityEngine.PlayerLoop;
+using Game.Models;
 
 namespace Game.Systems
 {

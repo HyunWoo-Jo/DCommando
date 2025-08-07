@@ -11,8 +11,10 @@ using R3;
 namespace Game.UI
 {
     /// <summary>
-    /// UI 매니저 - ViewModel을 통한 UI 생성 및 관리
+    /// UI 매니저 - ViewModel을 통한 UI 생성 및 위치 관리
     /// 이 컴포넌트는 Main Cavnas에 달려야함
+    /// System에서 처리안하고 View에서 처리하는 이유
+    /// UIManager는 기본적인 UI의 위치를 가지고 있어 위치 처리에 유리 
     /// </summary>
     public class UIManager : MonoBehaviour
     {
@@ -44,7 +46,7 @@ namespace Game.UI
         }
 
         public void CloseEvent(UICloseEvent closeEvent) {
-            _viewModel.CloseUI(closeEvent.uiName, closeEvent.uiObj);
+            _viewModel.CloseUI(closeEvent.id, closeEvent.uiName, closeEvent.uiObj);
         }
 
 
@@ -86,9 +88,9 @@ namespace Game.UI
         /// <summary>
         /// UI 닫기
         /// </summary>
-        public void CloseUI(UIName uiName, GameObject uiObj)
+        public void CloseUI(int id, UIName uiName, GameObject uiObj)
         {
-            _viewModel.CloseUI(uiName, uiObj);
+            _viewModel.CloseUI(id, uiName, uiObj);
         }
 
     }

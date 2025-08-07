@@ -17,6 +17,7 @@ namespace Game.Systems {
         public ReadOnlyReactiveProperty<int> RORP_FreeCrystal => _crystalModel.RORP_FreeCrystal;
         public ReadOnlyReactiveProperty<int> RORP_PaidCrystal => _crystalModel.RORP_PaidCrystal;
 
+        #region 초기화
         /// <summary>
         /// 크리스탈 시스템 초기화
         /// </summary>
@@ -47,7 +48,8 @@ namespace Game.Systems {
                 throw;
             }
         }
-
+        #endregion
+        #region 추가소모 로직
         /// <summary>
         /// 무료 크리스탈 추가
         /// </summary>
@@ -157,7 +159,8 @@ namespace Game.Systems {
                 return false;
             }
         }
-
+        #endregion
+        #region 검증
         /// <summary>
         /// 크리스탈 소모 가능 여부
         /// </summary>
@@ -199,5 +202,6 @@ namespace Game.Systems {
                 return false;
             }
         }
+        #endregion
     }
 }

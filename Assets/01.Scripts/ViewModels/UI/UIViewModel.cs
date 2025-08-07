@@ -23,9 +23,30 @@ namespace Game.ViewModels
         /// <summary>
         /// UI 닫기
         /// </summary>
-        public void CloseUI(UIName uiName, GameObject hudUiObj = null)
+        public void CloseUI(int id, UIName uiName, GameObject hudUiObj = null)
         {
-            _uiSystem.CloseUI(uiName, hudUiObj);
+            _uiSystem.CloseUI(id, uiName, hudUiObj);
+        }
+
+        /// <summary>
+        /// Damage Prefab을 로드
+        /// </summary>
+        /// <returns></returns>
+        public async UniTask<GameObject> LoadDamageUIPrefabAsync() {
+            return await _uiSystem.LoadPrefabsAsync(UIName.Damage_UI);
+        }
+
+        public void ReleaseDamageUI() {
+            _uiSystem.ReleasePrefab(UIName.Damage_UI);
+        }
+
+        /// <summary>
+        /// UI 부모를 가지고옴
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Transform GetParent(UIType name) {
+            return _uiSystem.GetUIParent(name);
         }
 
     }

@@ -21,6 +21,7 @@ namespace Game.Systems {
         [Inject] private readonly IUIService _uiService;
         [Inject] private readonly SO_UIConfig _uiConfig;
 
+        private readonly Dictionary<UIName, GameObject> _prefabs = new(); // Prefabs UI
         private readonly Dictionary<UIName, GameObject> _instanceUIs = new(); // 일반 단일 생성 UI
         private readonly Dictionary<UIName, List<GameObject>> _instanceHudUIs = new(); // 다중 생성 HUD UI
         private readonly Dictionary<UIType, Transform> _instanceUIParents = new(); // UI 부모 
@@ -82,10 +83,12 @@ namespace Game.Systems {
         private void SetupInstanceUIParents() {
             var canvas = FindOrCreateCanvas();
             _instanceUIParents[UIType.HUD] = CreateUILayer(canvas.transform, "HUD", 10, false);
-            _instanceUIParents[UIType.Screen] = CreateUILayer(canvas.transform, "Screen", 200);
-            _instanceUIParents[UIType.DynamicScreen] = CreateUILayer(canvas.transform, "DynamicScreen", 300);
-            _instanceUIParents[UIType.Popup] = CreateUILayer(canvas.transform, "Popup", 400);
-            _instanceUIParents[UIType.Overlay] = CreateUILayer(canvas.transform, "Overlay", 500);
+            _instanceUIParents[UIType.HUD1] = CreateUILayer(canvas.transform, "HUD1", 100, false);
+            _instanceUIParents[UIType.HUD2] = CreateUILayer(canvas.transform, "HUD2", 200, false);
+            _instanceUIParents[UIType.Screen] = CreateUILayer(canvas.transform, "Screen", 300);
+            _instanceUIParents[UIType.DynamicScreen] = CreateUILayer(canvas.transform, "DynamicScreen", 400);
+            _instanceUIParents[UIType.Popup] = CreateUILayer(canvas.transform, "Popup", 500);
+            _instanceUIParents[UIType.Overlay] = CreateUILayer(canvas.transform, "Overlay", 600);
         }
 
 
@@ -154,7 +157,7 @@ namespace Game.Systems {
         /// </summary>
         /// <param name="uiName"></param>
 
-        private void CloseUI(UIName uiName) {
+        private void CloseUI(int id, UIName uiName) {
             if (!_instanceUIs.TryGetValue(uiName, out var uiObj)) {
                 LogUINotFoundError();
                 return;
@@ -162,20 +165,20 @@ namespace Game.Systems {
             GameObject.Destroy(uiObj);
             _instanceUIs.Remove(uiName);
             _uiService.ReleaseUI(uiName);
-            EventBus.Publish(new UIClosedNotificationEvent(uiName));
+            EventBus.Publish(new UIClosedNotificationEvent(id, uiName));
         }
 
         /// <summary>
         /// HUD ui 제거
         /// </summary>
-        private void CloseHudUI(UIName uiName, GameObject hudUiObj) {
+        private void CloseHudUI(int id, UIName uiName, GameObject hudUiObj) {
             if (!_instanceHudUIs.ContainsKey(uiName)) {
                 LogUINotFoundError();
                 return;
             }
             _instanceHudUIs[uiName].Remove(hudUiObj);
             GameObject.Destroy(hudUiObj);
-            EventBus.Publish(new UIClosedNotificationEvent(uiName));
+            EventBus.Publish(new UIClosedNotificationEvent(id, uiName));
             if (_instanceHudUIs[uiName].Count <= 0) {
                 _uiService.ReleaseUI(uiName);
             }
@@ -185,6 +188,22 @@ namespace Game.Systems {
             GameDebug.LogError("존재 하지 않는 UI 삭제 시도");
         }
         #endregion
+
+        #region Prefab 관리
+        public async UniTask<GameObject> LoadPrefabsAsync(UIName name) {
+            if(_prefabs.TryGetValue(name, out var obj)) {
+                return obj;
+            }
+            var prefab = await _uiService.LoadUIPrefabAsync(name);
+            _prefabs[name] = prefab;
+            return _prefabs[name];
+        }
+        public void ReleasePrefab(UIName name)  {
+            _prefabs.Remove(name);
+            _uiService.ReleaseUI(name);
+        }
+        #endregion
+
 
         #region 편의 메서드
         /// <summary>
@@ -203,14 +222,18 @@ namespace Game.Systems {
         /// <summary>
         /// UI 제거 hudUIObj가 존재할경우 찾아서 제거
         /// </summary>
-        public void CloseUI(UIName uiName, GameObject hudUIObj = null) {
+        public void CloseUI(int id, UIName uiName, GameObject hudUIObj = null) {
             if (hudUIObj != null) {
                 // HUD UI 처리
-                CloseHudUI(uiName, hudUIObj);
+                CloseHudUI(id, uiName, hudUIObj);
             } else {
                 // 일반 UI 처리
-                CloseUI(uiName);
+                CloseUI(id, uiName);
             }
+        }
+
+        public Transform GetUIParent(UIType type) {
+            return _instanceUIParents[type];
         }
         #endregion
 

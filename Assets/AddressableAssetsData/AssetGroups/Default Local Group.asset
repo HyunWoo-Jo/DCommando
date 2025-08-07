@@ -20,6 +20,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33b570bb8ea07e341a6f22f7ed67edbc
+    m_Address: Assets/02.Prefabs/UI/Damage_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3a2491242235e6840a27821eb7f4bee2
     m_Address: Assets/02.Prefabs/UI/PauseButton_UI.prefab
     m_ReadOnly: 0

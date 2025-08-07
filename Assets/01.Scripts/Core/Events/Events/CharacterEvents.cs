@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Game.Core.Event
-{
+namespace Game.Core.Event {
     #region 캐릭터 생명주기 이벤트
     /// <summary>
     /// 캐릭터 등록 이벤트 (등록 후 발생)
@@ -34,11 +33,13 @@ namespace Game.Core.Event
     /// </summary>
     public readonly struct DamageTakenEvent {
         public readonly int characterID;
+        public readonly DamageType type;
         public readonly int damage;
         public readonly int currentHp;
 
-        public DamageTakenEvent(int characterID, int damage, int currentHp) {
+        public DamageTakenEvent(int characterID, DamageType type, int damage, int currentHp) {
             this.characterID = characterID;
+            this.type = type;
             this.damage = damage;
             this.currentHp = currentHp;
         }
@@ -117,4 +118,6 @@ namespace Game.Core.Event
         }
     }
     #endregion
+
+
 }

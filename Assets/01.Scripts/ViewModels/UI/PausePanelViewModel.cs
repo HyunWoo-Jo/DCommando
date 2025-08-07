@@ -3,6 +3,7 @@ using Zenject;
 using System;
 using Game.Core.Event;
 using Game.Core;
+using UnityEngine;
 namespace Game.ViewModels
 {
     public class PausePanelViewModel {
@@ -13,7 +14,7 @@ namespace Game.ViewModels
         /// </summary>
         public void OnContinueButton() {
             GameTime.Resume();
-            EventBus.Publish<UICloseEvent>(new UICloseEvent(UIName.PausePanel_UI));
+            EventBus.Publish<UICloseEvent>(new UICloseEvent(-1, UIName.PausePanel_UI));
         }
 
     }

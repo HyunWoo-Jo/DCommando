@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using R3;
 using System;
-namespace Game.Model {
+namespace Game.Models {
     public class CameraModel : IDisposable {
         // Camera 상태
         private readonly ReactiveProperty<Vector3> RP_targetPosition = new();

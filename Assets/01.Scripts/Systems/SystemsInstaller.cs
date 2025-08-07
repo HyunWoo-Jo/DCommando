@@ -78,6 +78,7 @@ namespace Game.Systems {
         /// </summary>
         private void BindCombatSystems() {
             Container.BindInterfacesAndSelfTo<HealthSystem>().AsCached().NonLazy();
+            Container.BindInterfacesAndSelfTo<CombatSystem>().AsCached().NonLazy();
         }
 
     }

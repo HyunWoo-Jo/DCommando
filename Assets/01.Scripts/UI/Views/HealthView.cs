@@ -16,6 +16,7 @@ namespace Game.UI.Views {
         [SerializeField] private TextMeshProUGUI _healthText;
         [SerializeField] private Image _healthBarFill;
         [SerializeField] private GameObject _healthBarObject;
+        [SerializeField] private TextMeshProUGUI _damageText;
 
         [Header("색상 설정")]
         [SerializeField] private Color _normalHealthColor = Color.green;
@@ -53,7 +54,7 @@ namespace Game.UI.Views {
 
             // UI 위치 업데이트 구독
             Observable.EveryValueChanged(_ownerTr, tr => tr.position)
-                .Where(_ => _ownerTr != null)
+                .Where(_ => _ownerTr != null)   
                 .Subscribe(pos => UpdateWorldToScreen(pos))
                 .AddTo(_disposables);
 
@@ -63,7 +64,9 @@ namespace Game.UI.Views {
             // 애니메이션 정리
             
             _healthBarFill?.DOKill();
-            _healthBarObject?.transform.DOKill();
+            if (_healthBarObject != null) {
+                _healthBarObject.transform.DOKill();
+            }
            
             // 구독 정리
             _disposables?.Dispose();
@@ -131,7 +134,6 @@ namespace Game.UI.Views {
         /// </summary>
         private void UpdateHealthColor(float ratio) {
             if (_healthBarFill == null) return;
-            Debug.Log(ratio);
             // 추후 스타일로 변경
             Color targetColor;
             if (ratio == 0) {

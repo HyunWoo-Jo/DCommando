@@ -63,6 +63,9 @@ namespace Game.Services {
         public async UniTask<GameObject> LoadUIGameObjectAsync(UIName uiName) {
             return await LoadDirectUIGameObjectAsync(uiName);
         }
+        public async UniTask<GameObject> LoadUIPrefabAsync(UIName uiName) {
+            return await LoadPrefabAync(uiName);
+        }
         #endregion
 
         #region 직접 로드
@@ -82,34 +85,41 @@ namespace Game.Services {
             return component;
         }
 
-        private async UniTask<GameObject> LoadDirectUIGameObjectAsync(UIName uiName) {
+        private async UniTask<GameObject> LoadPrefabAync(UIName uiName) {
             if (!_uiAddressableKeys.TryGetValue(uiName, out var addressableKey)) {
                 GameDebug.LogError($"UIName에 대한 AddressableKey를 찾을 수 없습니다: {uiName}");
                 return null;
             }
-
             AsyncOperationHandle<GameObject> handle = default;
-            GameObject instance = null;
-
+            GameObject prefab = null;
             try {
                 handle = Addressables.LoadAssetAsync<GameObject>(addressableKey);
-                var prefab = await handle.ToUniTask();
+                prefab = await handle.ToUniTask();
                 if (prefab == null)
                     throw new System.IO.FileNotFoundException($"Prefab not found: {addressableKey} for {uiName}");
 
-                instance = DIHelper.InstantiateWithInjection(prefab);
-
                 _loadedAssets[uiName] = handle;
+                return prefab;
+            }catch(Exception e) {
+                if (handle.IsValid())
+                    GameDebug.LogError($"UI 로드 실패: {uiName} ({addressableKey})\n{e}");
+                throw;
+            }
+        }
+
+        private async UniTask<GameObject> LoadDirectUIGameObjectAsync(UIName uiName) {
+            GameObject instance = null;
+            try {
+                var prefab = await LoadPrefabAync(uiName);
+                instance = DIHelper.InstantiateWithInjection(prefab);
                 IncreaseRefCount(uiName);
 
                 return instance;
             } catch (Exception e) {
-                GameDebug.LogError($"UI 로드 실패: {uiName} ({addressableKey})\n{e}");
+                _loadedAssets.Remove(uiName);
                 // 실패 시 자원 정리
                 if (instance != null)
                     Object.Destroy(instance);
-                if (handle.IsValid())
-                    Addressables.Release(handle);
                 throw;
             }
         }

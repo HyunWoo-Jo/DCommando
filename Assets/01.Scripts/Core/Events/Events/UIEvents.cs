@@ -19,6 +19,7 @@ namespace Game.Core.Event {
     /// UI 제거 요청 이벤트
     /// </summary>
     public readonly struct UICloseEvent {
+        public readonly int id;
         public readonly UIName uiName;
         public readonly GameObject uiObj;
         /// <summary>
@@ -26,7 +27,8 @@ namespace Game.Core.Event {
         /// </summary>
         /// <param name="name"></param>
         /// <param name="obj"></param>
-        public UICloseEvent(UIName name, GameObject obj = null) {
+        public UICloseEvent(int id, UIName name, GameObject obj = null) {
+            this.id = id;
             uiName = name;
             uiObj = obj;
         }
@@ -41,7 +43,7 @@ namespace Game.Core.Event {
         public readonly UIType uiType;
         public readonly GameObject uiObject;
 
-        public UIOpenedNotificationEvent(int id,UIName uiName, UIType uiType, GameObject uiObject) {
+        public UIOpenedNotificationEvent(int id, UIName uiName, UIType uiType, GameObject uiObject) {
             this.id = id;
             this.uiName = uiName;
             this.uiType = uiType;
@@ -53,9 +55,11 @@ namespace Game.Core.Event {
     /// UI가 성공적으로 닫혔을 때 발생하는 이벤트
     /// </summary>
     public readonly struct UIClosedNotificationEvent {
+        public readonly int id; // 누가 발행한 이벤트인지
         public readonly UIName uiName;
 
-        public UIClosedNotificationEvent(UIName uiName) {
+        public UIClosedNotificationEvent(int id, UIName uiName) {
+            this.id = id;
             this.uiName = uiName;
         }
     }

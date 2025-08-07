@@ -1,6 +1,4 @@
 ﻿using Game.Core;
-using Game.Model;
-using Game.Models;
 using UnityEngine;
 using Zenject;
 
@@ -47,6 +45,7 @@ namespace Game.Models
         /// </summary>
         private void BindCombatSceneModel() {
             Container.BindInterfacesAndSelfTo<HealthModel>().AsCached();
+            Container.BindInterfacesAndSelfTo<CombatModel>().AsCached();
         }
 
         /// <summary>

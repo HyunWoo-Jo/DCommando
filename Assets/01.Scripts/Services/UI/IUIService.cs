@@ -23,6 +23,10 @@ namespace Game.Services
         /// GameObject 단위로 UI를 로드합니다.
         /// </summary>
         UniTask<GameObject> LoadUIGameObjectAsync(UIName uiName);
+        /// <summary>
+        /// UI Prefab을 로드
+        /// </summary>
+        UniTask<GameObject> LoadUIPrefabAsync(UIName uiName);
 
         /// <summary>
         /// UI 오브젝트를 파괴합니다.
