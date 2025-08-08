@@ -24,7 +24,6 @@ namespace Game.Data {
             Container.Bind<SO_InputConfig>().FromScriptableObjectResource("Configs/InputConfig").AsSingle();
             Container.Bind<SO_GoldConfig>().FromScriptableObjectResource("Configs/GoldConfig").AsSingle();
             Container.Bind<SO_CrystalConfig>().FromScriptableObjectResource("Configs/CrystalConfig").AsSingle();
-            Container.Bind<SO_UIConfig>().FromScriptableObjectResource("Configs/UIConfig").AsSingle();
             Container.Bind<SO_ExpConfig>().FromScriptableObjectResource("Configs/ExpConfig").AsSingle();
 
             Container.Bind<SO_CameraConfig>().FromScriptableObjectResource("Configs/CameraConfig").AsSingle();

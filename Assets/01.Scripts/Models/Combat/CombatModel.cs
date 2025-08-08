@@ -20,6 +20,7 @@ namespace Game.Models {
         private const float DEFAULT_MULTIPLIER = 1.0f; // 기본 배율
 
         // 모든 캐릭터의 전투 데이터를 Dictionary로 관리
+        private readonly Dictionary<int, CombatModel> _weaponDataDict = new();
         private readonly Dictionary<int, ReactiveProperty<CombatData>> _combatDataDict = new();
         private bool _disposed = false;
 
@@ -31,7 +32,7 @@ namespace Game.Models {
         }
 
         // 데이터 생성
-        public void AddCombat(int id, int baseAttack = DEFAULT_BASE_ATTACK, int baseDefense = DEFAULT_BASE_DEFENSE) {
+        public void RegisterCombat(int id, int baseAttack = DEFAULT_BASE_ATTACK, int baseDefense = DEFAULT_BASE_DEFENSE) {
             if (_combatDataDict.ContainsKey(id)) {
                 GameDebug.LogError($"이미 생성된 전투 데이터 ID: {id}");
                 return;
@@ -41,7 +42,7 @@ namespace Game.Models {
             _combatDataDict[id] = new ReactiveProperty<CombatData>(combatData);
         }
 
-        public void AddCombat(int id, CombatData combatData) {
+        public void RegisterCombat(int id, CombatData combatData) {
             if (_combatDataDict.ContainsKey(id)) {
                 GameDebug.LogError($"이미 생성된 전투 데이터 ID: {id}");
                 return;

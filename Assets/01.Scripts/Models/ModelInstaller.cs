@@ -1,5 +1,6 @@
 ﻿using Game.Core;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace Game.Models
@@ -28,6 +29,7 @@ namespace Game.Models
         private void BindModel() {
             Container.BindInterfacesAndSelfTo<CameraModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<CrystalModel>().AsSingle();
+            Container.BindInterfacesAndSelfTo<EquipModel>().AsSingle();
         }
 
         /// <summary>

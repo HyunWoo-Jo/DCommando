@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
-using Game.Core;
+using System;
 using Game.Models;
-using Game.Core.Event;
+using Game.Core;
 using R3;
 
 namespace Game.Systems {
@@ -23,24 +22,25 @@ namespace Game.Systems {
 
         private readonly CompositeDisposable _disposables = new();
 
-
         #region 초기화, 해제
         public void Initialize() {
-  
+            GameDebug.Log("CombatSystem 초기화 완료");
         }
+
         public void Dispose() {
             _disposables?.Dispose();
+            GameDebug.Log("CombatSystem 해제 완료");
         }
         #endregion
+
         #region 캐릭터 전투 등록/해제
 
         /// <summary>
         /// 전투 캐릭터 등록 (전투 스탯)
         /// </summary>
         public bool RegisterCombatCharacter(int characterId, int baseAttack, int baseDefense) {
-
             // CombatModel에 전투 스탯 등록
-            _combatModel.AddCombat(characterId, baseAttack, baseDefense);
+            _combatModel.RegisterCombat(characterId, baseAttack, baseDefense);
 
             GameDebug.Log($"전투 캐릭터 등록 Character {characterId}: 공격력 {baseAttack}, 방어력 {baseDefense}");
             return true;
@@ -58,11 +58,23 @@ namespace Game.Systems {
 
         #endregion
 
-
-        #region 공격 처리
+        #region 공격 처리 (WeaponSystem 호환)
 
         /// <summary>
-        /// 타입별 공격 처리 
+        /// 타입별 공격 처리 (커스텀 데미지 지원 - WeaponSystem용)
+        /// </summary>
+        public bool ProcessAttack(int attackerId, int targetId, DamageType damageType, float customDamage = -1f) {
+            if (!ValidateAttack(attackerId, targetId)) return false;
+
+            // 커스텀 데미지가 지정되지 않으면 기본 공격력 사용
+            float attackPower = customDamage >= 0 ? customDamage : _combatModel.GetFinalAttack(attackerId);
+            int defense = _combatModel.GetFinalDefense(targetId);
+
+            return ApplyDamage(attackerId, targetId, Mathf.RoundToInt(attackPower), defense, damageType);
+        }
+
+        /// <summary>
+        /// 타입별 공격 처리 (기존 방식)
         /// </summary>
         public bool ProcessAttack(int attackerId, int targetId, DamageType damageType, bool isCritical = false) {
             if (!ValidateAttack(attackerId, targetId)) return false;
@@ -91,31 +103,57 @@ namespace Game.Systems {
         /// 화염 공격 처리 / 지속 피해
         /// </summary>
         public bool ProcessFireAttack(int attackerId, int targetId, bool isCritical = false) {
-            return ProcessAttack(attackerId, targetId, DamageType.Fire, isCritical);
+            bool result = ProcessAttack(attackerId, targetId, DamageType.Fire, isCritical);
+
+            // 화상 효과 추가 (선택적)
+            if (result) {
+                ApplyBurnEffect(attackerId, targetId);
+            }
+
+            return result;
         }
 
         /// <summary>
         /// 얼음 공격 처리
         /// </summary>
         public bool ProcessIceAttack(int attackerId, int targetId, bool isCritical = false) {
-            return ProcessAttack(attackerId, targetId, DamageType.Ice, isCritical);
+            bool result = ProcessAttack(attackerId, targetId, DamageType.Ice, isCritical);
+
+            // 빙결 효과 추가 (선택적)
+            if (result) {
+                ApplyFreezeEffect(targetId);
+            }
+
+            return result;
         }
 
         /// <summary>
         /// 번개 공격 처리
         /// </summary>
         public bool ProcessLightningAttack(int attackerId, int targetId, bool isCritical = false) {
-            return ProcessAttack(attackerId, targetId, DamageType.Lightning, isCritical);
+            bool result = ProcessAttack(attackerId, targetId, DamageType.Lightning, isCritical);
+
+            // 감전 효과 추가 (선택적)
+            if (result) {
+                ApplyStunEffect(targetId);
+            }
+
+            return result;
         }
 
         /// <summary>
         /// 독 데미지 처리 (방어력 무시) / 지속피해
         /// </summary>
-        public bool ProcessPoisonDamage(int targetId, int poisonDamage) {
+        public bool ProcessPoisonDamage(int targetId, int poisonDamage, int attackerId = -1) {
             if (!_healthSystem.CanTakeDamage(targetId)) return false;
 
             bool success = _healthSystem.TakeDamage(targetId, poisonDamage, DamageType.Poison);
-            GameDebug.Log($"독 데미지 적용 Target {targetId}: {poisonDamage} damage");
+
+            if (attackerId != -1) {
+                GameDebug.Log($"독 효과 적용 Attacker {attackerId} -> Target {targetId}: {poisonDamage} damage over {DEFAULT_POISON_DURATION}초");
+            } else {
+                GameDebug.Log($"독 데미지 적용 Target {targetId}: {poisonDamage} damage");
+            }
 
             return success;
         }
@@ -147,13 +185,28 @@ namespace Game.Systems {
             return success;
         }
 
+        /// <summary>
+        /// 흡혈 효과 처리
+        /// </summary>
+        public bool ProcessLifesteal(int attackerId, int targetId, int damage, float lifestealRate = DEFAULT_LIFESTEAL_RATE) {
+            if (!_healthSystem.HasCharacter(attackerId)) return false;
+
+            int healAmount = Mathf.RoundToInt(damage * lifestealRate);
+            bool success = _healthSystem.Heal(attackerId, healAmount);
+
+            if (success) {
+                GameDebug.Log($"흡혈 효과 Character {attackerId} 회복 {healAmount} HP");
+            }
+
+            return success;
+        }
 
         #endregion
 
         #region 데미지 계산 및 적용
 
         /// <summary>
-        /// 데미지 계산 및 적용 (수정됨)
+        /// 데미지 계산 및 적용
         /// </summary>
         private bool ApplyDamage(int attackerId, int targetId, int baseDamage, int defense, DamageType damageType, bool isCritical = false) {
             int finalDamage;
@@ -176,6 +229,13 @@ namespace Game.Systems {
             if (success) {
                 string criticalText = isCritical ? " (크리티컬!)" : "";
                 GameDebug.Log($"캐릭터 {attackerId}가 {targetId}에게 {finalDamage} {damageType} 데미지{criticalText}");
+
+                // 흡혈 효과 확인 (물리/마법 데미지만)
+                if (damageType == DamageType.Physical || damageType == DamageType.Magic) {
+                    ProcessLifesteal(attackerId, targetId, finalDamage);
+                }
+            } else {
+                GameDebug.LogWarning($"데미지 적용 실패 {attackerId} -> {targetId}");
             }
 
             return success;
@@ -185,11 +245,39 @@ namespace Game.Systems {
         /// 최종 데미지 계산
         /// </summary>
         private int CalculateFinalDamage(int baseDamage, int defense) {
+            // 방어력이 공격력보다 높으면 최소 데미지 보장
             return Mathf.Max(MIN_DAMAGE, baseDamage - defense);
         }
 
         #endregion
 
+        #region 상태 효과 (확장 가능)
+
+        /// <summary>
+        /// 화상 효과 적용
+        /// </summary>
+        private void ApplyBurnEffect(int attackerId, int targetId) {
+            // TODO: 지속 데미지 시스템 구현시 추가
+            GameDebug.Log($"화상 효과 적용 Target {targetId}");
+        }
+
+        /// <summary>
+        /// 빙결 효과 적용
+        /// </summary>
+        private void ApplyFreezeEffect(int targetId) {
+            // TODO: 상태이상 시스템 구현시 추가
+            GameDebug.Log($"빙결 효과 적용 Target {targetId}");
+        }
+
+        /// <summary>
+        /// 감전 효과 적용
+        /// </summary>
+        private void ApplyStunEffect(int targetId) {
+            // TODO: 상태이상 시스템 구현시 추가
+            GameDebug.Log($"감전 효과 적용 Target {targetId}");
+        }
+
+        #endregion
 
         #region 스탯 관리
 
@@ -260,6 +348,27 @@ namespace Game.Systems {
             return _combatModel.GetFinalDefense(characterId);
         }
 
+        /// <summary>
+        /// 전투 데이터 존재 여부 확인
+        /// </summary>
+        public bool HasCombatData(int characterId) {
+            return _combatModel.HasCombat(characterId);
+        }
+
+        /// <summary>
+        /// 전투 통계 정보 (디버그용)
+        /// </summary>
+        public void LogCombatStats() {
+            int combatCount = _combatModel.GetCombatCount();
+            GameDebug.Log($"전투 시스템 현황: {combatCount}개 캐릭터 등록");
+
+            foreach (int characterId in _combatModel.GetAllCombatIDs()) {
+                var combatData = _combatModel.GetCombatData(characterId);
+                bool canFight = CanFight(characterId);
+                GameDebug.Log($"Character {characterId}: ATK {combatData.FinalAttack}, DEF {combatData.FinalDefense}, 전투가능: {canFight}");
+            }
+        }
+
         #endregion
 
         #region 검증 메서드
@@ -268,6 +377,12 @@ namespace Game.Systems {
         /// 공격 유효성 검증
         /// </summary>
         private bool ValidateAttack(int attackerId, int targetId) {
+            // 자기 자신 공격 방지
+            if (attackerId == targetId) {
+                GameDebug.LogWarning($"자기 자신을 공격할 수 없음 Character {attackerId}");
+                return false;
+            }
+
             // 공격자 검증
             if (!_combatModel.HasCombat(attackerId)) {
                 GameDebug.LogError($"공격자 Combat 데이터 없음 Character {attackerId}");
@@ -298,7 +413,24 @@ namespace Game.Systems {
             return true;
         }
 
-        #endregion
+        /// <summary>
+        /// 연결된 시스템 상태 검증
+        /// </summary>
+        public bool ValidateSystemIntegrity() {
+            if (_combatModel == null) {
+                GameDebug.LogError("CombatModel이 주입되지 않음");
+                return false;
+            }
 
+            if (_healthSystem == null) {
+                GameDebug.LogError("HealthSystem이 주입되지 않음");
+                return false;
+            }
+
+            GameDebug.Log("CombatSystem 무결성 검증 통과");
+            return true;
+        }
+
+        #endregion
     }
 }

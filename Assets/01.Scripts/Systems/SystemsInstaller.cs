@@ -42,6 +42,8 @@ namespace Game.Systems {
             Container.BindInterfacesAndSelfTo<CameraSystem>().AsSingle().NonLazy();
 
             Container.BindInterfacesAndSelfTo<CrystalSystem>().AsSingle().NonLazy();
+
+            Container.BindInterfacesAndSelfTo<EquipSystem>().AsSingle().NonLazy();
         }
 
         /// <summary>

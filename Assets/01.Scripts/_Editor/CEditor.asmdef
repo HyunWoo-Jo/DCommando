@@ -2,9 +2,12 @@
     "name": "CEditor",
     "rootNamespace": "",
     "references": [
-        "GUID:79ba8d8a4d57c4844995ede4a27f1866"
+        "GUID:79ba8d8a4d57c4844995ede4a27f1866",
+        "GUID:cc5e82ecdd0cea94cba4edf6ac11b3e7"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

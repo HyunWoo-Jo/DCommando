@@ -19,19 +19,16 @@ namespace Game.Systems {
     [DefaultExecutionOrder(-50)]
     public class UISystem : IDisposable {
         [Inject] private readonly IUIService _uiService;
-        [Inject] private readonly SO_UIConfig _uiConfig;
 
         private readonly Dictionary<UIName, GameObject> _prefabs = new(); // Prefabs UI
         private readonly Dictionary<UIName, GameObject> _instanceUIs = new(); // 일반 단일 생성 UI
         private readonly Dictionary<UIName, List<GameObject>> _instanceHudUIs = new(); // 다중 생성 HUD UI
         private readonly Dictionary<UIType, Transform> _instanceUIParents = new(); // UI 부모 
-        private Dictionary<UIName, UIType> _uiTypeMappingDict;// uiName mapping uiType
 
-        #region Zenject 관리
+        #region 초기화 Zenject 관리
         [Inject]
         public void Initialize() {
             SetupInstanceUIParents();
-            InitializeUIService();
         }
        
         public void Dispose() {
@@ -56,25 +53,6 @@ namespace Game.Systems {
             }
             _instanceHudUIs.Clear();
             _uiService.ReleaseAll();
-        }
-        #endregion
-
-        #region 초기화
-        /// <summary>
-        /// UIService에 InstanceUI 매핑 설정
-        /// </summary>
-        private void InitializeUIService() {
-            var uiConfigDict = _uiConfig.GetUIDictionary();
-
-            // UI Name map addressablesKey
-            var instanceUIDict = uiConfigDict
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.addressableKey);
-            _uiService.Initialize(instanceUIDict);
-
-            // UiTypeMapping 생성
-            var uiTypeDict = uiConfigDict
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.uiType);
-            _uiTypeMappingDict = uiTypeDict;
         }
 
         /// <summary>
@@ -210,7 +188,7 @@ namespace Game.Systems {
         /// UI 생성 HUD 일경우 여러개 생성 가능
         /// </summary>
         public async UniTask<T> CreateUIAsync<T>(int id, UIName uiName) where T : Component {
-            UIType type = _uiTypeMappingDict[uiName];
+            UIType type = _uiService.GetUIType(uiName);
             switch (type) {
                 case UIType.HUD:
                 return await InstanceHudUI<T>(id, uiName);

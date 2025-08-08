@@ -205,5 +205,186 @@ namespace Game.Services {
             }
         }
         #endregion
+
+        #region 장비 관련 매서드
+        public async UniTask<EquipData> LoadEquipDataAsync() {
+            try {
+                if (!IsConnected) {
+                    throw new Exception("Firebase not connected");
+                }
+
+                // UserData/{uid}/Equip 경로에서 데이터 로드
+                var snapshot = await _databaseReference
+                    .Child("UserData")
+                    .Child(CurrentUserId)
+                    .Child("Equip")
+                    .GetValueAsync()
+                    .AsUniTask();
+
+                if (snapshot.Exists) {
+                    string jsonData = snapshot.GetRawJsonValue();
+                    var equipData = JsonUtility.FromJson<EquipData>(jsonData);
+                    GameDebug.Log($"장비 데이터 로드 완료: 무기={equipData.equippedWeapon}, 방어구={equipData.equippedArmor}, 보유={equipData.ownedEquipments.Count}개");
+                    return equipData;
+                } else {
+                    // 데이터가 없으면 기본값 반환
+                    GameDebug.Log("장비 데이터 없음, 기본값 반환");
+                    return new EquipData();
+                }
+            } catch (Exception ex) {
+                GameDebug.LogError($"장비 데이터 로드 실패: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async UniTask SaveEquipDataAsync(EquipData equipData) {
+            try {
+                if (!IsConnected) {
+                    throw new Exception("Firebase not connected");
+                }
+
+                string jsonData = JsonUtility.ToJson(equipData);
+
+                // UserData/{uid}/Equip 경로에 데이터 저장
+                await _databaseReference
+                    .Child("UserData")
+                    .Child(CurrentUserId)
+                    .Child("Equip")
+                    .SetRawJsonValueAsync(jsonData)
+                    .AsUniTask();
+
+                GameDebug.Log($"장비 데이터 저장 완료: 무기={equipData.equippedWeapon}, 방어구={equipData.equippedArmor}");
+            } catch (Exception ex) {
+                GameDebug.LogError($"장비 데이터 저장 실패: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async UniTask<bool> UpdateEquippedWeaponAsync(EquipName equipName) {
+            try {
+                if (!IsConnected) {
+                    GameDebug.LogError("네트워크 연결 안됨");
+                    return false;
+                }
+
+                var currentData = await LoadEquipDataAsync();
+
+                // 장비를 보유하고 있는지 확인
+                if (equipName != EquipName.None && !currentData.HasEquipment(equipName)) {
+                    GameDebug.LogError($"보유하지 않은 장비입니다: {equipName}");
+                    return false;
+                }
+
+                currentData.EquipWeapon(equipName);
+                await SaveEquipDataAsync(currentData);
+
+                GameDebug.Log($"무기 장착 업데이트: {equipName}");
+                return true;
+            } catch (Exception ex) {
+                GameDebug.LogError($"무기 장착 업데이트 실패: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async UniTask<bool> UpdateEquippedArmorAsync(EquipName equipName) {
+            try {
+                if (!IsConnected) {
+                    GameDebug.LogError("네트워크 연결 안됨");
+                    return false;
+                }
+
+                var currentData = await LoadEquipDataAsync();
+
+                if (equipName != EquipName.None && !currentData.HasEquipment(equipName)) {
+                    GameDebug.LogError($"보유하지 않은 장비입니다: {equipName}");
+                    return false;
+                }
+
+                currentData.EquipArmor(equipName);
+                await SaveEquipDataAsync(currentData);
+
+                GameDebug.Log($"방어구 장착 업데이트: {equipName}");
+                return true;
+            } catch (Exception ex) {
+                GameDebug.LogError($"방어구 장착 업데이트 실패: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async UniTask<bool> UpdateEquippedAccessoryAsync(EquipName equipName) {
+            try {
+                if (!IsConnected) {
+                    GameDebug.LogError("네트워크 연결 안됨");
+                    return false;
+                }
+
+                var currentData = await LoadEquipDataAsync();
+
+                if (equipName != EquipName.None && !currentData.HasEquipment(equipName)) {
+                    GameDebug.LogError($"보유하지 않은 장비입니다: {equipName}");
+                    return false;
+                }
+
+                currentData.EquipAccessory(equipName);
+                await SaveEquipDataAsync(currentData);
+
+                GameDebug.Log($"악세사리 장착 업데이트: {equipName}");
+                return true;
+            } catch (Exception ex) {
+                GameDebug.LogError($"악세사리 장착 업데이트 실패: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async UniTask<bool> AddOwnedEquipmentAsync(EquipName equipName) {
+            try {
+                if (!IsConnected) {
+                    GameDebug.LogError("네트워크 연결 안됨");
+                    return false;
+                }
+
+                var currentData = await LoadEquipDataAsync();
+
+                if (currentData.HasEquipment(equipName)) {
+                    GameDebug.Log($"이미 보유한 장비입니다: {equipName}");
+                    return true;
+                }
+
+                currentData.AddEquipment(equipName);
+                await SaveEquipDataAsync(currentData);
+
+                GameDebug.Log($"장비 획득: {equipName}");
+                return true;
+            } catch (Exception ex) {
+                GameDebug.LogError($"장비 획득 실패: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async UniTask<bool> RemoveOwnedEquipmentAsync(EquipName equipName) {
+            try {
+                if (!IsConnected) {
+                    GameDebug.LogError("네트워크 연결 안됨");
+                    return false;
+                }
+
+                var currentData = await LoadEquipDataAsync();
+
+                if (!currentData.HasEquipment(equipName)) {
+                    GameDebug.LogError($"보유하지 않은 장비입니다: {equipName}");
+                    return false;
+                }
+
+                currentData.RemoveEquipment(equipName);
+                await SaveEquipDataAsync(currentData);
+
+                GameDebug.Log($"장비 제거: {equipName}");
+                return true;
+            } catch (Exception ex) {
+                GameDebug.LogError($"장비 제거 실패: {ex.Message}");
+                return false;
+            }
+        }
+        #endregion
     }
 }

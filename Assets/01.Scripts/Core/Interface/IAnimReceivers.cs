@@ -1,14 +1,14 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace Game.Core
 {
     /// <summary>
-    /// ¾Ö´Ï¸ŞÀÌ¼Ç¿¡¼­ ¹ß»ıÇÏ´Â ÀÌº¥Æ®¸¦ Àü´Ş¹Ş±â À§ÇÑ ÀÎÅÍÆäÀÌ½º
-    /// °ø°İ ºÎºĞ
+    /// ì• ë‹ˆë©”ì´ì…˜ì—ì„œ ë°œìƒí•˜ëŠ” ì´ë²¤íŠ¸ë¥¼ ì „ë‹¬ë°›ê¸° ìœ„í•œ ì¸í„°í˜ì´ìŠ¤
+    /// ê³µê²© ë¶€ë¶„
     /// </summary>
     public interface IAnimAttackReceiver
     {
-        void OnAttackStart(); // ¾îÅÃ ½ÃÀÛ½Ã È£Ãâ
-        void OnAttackEnd(); // ¾îÅÃ Á¾·á½Ã È£Ãâ
+        void OnAttackStartEvent(); // ì–´íƒ ì‹œì‘ì‹œ í˜¸ì¶œ
+        void OnAttackEndEvent(); // ì–´íƒ ì¢…ë£Œì‹œ í˜¸ì¶œ
     }
 }

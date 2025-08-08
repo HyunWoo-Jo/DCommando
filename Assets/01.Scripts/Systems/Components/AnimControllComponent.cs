@@ -1,12 +1,12 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Assertions;
 using Game.Core;
 using PlasticGui.WorkspaceWindow.Locks;
 namespace Game.Systems
 {
     /// <summary>
-    /// ¾Ö´Ï¸ŞÀÌ¼Ç¿¡¼­ ¹ß»ıÇÏ´Â ÀÌº¥Æ®¸¦ Àü´ŞÇØÁÖ´Â ÄÄÆ÷³ÍÆ®
-    /// Animator ÄÄÆ÷³ÍÆ®°¡ ÀÖ´Â GameObject¿¡ ÇÊ¿ä
+    /// ì• ë‹ˆë©”ì´ì…˜ì—ì„œ ë°œìƒí•˜ëŠ” ì´ë²¤íŠ¸ë¥¼ ì „ë‹¬í•´ì£¼ëŠ” ì»´í¬ë„ŒíŠ¸
+    /// Animator ì»´í¬ë„ŒíŠ¸ê°€ ìˆëŠ” GameObjectì— í•„ìš”
     /// </summary>
     /// 
     public class AnimControllComponent : MonoBehaviour
@@ -15,7 +15,7 @@ namespace Game.Systems
 
         private IAnimAttackReceiver _attackReceiver;
 
-        // »ó¼ö
+        // ìƒìˆ˜
         public static readonly int ATTACK_KEY = Animator.StringToHash("Attack"); 
         public static readonly int IS_MOVE_KEY = Animator.StringToHash("IsMove"); 
         public static readonly int IS_DEBUFF_KEY = Animator.StringToHash("IsDebuff");
@@ -33,13 +33,13 @@ namespace Game.Systems
         private void Awake() {
             _animator = GetComponent<Animator>();
 #if UNITY_EDITOR
-            Assert.IsNotNull(_animator, "Animator°¡ ¹İµå½Ã ÇÊ¿äÇÑ ÄÄÆ÷³ÍÆ®ÀÔ´Ï´Ù");
+            Assert.IsNotNull(_animator, "Animatorê°€ ë°˜ë“œì‹œ í•„ìš”í•œ ì»´í¬ë„ŒíŠ¸ì…ë‹ˆë‹¤");
 
 #endif
 
             _attackReceiver = GetComponentInParent<IAnimAttackReceiver>();
         }
-        #region ¿ÜºÎ¿¡¼­ È£ÃâµÇ´Â ¿µ¿ª
+        #region ì™¸ë¶€ì—ì„œ í˜¸ì¶œë˜ëŠ” ì˜ì—­
 
         public void DebuffAnim(bool isDebuff) {
             _animator.SetBool(IS_DEBUFF_KEY, isDebuff);
@@ -73,13 +73,13 @@ namespace Game.Systems
         }
         #endregion
 
-        #region Animation¿¡¼­ È£Ãâ µÇ´Â ¿µ¿ª
+        #region Animationì—ì„œ í˜¸ì¶œ ë˜ëŠ” ì˜ì—­
         public void OnAttackStart() {
-            _attackReceiver?.OnAttackStart();
+            _attackReceiver?.OnAttackStartEvent();
         }
 
         public void OnAttackEnd() {
-            _attackReceiver.OnAttackEnd();
+            _attackReceiver?.OnAttackEndEvent();
         }
         #endregion
     }

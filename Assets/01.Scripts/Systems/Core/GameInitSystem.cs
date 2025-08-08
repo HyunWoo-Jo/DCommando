@@ -11,7 +11,7 @@ namespace Game.Systems
     public class GameInitSystem : MonoBehaviour {
         [Inject] private INetworkService _networkService;
         [Inject] private CrystalSystem _crystalSystem;
-
+        [Inject] private EquipSystem _equipSystem;
         private void Start() {
             _ = InitializeGameAsync();
         }
@@ -25,6 +25,7 @@ namespace Game.Systems
 
                 await _crystalSystem.InitializeAsync();
 
+                await _equipSystem.InitializeAsync();
 
             } catch (System.Exception ex) {
                 GameDebug.LogError($"초기화 실패: {ex.Message}");

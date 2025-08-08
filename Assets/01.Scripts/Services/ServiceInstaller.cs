@@ -1,4 +1,5 @@
 ﻿using Game.Core;
+using Game.Data;
 using UnityEngine;
 using Zenject;
 
@@ -14,7 +15,9 @@ namespace Game.Services
         public override void InstallBindings() {
             BindNetworkServices();
             BindStorageServices();
+            BindAddressables();
             BindExternalServices();
+
             switch (_sceneName) {
                 case SceneName.MainLobby:
                 break;
@@ -32,6 +35,7 @@ namespace Game.Services
 
             Container.Bind<ICrystalService>().To<CrystalService>().AsSingle();
             Container.Bind<IGoldService>().To<GoldService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<EquipService>().AsSingle().NonLazy(); // firebase + Addressables 
         }
 
 
@@ -46,9 +50,25 @@ namespace Game.Services
         ///기타 서비스 바인딩
         /// </summary>
         private void BindExternalServices() {
-            Container.Bind<IUIService>().To<UIService>().AsSingle();
-
+            Container.Bind<IUIService>().To<UIService>().AsSingle().NonLazy();
             Container.Bind<ICameraService>().To<CameraService>().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<SkillDataService>().AsSingle().NonLazy();
+            
+           
+        }
+
+        private void BindAddressables() {
+            Container.Bind<IAddressableService<SkillName, SO_SkillData>>()
+                .To<AddressableService<SkillName, SO_SkillData>>()
+                .AsSingle();
+
+            Container.Bind<IAddressableService<EquipName, GameObject>>()
+                .To<AddressableService<EquipName, GameObject>>()
+                .AsSingle();
+
+            Container.Bind<IAddressableService<UIName, GameObject>>()
+                .To<AddressableService<UIName, GameObject>>().AsSingle();
         }
 
     }

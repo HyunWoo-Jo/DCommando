@@ -1,74 +1,135 @@
-﻿using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.Pool;
-using UnityEngine.ResourceManagement.AsyncOperations;
+using Cysharp.Threading.Tasks;
+using Zenject;
 using Game.Core;
 using Game.Data;
-using System;
-
-using Object = UnityEngine.Object;
-using System.IO;
 
 namespace Game.Services {
-    public class UIService : IUIService {
+    public class UIService : IUIService, IDisposable {
+        [Inject] private IAddressableService<UIName, GameObject> _addressableService;
 
-        private readonly Dictionary<UIName, AsyncOperationHandle> _loadedAssets = new(); // Addressables 로드된 에셋 핸들을 저장                                 
-        private readonly Dictionary<UIName, int> _assetRefCount = new();    // Addressable 참조 카운터
-        private readonly Dictionary<UIName, string> _uiAddressableKeys = new(); // UIName -> AddressableKey 매핑
+        // UI 정보 관리
+        private readonly Dictionary<UIName, UIInfoData> _uiInfoDict = new();
 
-        #region 초기화
-        /// <summary>
-        /// UIName과 AddressableKey 매핑을 설정합니다.
-        /// </summary>
-        public void Initialize(Dictionary<UIName, string> uiKeyMappings) {
-            _uiAddressableKeys.Clear();
-            foreach (var mapping in uiKeyMappings) {
-                _uiAddressableKeys[mapping.Key] = mapping.Value;
+        // 인스턴스 관리
+        private readonly Dictionary<UIName, int> _instanceRefCount = new();    // 인스턴스 참조 카운터
+        private readonly List<GameObject> _activeInstances = new();           // 활성 인스턴스 추적
+
+        #region 초기화 Zenject에서 관리
+        [Inject]
+        public void Initialize() {
+            try {
+                LoadUIInfoFromCSV();
+                RegisterAddressableKeys();
+
+                GameDebug.Log($"UI Service 초기화 완료: UI {_uiInfoDict.Count}개");
+            } catch (Exception e) {
+                GameDebug.LogError($"UI Service 초기화 실패: {e.Message}");
             }
+        }
+
+        public void Dispose() {
+            _addressableService.UnloadAll();
+        }
+
+        private void LoadUIInfoFromCSV() {
+            var csvData = CSVReader.ReadToMultiColumnDictionary("AddressKey/UIAddressKey");
+
+            foreach (var row in csvData) {
+                try {
+                    // CSV / UI Name, UI Type, AddressKey
+                    var uiNameStr = row.Key;
+                    var columns = row.Value;
+                    if (columns.Count != 3) {
+                        GameDebug.LogError($"UI CSV 행 형식 오류: {uiNameStr}");
+                        continue;
+                    }
+
+                    // UIName 파싱
+                    if (!Enum.TryParse<UIName>(uiNameStr, out var uiName)) {
+                        GameDebug.LogError($"알 수 없는 UIName: {uiNameStr}");
+                        continue;
+                    }
+
+                    // UIType 파싱
+                    if (!Enum.TryParse<UIType>(columns[1], out var uiType)) {
+                        GameDebug.LogError($"알 수 없는 UIType: {columns[1]} for {uiNameStr}");
+                        continue;
+                    }
+
+                    // AddressKey
+                    var addressKey = columns[2];
+
+                    var uiInfo = new UIInfoData(uiName, addressKey, uiType);
+                    _uiInfoDict[uiName] = uiInfo;
+                } catch (Exception e) {
+                    GameDebug.LogError($"UI 정보 파싱 실패: {row.Key}, 에러: {e.Message}");
+                }
+            }
+        }
+
+        private void RegisterAddressableKeys() {
+            var addressKeyMap = _uiInfoDict.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.addressableKey
+            );
+
+            _addressableService.RegisterAddressKeys(addressKeyMap);
+            GameDebug.Log($"UI 주소 키 {addressKeyMap.Count}개 등록 완료");
         }
         #endregion
 
         #region 참조 카운트 관리
-        // 참조 카운트 증가
         private void IncreaseRefCount(UIName uiName) {
-            if (!_assetRefCount.ContainsKey(uiName)) _assetRefCount[uiName] = 0;
-            _assetRefCount[uiName]++;
+            if (!_instanceRefCount.ContainsKey(uiName))
+                _instanceRefCount[uiName] = 0;
+            _instanceRefCount[uiName]++;
         }
 
-        // 참조 카운트 감소 및 0이 되면 Addressables 해제
         private void DecreaseRefCount(UIName uiName) {
-            if (!_assetRefCount.ContainsKey(uiName)) return;
+            if (!_instanceRefCount.ContainsKey(uiName)) return;
 
-            _assetRefCount[uiName]--;
-            if (_assetRefCount[uiName] > 0) return; // 아직 참조가 남아있음
-
-            if (_loadedAssets.TryGetValue(uiName, out var handle) && handle.IsValid())
-                Addressables.Release(handle);
-
-            _loadedAssets.Remove(uiName);
-            _assetRefCount.Remove(uiName);
+            _instanceRefCount[uiName]--;
+            if (_instanceRefCount[uiName] <= 0) {
+                _instanceRefCount.Remove(uiName);
+                _addressableService.UnloadAsset(uiName);
+            }
         }
         #endregion
 
-        #region 공개 로드 API
+        #region UI 로드 API
 
-        // Component 단위 로드
+        /// <summary>
+        /// UI를 Component 타입으로 로드합니다
+        /// </summary>
         public async UniTask<T> LoadUIAsync<T>(UIName uiName) where T : Component {
             return await LoadDirectUIAsync<T>(uiName);
         }
 
-        // GameObject 단위 로드
+        /// <summary>
+        /// UI를 GameObject로 로드합니다
+        /// </summary>
         public async UniTask<GameObject> LoadUIGameObjectAsync(UIName uiName) {
             return await LoadDirectUIGameObjectAsync(uiName);
         }
-        public async UniTask<GameObject> LoadUIPrefabAsync(UIName uiName) {
-            return await LoadPrefabAync(uiName);
-        }
-        #endregion
 
-        #region 직접 로드
+        /// <summary>
+        /// UI 프리팹을 로드합니다 (인스턴스화 안함)
+        /// </summary>
+        public async UniTask<GameObject> LoadUIPrefabAsync(UIName uiName) {
+            var prefab = await _addressableService.LoadAssetAsync(uiName);
+
+            if (prefab != null) {
+                GameDebug.Log($"UI 프리팹 로드 완료: {uiName}");
+            } else {
+                GameDebug.LogError($"UI 프리팹 로드 실패: {uiName}");
+            }
+
+            return prefab;
+        }
 
         private async UniTask<T> LoadDirectUIAsync<T>(UIName uiName) where T : Component {
             var gameObject = await LoadDirectUIGameObjectAsync(uiName);
@@ -77,85 +138,195 @@ namespace Game.Services {
             var component = gameObject.GetComponent<T>();
             if (component == null) {
                 GameDebug.LogError($"Component 누락: {typeof(T).Name} in {uiName}");
-                Object.Destroy(gameObject);
-                DecreaseRefCount(uiName);
+                ReleaseUI(gameObject);
                 return null;
             }
 
             return component;
         }
 
-        private async UniTask<GameObject> LoadPrefabAync(UIName uiName) {
-            if (!_uiAddressableKeys.TryGetValue(uiName, out var addressableKey)) {
-                GameDebug.LogError($"UIName에 대한 AddressableKey를 찾을 수 없습니다: {uiName}");
-                return null;
-            }
-            AsyncOperationHandle<GameObject> handle = default;
-            GameObject prefab = null;
-            try {
-                handle = Addressables.LoadAssetAsync<GameObject>(addressableKey);
-                prefab = await handle.ToUniTask();
-                if (prefab == null)
-                    throw new System.IO.FileNotFoundException($"Prefab not found: {addressableKey} for {uiName}");
-
-                _loadedAssets[uiName] = handle;
-                return prefab;
-            }catch(Exception e) {
-                if (handle.IsValid())
-                    GameDebug.LogError($"UI 로드 실패: {uiName} ({addressableKey})\n{e}");
-                throw;
-            }
-        }
-
         private async UniTask<GameObject> LoadDirectUIGameObjectAsync(UIName uiName) {
             GameObject instance = null;
             try {
-                var prefab = await LoadPrefabAync(uiName);
-                instance = DIHelper.InstantiateWithInjection(prefab);
-                IncreaseRefCount(uiName);
+                // AddressableService를 통해 프리팹 로드
+                var prefab = await _addressableService.LoadAssetAsync(uiName);
+                if (prefab == null) {
+                    GameDebug.LogError($"UI 프리팹 로드 실패: {uiName}");
+                    return null;
+                }
 
+                // DI 주입과 함께 인스턴스화
+                instance = DIHelper.InstantiateWithInjection(prefab);
+
+                // 참조 카운트 증가 및 인스턴스 추적
+                IncreaseRefCount(uiName);
+                _activeInstances.Add(instance);
+
+                GameDebug.Log($"UI 인스턴스 생성 완료: {uiName}");
                 return instance;
             } catch (Exception e) {
-                _loadedAssets.Remove(uiName);
+                GameDebug.LogError($"UI 로드 실패: {uiName}, 에러: {e.Message}");
+
                 // 실패 시 자원 정리
-                if (instance != null)
-                    Object.Destroy(instance);
+                if (instance != null) {
+                    ReleaseUI(instance);
+                }
                 throw;
             }
         }
 
-        
-
         #endregion
 
-        #region 해제
+        #region UI 해제
 
         /// <summary>
-        /// UI 오브젝트를 파괴합니다.
+        /// UI 오브젝트를 파괴합니다
         /// </summary>
         public void ReleaseUI(GameObject obj) {
             if (obj != null) {
-                Object.Destroy(obj);
+                // 활성 인스턴스 목록에서 제거
+                _activeInstances.Remove(obj);
+
+                // UIName 찾아서 참조 카운트 감소
+                var uiName = FindUINameByInstance(obj);
+                if (uiName.HasValue) {
+                    DecreaseRefCount(uiName.Value);
+                }
+
+                UnityEngine.Object.Destroy(obj);
+                GameDebug.Log($"UI 인스턴스 해제: {obj.name}");
             }
         }
 
         /// <summary>
-        /// UIName을 지정해 참조 카운트를 감소시킵니다.
+        /// UIName을 지정해 참조 카운트를 감소시킵니다
         /// </summary>
         public void ReleaseUI(UIName uiName) {
             DecreaseRefCount(uiName);
+            GameDebug.Log($"UI 참조 해제: {uiName}");
         }
 
         /// <summary>
-        /// 모든 Addressables 자원을 일괄 해제합니다.
+        /// 모든 UI 인스턴스와 자원을 해제합니다
         /// </summary>
         public void ReleaseAll() {
-            // 남아 있는 Addressables 참조 강제 0으로 설정 후 해제
-            foreach (var uiName in new List<UIName>(_assetRefCount.Keys)) {
-                _assetRefCount[uiName] = 0;
-                DecreaseRefCount(uiName);
+            // 모든 활성 인스턴스 파괴
+            foreach (var instance in new List<GameObject>(_activeInstances)) {
+                if (instance != null) {
+                    UnityEngine.Object.Destroy(instance);
+                }
             }
+
+            _activeInstances.Clear();
+            _instanceRefCount.Clear();
+
+            // AddressableService의 모든 UI 에셋 언로드
+            _addressableService.UnloadAll();
+
+            GameDebug.Log("모든 UI 자원 해제 완료");
         }
+
+        #endregion
+
+        #region UI 정보 조회
+
+        /// <summary>
+        /// UIName으로 UI 정보를 가져옵니다
+        /// </summary>
+        public UIInfoData GetUIInfo(UIName uiName) {
+            _uiInfoDict.TryGetValue(uiName, out var uiInfo);
+            return uiInfo;
+        }
+
+        /// <summary>
+        /// UIName으로 AddressableKey를 가져옵니다
+        /// </summary>
+        public string GetAddressableKey(UIName uiName) {
+            var uiInfo = GetUIInfo(uiName);
+            return uiInfo?.addressableKey ?? string.Empty;
+        }
+
+        /// <summary>
+        /// UIName으로 UIType을 가져옵니다
+        /// </summary>
+        public UIType GetUIType(UIName uiName) {
+            var uiInfo = GetUIInfo(uiName);
+            return uiInfo?.uiType ?? UIType.Screen;
+        }
+
+        /// <summary>
+        /// 특정 UIType에 해당하는 모든 UI 목록을 가져옵니다
+        /// </summary>
+        public List<UIInfoData> GetUIsByType(UIType uiType) {
+            return _uiInfoDict.Values
+                .Where(info => info.uiType == uiType)
+                .ToList();
+        }
+
+        /// <summary>
+        /// 모든 UI 정보를 가져옵니다
+        /// </summary>
+        public IReadOnlyDictionary<UIName, UIInfoData> GetAllUIInfo() {
+            return _uiInfoDict;
+        }
+
+        /// <summary>
+        /// UI가 존재하는지 확인합니다
+        /// </summary>
+        public bool HasUI(UIName uiName) {
+            return _uiInfoDict.ContainsKey(uiName);
+        }
+
+        #endregion
+
+        #region 상태 조회
+
+        /// <summary>
+        /// 로드된 UI 프리팹이 있는지 확인합니다
+        /// </summary>
+        public bool HasLoadedPrefab(UIName uiName) {
+            return _addressableService.HasAsset(uiName);
+        }
+
+        /// <summary>
+        /// UI 주소 키가 등록되어 있는지 확인합니다
+        /// </summary>
+        public bool HasUIKey(UIName uiName) {
+            return _addressableService.HasAddressKey(uiName);
+        }
+
+        /// <summary>
+        /// 현재 활성 인스턴스 개수를 반환합니다
+        /// </summary>
+        public int GetActiveInstanceCount() {
+            return _activeInstances.Count;
+        }
+
+        /// <summary>
+        /// 특정 UI의 참조 카운트를 반환합니다
+        /// </summary>
+        public int GetRefCount(UIName uiName) {
+            return _instanceRefCount.GetValueOrDefault(uiName, 0);
+        }
+
+        #endregion
+
+        #region 유틸리티
+
+        private UIName? FindUINameByInstance(GameObject instance) {
+            // 인스턴스 이름이나 태그를 통해 UIName을 찾는 로직
+            var instanceName = instance.name.Replace("(Clone)", "");
+
+            foreach (UIName uiName in System.Enum.GetValues(typeof(UIName))) {
+                if (instanceName.Contains(uiName.ToString())) {
+                    return uiName;
+                }
+            }
+
+            return null;
+        }
+
+  
 
         #endregion
     }

@@ -41,7 +41,7 @@ namespace Game.Core.Event
             var subject = GetOrCreateSubject<T>();
             var subscription = subject.Subscribe(onEvent);
 
-            GameDebug.Log($"이벤트 구독: {typeof(T).Name}");
+            //GameDebug.Log($"이벤트 구독: {typeof(T).Name}");
             return subscription;
         }
 
@@ -66,7 +66,7 @@ namespace Game.Core.Event
                 // Subject를 disposables에 추가하여 메모리 관리
                 newSubject.AddTo(_disposables);
 
-                GameDebug.Log($"새로운 이벤트 스트림 생성: {eventType.Name}");
+                //GameDebug.Log($"새로운 이벤트 스트림 생성: {eventType.Name}");
                 return newSubject;
             }
 
