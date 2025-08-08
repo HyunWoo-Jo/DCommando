@@ -62,35 +62,120 @@ namespace Game.Systems {
         #region 공격 처리
 
         /// <summary>
-        /// 기본 공격 처리
+        /// 타입별 공격 처리 
         /// </summary>
-        public bool ProcessAttack(int attackerId, int targetId) {
-
-
+        public bool ProcessAttack(int attackerId, int targetId, DamageType damageType, bool isCritical = false) {
             if (!ValidateAttack(attackerId, targetId)) return false;
 
             int attackPower = _combatModel.GetFinalAttack(attackerId);
             int defense = _combatModel.GetFinalDefense(targetId);
 
-            return ApplyDamage(attackerId, targetId, attackPower, defense);
+            return ApplyDamage(attackerId, targetId, attackPower, defense, damageType, isCritical);
         }
+
+        /// <summary>
+        /// 물리 공격 처리
+        /// </summary>
+        public bool ProcessPhysicalAttack(int attackerId, int targetId, bool isCritical = false) {
+            return ProcessAttack(attackerId, targetId, DamageType.Physical, isCritical);
+        }
+
+        /// <summary>
+        /// 마법 공격 처리
+        /// </summary>
+        public bool ProcessMagicAttack(int attackerId, int targetId, bool isCritical = false) {
+            return ProcessAttack(attackerId, targetId, DamageType.Magic, isCritical);
+        }
+
+        /// <summary>
+        /// 화염 공격 처리 / 지속 피해
+        /// </summary>
+        public bool ProcessFireAttack(int attackerId, int targetId, bool isCritical = false) {
+            return ProcessAttack(attackerId, targetId, DamageType.Fire, isCritical);
+        }
+
+        /// <summary>
+        /// 얼음 공격 처리
+        /// </summary>
+        public bool ProcessIceAttack(int attackerId, int targetId, bool isCritical = false) {
+            return ProcessAttack(attackerId, targetId, DamageType.Ice, isCritical);
+        }
+
+        /// <summary>
+        /// 번개 공격 처리
+        /// </summary>
+        public bool ProcessLightningAttack(int attackerId, int targetId, bool isCritical = false) {
+            return ProcessAttack(attackerId, targetId, DamageType.Lightning, isCritical);
+        }
+
+        /// <summary>
+        /// 독 데미지 처리 (방어력 무시) / 지속피해
+        /// </summary>
+        public bool ProcessPoisonDamage(int targetId, int poisonDamage) {
+            if (!_healthSystem.CanTakeDamage(targetId)) return false;
+
+            bool success = _healthSystem.TakeDamage(targetId, poisonDamage, DamageType.Poison);
+            GameDebug.Log($"독 데미지 적용 Target {targetId}: {poisonDamage} damage");
+
+            return success;
+        }
+
+        /// <summary>
+        /// 순수 데미지 처리 (방어력 무시)
+        /// </summary>
+        public bool ProcessPureDamage(int attackerId, int targetId, int pureDamage) {
+            if (!ValidateAttack(attackerId, targetId)) return false;
+
+            bool success = _healthSystem.TakeDamage(targetId, pureDamage, DamageType.Pure);
+            GameDebug.Log($"순수 데미지 적용 Character {attackerId} -> {targetId}: {pureDamage} pure damage");
+
+            return success;
+        }
+
+        /// <summary>
+        /// 치료 처리
+        /// </summary>
+        public bool ProcessHeal(int targetId, int healAmount, int healerId = -1) {
+            if (!_healthSystem.CanHeal(targetId)) return false;
+
+            bool success = _healthSystem.Heal(targetId, healAmount);
+
+            if (success && healerId != -1) {
+                GameDebug.Log($"치료 적용 Character {healerId} -> {targetId}: {healAmount} heal");
+            }
+
+            return success;
+        }
+
 
         #endregion
 
         #region 데미지 계산 및 적용
 
         /// <summary>
-        /// 데미지 계산 및 적용
+        /// 데미지 계산 및 적용 (수정됨)
         /// </summary>
-        private bool ApplyDamage(int attackerId, int targetId, int baseDamage, int defense) {
-            // 최종 데미지 계산 (방어력 적용)
-            int finalDamage = CalculateFinalDamage(baseDamage, defense);
+        private bool ApplyDamage(int attackerId, int targetId, int baseDamage, int defense, DamageType damageType, bool isCritical = false) {
+            int finalDamage;
+
+            // 순수 데미지나 독은 방어력 무시
+            if (damageType == DamageType.Pure || damageType == DamageType.Poison) {
+                finalDamage = baseDamage;
+            } else {
+                finalDamage = CalculateFinalDamage(baseDamage, defense);
+            }
+
+            // 크리티컬 적용 (치료는 제외)
+            if (isCritical && damageType != DamageType.Heal) {
+                finalDamage = Mathf.RoundToInt(finalDamage * CRITICAL_DAMAGE_MULTIPLIER);
+            }
 
             // HealthSystem을 통해 데미지 적용
-            bool success = _healthSystem.TakeDamage(targetId, finalDamage);
+            bool success = _healthSystem.TakeDamage(targetId, finalDamage, damageType);
 
             if (success) {
-                GameDebug.Log($"캐릭터 {attackerId}가 {targetId}에게 {finalDamage} 데미지 (기본: {baseDamage}, 방어력: {defense})");
+                string criticalText = isCritical ? " (크리티컬!)" : "";
+                GameDebug.Log($"캐릭터 {attackerId}가 {targetId}에게 {finalDamage} {damageType} 데미지{criticalText}");
             }
 
             return success;
@@ -190,12 +275,12 @@ namespace Game.Systems {
             }
 
             if (!_healthSystem.HasCharacter(attackerId)) {
-                GameDebug.LogError($"공격자 Health 데이터 없음 Character {attackerId}");
+                GameDebug.LogWarning($"공격자 Health 데이터 없음 Character {attackerId}");
                 return false;
             }
 
             if (_healthSystem.IsDead(attackerId)) {
-                GameDebug.LogError($"사망한 공격자 Character {attackerId}");
+                GameDebug.LogWarning($"사망한 공격자 Character {attackerId}");
                 return false;
             }
 
@@ -206,7 +291,7 @@ namespace Game.Systems {
             }
 
             if (!_healthSystem.CanTakeDamage(targetId)) {
-                GameDebug.LogError($"데미지를 받을 수 없는 대상 Character {targetId}");
+                GameDebug.LogWarning($"데미지를 받을 수 없는 대상 Character {targetId}");
                 return false;
             }
 

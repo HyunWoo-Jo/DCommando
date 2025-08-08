@@ -1,27 +1,27 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Game.Core;
 
 namespace Game.Core {
     /// <summary>
-    /// µ¥¹ÌÁö UI ½ºÅ¸ÀÏ ¼³Á¤ ScriptableObject
+    /// ë°ë¯¸ì§€ UI ìŠ¤íƒ€ì¼ ì„¤ì • ScriptableObject
     /// </summary>
     [CreateAssetMenu(fileName = "DamageUIStyle", menuName = "Styles/DamageUIStyle")]
     public class SO_DamageUIStyle : ScriptableObject {
-        [Header("µ¥¹ÌÁö Å¸ÀÔº° »ö»ó")]
+        [Header("ë°ë¯¸ì§€ íƒ€ì…ë³„ ìƒ‰ìƒ")]
         [SerializeField]
         private DamageTypeColorData[] _damageTypeColors = new DamageTypeColorData[]
         {
-            new DamageTypeColorData { damageType = DamageType.Physical, color = Color.red, displayName = "¹°¸®" },
-            new DamageTypeColorData { damageType = DamageType.Magic, color = Color.blue, displayName = "¸¶¹ı" },
-            new DamageTypeColorData { damageType = DamageType.Fire, color = new Color(1f, 0.5f, 0f), displayName = "È­¿°" },
-            new DamageTypeColorData { damageType = DamageType.Ice, color = Color.cyan, displayName = "¾óÀ½" },
-            new DamageTypeColorData { damageType = DamageType.Poison, color = Color.green, displayName = "µ¶" },
-            new DamageTypeColorData { damageType = DamageType.Lightning, color = Color.yellow, displayName = "¹ø°³" },
-            new DamageTypeColorData { damageType = DamageType.Pure, color = Color.white, displayName = "¼ø¼ö" },
-            new DamageTypeColorData { damageType = DamageType.Heal, color = new Color(0f, 1f, 0.5f), displayName = "È¸º¹" }
+            new DamageTypeColorData { damageType = DamageType.Physical, color = Color.red, displayName = "ë¬¼ë¦¬" },
+            new DamageTypeColorData { damageType = DamageType.Magic, color = Color.blue, displayName = "ë§ˆë²•" },
+            new DamageTypeColorData { damageType = DamageType.Fire, color = new Color(1f, 0.5f, 0f), displayName = "í™”ì—¼" },
+            new DamageTypeColorData { damageType = DamageType.Ice, color = Color.cyan, displayName = "ì–¼ìŒ" },
+            new DamageTypeColorData { damageType = DamageType.Poison, color = Color.green, displayName = "ë…" },
+            new DamageTypeColorData { damageType = DamageType.Lightning, color = Color.yellow, displayName = "ë²ˆê°œ" },
+            new DamageTypeColorData { damageType = DamageType.Pure, color = Color.white, displayName = "ìˆœìˆ˜" },
+            new DamageTypeColorData { damageType = DamageType.Heal, color = new Color(0f, 1f, 0.5f), displayName = "íšŒë³µ" }
         };
 
-        [Header("ÇÃ·ÎÆÃ UI Å¸ÀÔº° ¼³Á¤")]
+        [Header("í”Œë¡œíŒ… UI íƒ€ì…ë³„ ì„¤ì •")]
         [SerializeField]
         private FloatingUIStyleData[] _floatingUIStyles = new FloatingUIStyleData[]
         {
@@ -48,23 +48,23 @@ namespace Game.Core {
             }
         };
 
-        [Header("¾Ö´Ï¸ŞÀÌ¼Ç ¼³Á¤")]
+        [Header("ì• ë‹ˆë©”ì´ì…˜ ì„¤ì •")]
         [SerializeField] private Vector3 _startOffset = new Vector3(0, 50f, 0);
         [SerializeField] private Vector3 _endOffset = new Vector3(0, 150f, 0);
         [SerializeField] private float _fadeDelay = 0.5f;
         [SerializeField] private AnimationCurve _movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-        [Header("Miss Àü¿ë »ö»ó")]
+        [Header("Miss ì „ìš© ìƒ‰ìƒ")]
         [SerializeField] private Color _missColor = Color.gray;
 
-        // ÇÁ·ÎÆÛÆ¼
+        // í”„ë¡œí¼í‹°
         public Vector3 StartOffset => _startOffset;
         public Vector3 EndOffset => _endOffset;
         public float FadeDelay => _fadeDelay;
         public AnimationCurve MovementCurve => _movementCurve;
         public Color MissColor => _missColor;
 
-        // µ¥¹ÌÁö Å¸ÀÔº° »ö»ó °¡Á®¿À±â
+        // ë°ë¯¸ì§€ íƒ€ì…ë³„ ìƒ‰ìƒ ê°€ì ¸ì˜¤ê¸°
         public Color GetDamageTypeColor(DamageType damageType) {
             foreach (var data in _damageTypeColors) {
                 if (data.damageType == damageType) {
@@ -72,11 +72,11 @@ namespace Game.Core {
                 }
             }
 
-            // ±âº»°ª (¹°¸® µ¥¹ÌÁö)
+            // ê¸°ë³¸ê°’ (ë¬¼ë¦¬ ë°ë¯¸ì§€)
             return Color.red;
         }
 
-        // µ¥¹ÌÁö Å¸ÀÔº° Ç¥½Ã ÀÌ¸§ °¡Á®¿À±â
+        // ë°ë¯¸ì§€ íƒ€ì…ë³„ í‘œì‹œ ì´ë¦„ ê°€ì ¸ì˜¤ê¸°
         public string GetDamageTypeDisplayName(DamageType damageType) {
             foreach (var data in _damageTypeColors) {
                 if (data.damageType == damageType) {
@@ -87,7 +87,7 @@ namespace Game.Core {
             return damageType.ToString();
         }
 
-        // ÇÃ·ÎÆÃ UI Å¸ÀÔº° ½ºÅ¸ÀÏ °¡Á®¿À±â
+        // í”Œë¡œíŒ… UI íƒ€ì…ë³„ ìŠ¤íƒ€ì¼ ê°€ì ¸ì˜¤ê¸°
         public FloatingUIStyleData GetFloatingUIStyle(DamageUIType uiType) {
             foreach (var data in _floatingUIStyles) {
                 if (data.uiType == uiType) {
@@ -95,7 +95,7 @@ namespace Game.Core {
                 }
             }
 
-            // ±âº»°ª
+            // ê¸°ë³¸ê°’
             return new FloatingUIStyleData {
                 uiType = DamageUIType.Normal,
                 fontSizeMultiplier = 1.0f,
@@ -104,69 +104,69 @@ namespace Game.Core {
             };
         }
 
-        // ¸ğµç µ¥¹ÌÁö Å¸ÀÔ »ö»ó µ¥ÀÌÅÍ ¹İÈ¯ (¿¡µğÅÍ¿ë)
+        // ëª¨ë“  ë°ë¯¸ì§€ íƒ€ì… ìƒ‰ìƒ ë°ì´í„° ë°˜í™˜ (ì—ë””í„°ìš©)
         public DamageTypeColorData[] GetAllDamageTypeColors() {
             return _damageTypeColors;
         }
 
-        // ¸ğµç ÇÃ·ÎÆÃ UI ½ºÅ¸ÀÏ µ¥ÀÌÅÍ ¹İÈ¯ (¿¡µğÅÍ¿ë)
+        // ëª¨ë“  í”Œë¡œíŒ… UI ìŠ¤íƒ€ì¼ ë°ì´í„° ë°˜í™˜ (ì—ë””í„°ìš©)
         public FloatingUIStyleData[] GetAllFloatingUIStyles() {
             return _floatingUIStyles;
         }
 
 #if UNITY_EDITOR
-        // ¿¡µğÅÍ¿¡¼­ °ª °ËÁõ
+        // ì—ë””í„°ì—ì„œ ê°’ ê²€ì¦
         private void OnValidate()
         {
-            // µ¥¹ÌÁö Å¸ÀÔÀÌ ¸ğµÎ ¼³Á¤µÇ¾î ÀÖ´ÂÁö È®ÀÎ
+            // ë°ë¯¸ì§€ íƒ€ì…ì´ ëª¨ë‘ ì„¤ì •ë˜ì–´ ìˆëŠ”ì§€ í™•ì¸
             var allDamageTypes = System.Enum.GetValues(typeof(DamageType));
             if (_damageTypeColors.Length != allDamageTypes.Length)
             {
-                Debug.LogWarning($"DamageUIStyle: ¸ğµç µ¥¹ÌÁö Å¸ÀÔÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù. ÇöÀç: {_damageTypeColors.Length}, ÇÊ¿ä: {allDamageTypes.Length}");
+                Debug.LogWarning($"DamageUIStyle: ëª¨ë“  ë°ë¯¸ì§€ íƒ€ì…ì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. í˜„ì¬: {_damageTypeColors.Length}, í•„ìš”: {allDamageTypes.Length}");
             }
             
-            // ÇÃ·ÎÆÃ UI Å¸ÀÔÀÌ ¸ğµÎ ¼³Á¤µÇ¾î ÀÖ´ÂÁö È®ÀÎ
+            // í”Œë¡œíŒ… UI íƒ€ì…ì´ ëª¨ë‘ ì„¤ì •ë˜ì–´ ìˆëŠ”ì§€ í™•ì¸
             var allDamageUITypes = System.Enum.GetValues(typeof(DamageUIType));
             if (_floatingUIStyles.Length != allDamageUITypes.Length)
             {
-                Debug.LogWarning($"DamageUIStyle: ¸ğµç ÇÃ·ÎÆÃ UI Å¸ÀÔÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù. ÇöÀç: {_floatingUIStyles.Length}, ÇÊ¿ä: {allDamageUITypes.Length}");
+                Debug.LogWarning($"DamageUIStyle: ëª¨ë“  í”Œë¡œíŒ… UI íƒ€ì…ì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. í˜„ì¬: {_floatingUIStyles.Length}, í•„ìš”: {allDamageUITypes.Length}");
             }
         }
 #endif
     }
 
     /// <summary>
-    /// µ¥¹ÌÁö Å¸ÀÔº° »ö»ó µ¥ÀÌÅÍ
+    /// ë°ë¯¸ì§€ íƒ€ì…ë³„ ìƒ‰ìƒ ë°ì´í„°
     /// </summary>
     [System.Serializable]
     public struct DamageTypeColorData {
-        [Header("µ¥¹ÌÁö Å¸ÀÔ")]
+        [Header("ë°ë¯¸ì§€ íƒ€ì…")]
         public DamageType damageType;
 
-        [Header("UI »ö»ó")]
+        [Header("UI ìƒ‰ìƒ")]
         public Color color;
 
-        [Header("Ç¥½Ã ÀÌ¸§")]
+        [Header("í‘œì‹œ ì´ë¦„")]
         public string displayName;
     }
 
     /// <summary>
-    /// ÇÃ·ÎÆÃ UI Å¸ÀÔº° ½ºÅ¸ÀÏ µ¥ÀÌÅÍ
+    /// í”Œë¡œíŒ… UI íƒ€ì…ë³„ ìŠ¤íƒ€ì¼ ë°ì´í„°
     /// </summary>
     [System.Serializable]
     public struct FloatingUIStyleData {
-        [Header("UI Å¸ÀÔ")]
+        [Header("UI íƒ€ì…")]
         public DamageUIType uiType;
 
-        [Header("ÆùÆ® Å©±â ¹èÀ²")]
+        [Header("í°íŠ¸ í¬ê¸° ë°°ìœ¨")]
         [Range(0.1f, 3.0f)]
         public float fontSizeMultiplier;
 
-        [Header("¾Ö´Ï¸ŞÀÌ¼Ç Áö¼Ó ½Ã°£")]
+        [Header("ì• ë‹ˆë©”ì´ì…˜ ì§€ì† ì‹œê°„")]
         [Range(0.5f, 5.0f)]
         public float animationDuration;
 
-        [Header("½ºÄÉÀÏ ¹èÀ²")]
+        [Header("ìŠ¤ì¼€ì¼ ë°°ìœ¨")]
         [Range(0.1f, 3.0f)]
         public float scaleMultiplier;
     }

@@ -4,6 +4,7 @@ using Game.Models;
 using Game.Core;
 using Game.Core.Event;
 using System;
+using static PlasticGui.PlasticTableCell;
 
 namespace Game.Systems {
     public class HealthSystem {
@@ -57,7 +58,7 @@ namespace Game.Systems {
 
         #region 데미지 처리
         // 데미지 처리
-        public bool TakeDamage(int characterID, int damage) {
+        public bool TakeDamage(int characterID, int damage, DamageType damageType) {
             // 유효성 검사
             if (!ValidateCharacterExists(characterID)) return false;
             if (!ValidateDamageAmount(damage)) return false;
@@ -71,7 +72,7 @@ namespace Game.Systems {
             GameDebug.Log($"캐릭터 데미지 Character {characterID} took {actualDamage} damage ({prevHp} → {currentHp})");
 
             // 이벤트 발행
-            EventBus.Publish(new DamageTakenEvent(characterID, DamageType.Physical, actualDamage, currentHp));
+            EventBus.Publish(new DamageTakenEvent(characterID, damageType, actualDamage, currentHp));
 
             // 사망 체크
             if (_healthModel.IsDead(characterID)) {
@@ -93,7 +94,7 @@ namespace Game.Systems {
             if (!CanTakeDamage(characterID)) return false;
 
             var currentHp = _healthModel.GetCurrentHp(characterID);
-            return TakeDamage(characterID, currentHp);
+            return TakeDamage(characterID, currentHp, DamageType.Pure);
         }
         #endregion
 

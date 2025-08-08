@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 using Game.Core.Event;
 using Game.Core;
 using System;
+using Cysharp.Threading.Tasks;
+using R3;
 namespace Game.Systems {
     /// <summary>
     /// Health 를 관리해주는 Component
@@ -20,16 +22,20 @@ namespace Game.Systems {
 
         private GameObject _uiObject;
 
-        private IDisposable _disposable;
+        private CompositeDisposable _Initdisposable = new(); // 초기화용 1회성
+        private CompositeDisposable _disposable = new();
 
         // 해제
         private void OnDestroy() {
             _healthSystem.UnregisterCharacter(gameObject.GetInstanceID());
+            _Initdisposable?.Dispose();
             _disposable?.Dispose();
             if (_uiObject != null) {
                 EventBus.Publish(new UICloseEvent(gameObject.GetInstanceID(), UIName.Health_UI, _uiObject));
             }
         }
+
+        
 
         private void Start() {
             int id = gameObject.GetInstanceID();
@@ -37,8 +43,12 @@ namespace Game.Systems {
             _healthSystem.SetCurrentHp(id, _healthData.currentHp);
 
             if (_isUseUI) {
-                _disposable = EventBus.Subscribe<UIOpenedNotificationEvent>(OnOpenHealthUI);
+                // UI 생성 Bind
+                EventBus.Subscribe<UIOpenedNotificationEvent>(OnOpenHealthUI).AddTo(_Initdisposable);
                 EventBus.Publish(new UICreationEvent(id, UIName.Health_UI));
+
+                // UI Hide
+                EventBus.Subscribe<CharacterDeathEvent>(OnDeathHideUI).AddTo(_disposable);
             }
             
         }
@@ -51,7 +61,14 @@ namespace Game.Systems {
             if (openEvent.id == gameObject.GetInstanceID() && openEvent.uiName == UIName.Health_UI) {
                 _uiObject = openEvent.uiObject;
                 openEvent.uiObject.GetComponent<IHealthInitializable>().InitHealth(this.gameObject, _offset);
-                _disposable?.Dispose();
+                _Initdisposable?.Dispose(); 
+            }
+        }
+
+        // 죽으면 View를 Hide상태로 변경
+        private void OnDeathHideUI(CharacterDeathEvent deathEvent) {
+            if (deathEvent.characterID == gameObject.GetInstanceID()) {
+                _uiObject.SetActive(false);
             }
         }
     }

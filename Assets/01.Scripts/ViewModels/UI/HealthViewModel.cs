@@ -156,7 +156,7 @@ namespace Game.ViewModels {
         /// 데미지 처리
         /// </summary>
         public bool TakeDamage(int characterID, int damage) {
-            var result = _healthSystem?.TakeDamage(characterID, damage) ?? false;
+            var result = _healthSystem?.TakeDamage(characterID, damage, Core.DamageType.Physical) ?? false;
             if (result) {
                 OnHealthNotification.OnNext($"Character {characterID} took {damage} damage");
             }

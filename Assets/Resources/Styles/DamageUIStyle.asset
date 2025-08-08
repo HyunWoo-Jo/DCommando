@@ -50,8 +50,8 @@ MonoBehaviour:
     fontSizeMultiplier: 0.8
     animationDuration: 1.2
     scaleMultiplier: 0.9
-  _startOffset: {x: 0, y: 50, z: 0}
-  _endOffset: {x: 0, y: 150, z: 0}
+  _startOffset: {x: 0, y: 40, z: 0}
+  _endOffset: {x: 0, y: 70, z: 0}
   _fadeDelay: 0.5
   _movementCurve:
     serializedVersion: 2

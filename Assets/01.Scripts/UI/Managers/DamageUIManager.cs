@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using TMPro;
@@ -11,7 +11,7 @@ using R3;
 
 namespace Game.UI {
     /// <summary>
-    /// µ¥¹ÌÁö UI ¸Å´ÏÀú - ÇÃ·ÎÆÃ µ¥¹ÌÁö ÅØ½ºÆ®¸¦ Object Pool·Î °ü¸®
+    /// ë°ë¯¸ì§€ UI ë§¤ë‹ˆì € - í”Œë¡œíŒ… ë°ë¯¸ì§€ í…ìŠ¤íŠ¸ë¥¼ Object Poolë¡œ ê´€ë¦¬
     /// </summary>
     public class DamageUIManager : MonoBehaviour {
         [Header("Dependencies")]
@@ -22,7 +22,7 @@ namespace Game.UI {
         [SerializeField] private int _poolDefaultCapacity = 20;
         [SerializeField] private int _poolMaxSize = 100;
 
-        // ³»ºÎ º¯¼ö
+        // ë‚´ë¶€ ë³€ìˆ˜
         private Dictionary<int, Transform> _healthPositionDict = new();
         private CompositeDisposable _disposables = new();
         private ObjectPool<TextMeshProUGUI> _damageUIPool;
@@ -40,7 +40,7 @@ namespace Game.UI {
             _viewModel?.ReleaseDamageUI();
         }
 
-        // ¹ÙÀÎµù
+        // ë°”ì¸ë”©
         private void Bind() {
             EventBus.Subscribe<UIOpenedNotificationEvent>(OnOpenedHealthUI)
                 .AddTo(_disposables);
@@ -52,14 +52,14 @@ namespace Game.UI {
                 .AddTo(_disposables);
         }
 
-        // µ¥¹ÌÁö UI ÃÊ±âÈ­
+        // ë°ë¯¸ì§€ UI ì´ˆê¸°í™”
         private async void InitializeDamageUIAsync() {
             try {
-                // ºñµ¿±â·Î ÇÁ¸®ÆÕ ·Îµå
+                // ë¹„ë™ê¸°ë¡œ í”„ë¦¬íŒ¹ ë¡œë“œ
                 _damageUIPrefab = await _viewModel.LoadDamageUIPrefabAsync();
                 _damageUIParent = _viewModel.GetParent(UIType.HUD);
 
-                // Object Pool »ı¼º
+                // Object Pool ìƒì„±
                 _damageUIPool = new ObjectPool<TextMeshProUGUI>(
                     createFunc: CreateDamageUI,
                     actionOnGet: OnGetDamageUI,
@@ -70,18 +70,18 @@ namespace Game.UI {
                     maxSize: _poolMaxSize
                 );
 
-                GameDebug.Log($"DamageUIManager ÃÊ±âÈ­ ¿Ï·á Pool Size: {_poolDefaultCapacity}");
+                GameDebug.Log($"DamageUIManager ì´ˆê¸°í™” ì™„ë£Œ Pool Size: {_poolDefaultCapacity}");
             } catch (System.Exception e) {
-                GameDebug.LogError($"DamageUIManager ÃÊ±âÈ­ ½ÇÆĞ: {e.Message}");
+                GameDebug.LogError($"DamageUIManager ì´ˆê¸°í™” ì‹¤íŒ¨: {e.Message}");
             }
         }
 
-        #region Object Pool °ü¸®
+        #region Object Pool ê´€ë¦¬
 
-        // ¿ÀºêÁ§Æ® »ı¼º
+        // ì˜¤ë¸Œì íŠ¸ ìƒì„±
         private TextMeshProUGUI CreateDamageUI() {
             if (_damageUIPrefab == null || _damageUIParent == null) {
-                GameDebug.LogError("DamageUI Prefab ¶Ç´Â Parent°¡ null");
+                GameDebug.LogError("DamageUI Prefab ë˜ëŠ” Parentê°€ null");
                 return null;
             }
 
@@ -89,18 +89,18 @@ namespace Game.UI {
             return obj.GetComponent<TextMeshProUGUI>();
         }
 
-        // Ç®¿¡¼­ °¡Á®¿Ã ¶§
+        // í’€ì—ì„œ ê°€ì ¸ì˜¬ ë•Œ
         private void OnGetDamageUI(TextMeshProUGUI textComp) {
             textComp.gameObject.SetActive(true);
             if (textComp != null) {
                 textComp.alpha = 1.0f;
             }
 
-            // Æ®À© Á¤Áö
+            // íŠ¸ìœˆ ì •ì§€
             textComp.gameObject.transform.DOKill();
         }
 
-        // Ç®·Î ¹İÈ¯ÇÒ ¶§
+        // í’€ë¡œ ë°˜í™˜í•  ë•Œ
         private void OnReleaseDamageUI(TextMeshProUGUI textComp) {
             if (textComp != null) {
                 var obj = textComp.gameObject;
@@ -109,7 +109,7 @@ namespace Game.UI {
             }
         }
 
-        // ¿ÀºêÁ§Æ® ÆÄ±«ÇÒ ¶§
+        // ì˜¤ë¸Œì íŠ¸ íŒŒê´´í•  ë•Œ
         private void OnDestroyDamageUI(TextMeshProUGUI textComp) {
             if (textComp != null) {
                 textComp.transform.DOKill();
@@ -119,20 +119,20 @@ namespace Game.UI {
 
         #endregion
 
-        #region UI ÀÌº¥Æ® Ã³¸®
+        #region UI ì´ë²¤íŠ¸ ì²˜ë¦¬
 
-        // Health UI »ı¼º ½Ã À§Ä¡ µî·Ï
+        // Health UI ìƒì„± ì‹œ ìœ„ì¹˜ ë“±ë¡
         private void OnOpenedHealthUI(UIOpenedNotificationEvent openedEvent) {
             if (openedEvent.uiName == UIName.Health_UI) {
                 _healthPositionDict[openedEvent.id] = openedEvent.uiObject.transform;
-                GameDebug.Log($"Health UI À§Ä¡ µî·Ï Character {openedEvent.id}");
+                GameDebug.Log($"Health UI ìœ„ì¹˜ ë“±ë¡ Character {openedEvent.id}");
             }
         }
 
-        // Health UI Á¦°Å ½Ã À§Ä¡ ÇØÁ¦
+        // Health UI ì œê±° ì‹œ ìœ„ì¹˜ í•´ì œ
         private void OnClosedHealthUI(UIClosedNotificationEvent closedEvent) {
             if (closedEvent.uiName == UIName.Health_UI) {
-                // ID¸¦ Á÷Á¢ °¡Á®¿Ã ¼ö ¾øÀ¸¹Ç·Î nullÀÎ Transform Á¦°Å
+                // IDë¥¼ ì§ì ‘ ê°€ì ¸ì˜¬ ìˆ˜ ì—†ìœ¼ë¯€ë¡œ nullì¸ Transform ì œê±°
                 var keysToRemove = new List<int>();
                 foreach (var kvp in _healthPositionDict) {
                     if (kvp.Value == null) {
@@ -142,84 +142,84 @@ namespace Game.UI {
 
                 foreach (var key in keysToRemove) {
                     _healthPositionDict.Remove(key);
-                    GameDebug.Log($"Health UI À§Ä¡ ÇØÁ¦ Character {key}");
+                    GameDebug.Log($"Health UI ìœ„ì¹˜ í•´ì œ Character {key}");
                 }
             }
         }
 
         #endregion
 
-        #region µ¥¹ÌÁö/Ä¡·á UI »ı¼º
+        #region ë°ë¯¸ì§€/ì¹˜ë£Œ UI ìƒì„±
 
-        // µ¥¹ÌÁö UI »ı¼º (ÀÌº¥Æ®¿¡¼­ È£Ãâ)
+        // ë°ë¯¸ì§€ UI ìƒì„± (ì´ë²¤íŠ¸ì—ì„œ í˜¸ì¶œ)
         private void OnDamageUI(DamageTakenEvent damageEvent) {
             ShowDamageUI(damageEvent.characterID, damageEvent.damage, damageEvent.type);
         }
 
-        // Ä¡·á UI »ı¼º (ÀÌº¥Æ®¿¡¼­ È£Ãâ)
+        // ì¹˜ë£Œ UI ìƒì„± (ì´ë²¤íŠ¸ì—ì„œ í˜¸ì¶œ)
         private void OnHealUI(HealedEvent healedEvent) {
             ShowDamageUI(healedEvent.characterID, healedEvent.healAmount, DamageType.Heal);
         }
 
-        // µ¥¹ÌÁö UI »ı¼º (°ø°³ ¸Ş¼­µå)
+        // ë°ë¯¸ì§€ UI ìƒì„± (ê³µê°œ ë©”ì„œë“œ)
         public void ShowDamageUI(int characterId, int amount, DamageType damageType, bool isCritical = false) {
             if (!CanShowDamageUI(characterId)) return;
 
             var textComp = _damageUIPool.Get();
             if (textComp == null) {
-                GameDebug.LogError("TextMeshProUGUI ÄÄÆ÷³ÍÆ®¸¦ Ã£À» ¼ö ¾øÀ½");
+                GameDebug.LogError("TextMeshProUGUI ì»´í¬ë„ŒíŠ¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŒ");
                 _damageUIPool.Release(textComp);
                 return;
             }
 
-            // UI ¼³Á¤
+            // UI ì„¤ì •
             SetupDamageUI(textComp, amount, damageType, isCritical);
 
-            // À§Ä¡ ¼³Á¤
+            // ìœ„ì¹˜ ì„¤ì •
             Vector3 worldPos = _healthPositionDict[characterId].position;
             Vector3 startPos = worldPos + _damageUIStyle.StartOffset;
             textComp.gameObject.transform.position = startPos;
 
-            // ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ
+            // ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘
             StartDamageAnimation(textComp, isCritical);
 
-            GameDebug.Log($"µ¥¹ÌÁö UI »ı¼º Character {characterId}: {amount} {damageType} damage");
+            GameDebug.Log($"ë°ë¯¸ì§€ UI ìƒì„± Character {characterId}: {amount} {damageType} damage");
         }
 
-        // Miss UI »ı¼º
+        // Miss UI ìƒì„±
         public void ShowMissUI(int characterId) {
             if (!CanShowDamageUI(characterId)) return;
 
 
             var textComp = _damageUIPool.Get();
             if (textComp == null) {
-                GameDebug.LogError("TextMeshProUGUI ÄÄÆ÷³ÍÆ®¸¦ Ã£À» ¼ö ¾øÀ½");
+                GameDebug.LogError("TextMeshProUGUI ì»´í¬ë„ŒíŠ¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŒ");
                 _damageUIPool.Release(textComp);
                 return;
             }
 
-            // Miss UI ¼³Á¤
+            // Miss UI ì„¤ì •
             textComp.text = "MISS";
             textComp.color = _damageUIStyle.MissColor;
 
-            // À§Ä¡ ¼³Á¤
+            // ìœ„ì¹˜ ì„¤ì •
             Vector3 worldPos = _healthPositionDict[characterId].position;
             Vector3 startPos = worldPos + _damageUIStyle.StartOffset;
             textComp.gameObject.transform.position = startPos;
 
-            // Miss ¾Ö´Ï¸ŞÀÌ¼Ç
+            // Miss ì• ë‹ˆë©”ì´ì…˜
             StartMissAnimation(textComp);
 
-            GameDebug.Log($"Miss UI »ı¼º Character {characterId}");
+            GameDebug.Log($"Miss UI ìƒì„± Character {characterId}");
         }
 
         #endregion
 
-        #region UI ¼³Á¤ ¹× ¾Ö´Ï¸ŞÀÌ¼Ç
+        #region UI ì„¤ì • ë° ì• ë‹ˆë©”ì´ì…˜
 
-        // µ¥¹ÌÁö UI ¼³Á¤
+        // ë°ë¯¸ì§€ UI ì„¤ì •
         private void SetupDamageUI(TextMeshProUGUI textComp, int amount, DamageType damageType, bool isCritical) {
-            // ÅØ½ºÆ® ¼³Á¤
+            // í…ìŠ¤íŠ¸ ì„¤ì •
             if (damageType == DamageType.Heal) {
                 textComp.text = $"+{amount}";
             } else {
@@ -227,63 +227,63 @@ namespace Game.UI {
                 textComp.text = $"-{amount}{criticalMark}";
             }
 
-            // »ö»ó ¼³Á¤
+            // ìƒ‰ìƒ ì„¤ì •
             textComp.color = _damageUIStyle.GetDamageTypeColor(damageType);
 
-            // Å©¸®Æ¼ÄÃÀÎ °æ¿ì ÆùÆ® Å©±â Áõ°¡
+            // í¬ë¦¬í‹°ì»¬ì¸ ê²½ìš° í°íŠ¸ í¬ê¸° ì¦ê°€
             if (isCritical && damageType != DamageType.Heal) {
                 var criticalStyle = _damageUIStyle.GetFloatingUIStyle(DamageUIType.Critical);
                 textComp.fontSize *= criticalStyle.fontSizeMultiplier;
             }
         }
 
-        // µ¥¹ÌÁö ¾Ö´Ï¸ŞÀÌ¼Ç
+        // ë°ë¯¸ì§€ ì• ë‹ˆë©”ì´ì…˜
         private void StartDamageAnimation(TextMeshProUGUI textComp, bool isCritical) {
             var obj = textComp.gameObject;
             Vector3 startPos = obj.transform.position;
             Vector3 endPos = startPos + _damageUIStyle.EndOffset;
 
-            // ½ºÅ¸ÀÏ °¡Á®¿À±â
+            // ìŠ¤íƒ€ì¼ ê°€ì ¸ì˜¤ê¸°
             var styleData = isCritical ?
                 _damageUIStyle.GetFloatingUIStyle(DamageUIType.Critical) :
                 _damageUIStyle.GetFloatingUIStyle(DamageUIType.Normal);
 
-            // ½ÃÄö½º »ı¼º
+            // ì‹œí€€ìŠ¤ ìƒì„±
             var sequence = DOTween.Sequence();
 
-            // À§·Î ÀÌµ¿
+            // ìœ„ë¡œ ì´ë™
             sequence.Append(
                 obj.transform.DOMove(endPos, styleData.animationDuration)
                     .SetEase(_damageUIStyle.MovementCurve)
             );
 
-            // Å©¸®Æ¼ÄÃ ¾Ö´Ï¸ŞÀÌ¼Ç
+            // í¬ë¦¬í‹°ì»¬ ì• ë‹ˆë©”ì´ì…˜
             if (isCritical) {
-                // ½ºÄÉÀÏ È¿°ú
+                // ìŠ¤ì¼€ì¼ íš¨ê³¼
                 sequence.Join(
                     obj.transform.DOScale(Vector3.one * styleData.scaleMultiplier, 0.2f)
                         .SetEase(Ease.OutBack)
                         .OnComplete(() => obj.transform.DOScale(Vector3.one, 0.2f))
                 );
 
-                // ¹İÂ¦ÀÓ È¿°ú
+                // ë°˜ì§ì„ íš¨ê³¼
                 sequence.Insert(0.1f,
                     textComp.DOColor(Color.white, 0.1f)
                         .SetLoops(2, LoopType.Yoyo)
                 );
             }
 
-            // ÆäÀÌµå ¾Æ¿ô
+            // í˜ì´ë“œ ì•„ì›ƒ
             sequence.Insert(_damageUIStyle.FadeDelay,
                 textComp.DOFade(0f, styleData.animationDuration - _damageUIStyle.FadeDelay)
                     .SetEase(Ease.InQuad)
             );
 
-            // ¿Ï·á ½Ã Ç®·Î ¹İÈ¯
+            // ì™„ë£Œ ì‹œ í’€ë¡œ ë°˜í™˜
             sequence.OnComplete(() => _damageUIPool.Release(textComp));
         }
 
-        // Miss ¾Ö´Ï¸ŞÀÌ¼Ç
+        // Miss ì• ë‹ˆë©”ì´ì…˜
         private void StartMissAnimation(TextMeshProUGUI textComp) {
             var obj = textComp.gameObject;
             var styleData = _damageUIStyle.GetFloatingUIStyle(DamageUIType.Miss);
@@ -291,48 +291,48 @@ namespace Game.UI {
             Vector3 startPos = obj.transform.position;
             Vector3 endPos = startPos + _damageUIStyle.EndOffset;
 
-            // ½ÃÄö½º »ı¼º
+            // ì‹œí€€ìŠ¤ ìƒì„±
             var sequence = DOTween.Sequence();
 
-            // À§·Î ÀÌµ¿
+            // ìœ„ë¡œ ì´ë™
             sequence.Append(
                 obj.transform.DOMove(endPos, styleData.animationDuration)
                     .SetEase(_damageUIStyle.MovementCurve)
             );
 
-            // ÁÂ¿ì Èçµé¸²
+            // ì¢Œìš° í”ë“¤ë¦¼
             sequence.Join(
                 obj.transform.DOShakePosition(0.5f, new Vector3(20f, 0, 0), 8, 90f)
             );
 
-            // ÆäÀÌµå ¾Æ¿ô
+            // í˜ì´ë“œ ì•„ì›ƒ
             sequence.Insert(_damageUIStyle.FadeDelay,
                 textComp.DOFade(0f, styleData.animationDuration - _damageUIStyle.FadeDelay)
                     .SetEase(Ease.InQuad)
             );
 
-            // ¿Ï·á ½Ã Ç®·Î ¹İÈ¯
+            // ì™„ë£Œ ì‹œ í’€ë¡œ ë°˜í™˜
             sequence.OnComplete(() => _damageUIPool.Release(textComp));
         }
 
         #endregion
 
-        #region À¯Æ¿¸®Æ¼
+        #region ìœ í‹¸ë¦¬í‹°
 
-        // µ¥¹ÌÁö UI Ç¥½Ã °¡´É ¿©ºÎ È®ÀÎ
+        // ë°ë¯¸ì§€ UI í‘œì‹œ ê°€ëŠ¥ ì—¬ë¶€ í™•ì¸
         private bool CanShowDamageUI(int characterId) {
             if (_damageUIPool == null) {
-                GameDebug.LogWarning("DamageUI PoolÀÌ ÃÊ±âÈ­µÇÁö ¾ÊÀ½");
+                GameDebug.LogWarning("DamageUI Poolì´ ì´ˆê¸°í™”ë˜ì§€ ì•ŠìŒ");
                 return false;
             }
 
             if (!_healthPositionDict.TryGetValue(characterId, out Transform healthTransform)) {
-                GameDebug.LogWarning($"Health UI À§Ä¡¸¦ Ã£À» ¼ö ¾øÀ½ Character {characterId}");
+                GameDebug.LogWarning($"Health UI ìœ„ì¹˜ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŒ Character {characterId}");
                 return false;
             }
 
             if (healthTransform == null) {
-                GameDebug.LogWarning($"Health UI TransformÀÌ null Character {characterId}");
+                GameDebug.LogWarning($"Health UI Transformì´ null Character {characterId}");
                 _healthPositionDict.Remove(characterId);
                 return false;
             }
@@ -340,7 +340,7 @@ namespace Game.UI {
             return true;
         }
 
-        // Ç® »óÅÂ Á¤º¸ (µğ¹ö±×¿ë)
+        // í’€ ìƒíƒœ ì •ë³´ (ë””ë²„ê·¸ìš©)
         public string GetPoolStatus() {
             if (_damageUIPool == null) return "Pool not initialized";
 
