@@ -660,7 +660,144 @@ flowchart LR
 #### 2. CSV 기반 자동 등록 (설정)
 - EquipAddressKey.csv: 장비 주소 매핑
 - SkillAddressKey.csv: 스킬 주소 매핑
+---
+# Firebase 장비 시스템 통합 가이드
 
+## 📋 개요
+Unity 프로젝트에서 Firebase RTDB 기능을 이용해 Eqip을 관리
+Addressables를 이용해 프리팹 로드
+
+## 🏗️ 시스템 구조
+
+### 계층별 역할과 의존성
+```
+EquipSystem (System Layer)
+    ├→ EquipModel (Model Layer) - 상태 관리
+    └→ EquipService (Service Layer) - 비즈니스 로직
+         ├→ FirebaseService (Service Layer) - 데이터 통신
+         └→ AddressableService (Service Layer) - 에셋 관리
+```
+
+### 실제 데이터 흐름
+1. **EquipSystem**이 중심 컨트롤러 역할
+2. **EquipModel**에서 ReactiveProperty로 상태 관리
+3. **EquipService**가 Firebase와 Addressable 모두 연동
+4. **FirebaseService**가 실제 네트워크 통신 담당
+5. **AddressableService**가 프리팹 로드 및 캐싱 담당
+
+## 🔥 FirebaseService 구현 (장비 관련)
+
+### 장비 데이터베이스 구조
+```
+UserData/
+  └── {userId}/
+      └── Equip/
+          ├── equippedWeapon: string
+          ├── equippedArmor: string
+          ├── equippedAccessory: string
+          └── ownedEquipments: List<string>
+```
+
+### 장비 관련 메서드
+```csharp
+// 장비 데이터 관리
+LoadEquipDataAsync() // 장비 데이터 로드
+SaveEquipDataAsync(EquipData) // 장비 데이터 저장
+
+// 장비 장착 업데이트
+UpdateEquippedWeaponAsync(EquipName) // 무기 장착
+UpdateEquippedArmorAsync(EquipName) // 방어구 장착
+UpdateEquippedAccessoryAsync(EquipName) // 악세사리 장착
+
+// 장비 보유 목록 관리
+AddOwnedEquipmentAsync(EquipName) // 장비 획득
+RemoveOwnedEquipmentAsync(EquipName) // 장비 제거
+```
+
+### 데이터 검증 로직
+- 장착 시 보유 여부 확인
+- 중복 장비 획득 방지
+- 존재하지 않는 장비 제거 방지
+- 연결 상태 확인 후 작업 수행
+
+## 🛡️ EquipService 구현
+
+### 주요 기능
+- **Addressable 통합**: CSV 기반 주소 키 자동 매핑
+- **프리팹 관리**: 장비 프리팹 로드 및 인스턴스 생성
+- **DI 통합**: Zenject로 의존성 자동 주입
+
+### CSV 주소 매핑
+```
+Resources/AddressKey/EquipAddressKey.csv
+┌─────────────┬──────────────────────┐
+│ EquipName   │ AddressableKey       │
+├─────────────┼──────────────────────┤
+│ BasicSword  │ Equip/Weapon/Sword01 │
+│ IronArmor   │ Equip/Armor/Armor01  │
+│ FireRing    │ Equip/Acc/Ring01     │
+└─────────────┴──────────────────────┘
+```
+
+### 핵심 메서드
+```csharp
+// 프리팹 관리
+LoadEquipInstancePrefabAsync(EquipName) // 프리팹 로드 및 인스턴스 생성
+UnloadEquip(EquipName) // 메모리에서 언로드
+GetLoadedEquipPrefab(EquipName) // 캐시된 프리팹 반환
+
+// Firebase 브릿지
+EquipWeaponAsync(EquipName) // 무기 장착 (Firebase 동기화)
+AcquireEquipmentAsync(EquipName) // 장비 획득 (Firebase 동기화)
+GetEquippedItemsAsync() // 현재 장착 장비 조회
+GetOwnedEquipmentsAsync() // 보유 장비 목록 조회
+```
+## 🚀 사용 예시
+
+### PlayerController에서 장비 관리
+```csharp
+public class PlayerController : MonoBehaviour 
+{
+    [Inject] private EquipSystem _equipSystem;
+    
+    private IWeapon _currentWeapon;
+    
+    private async UniTask Start() 
+    {
+        // 장착된 무기 인스턴스 생성
+        _currentWeapon = await _equipSystem.InstanceWeapon();
+        _currentWeapon.Equip(gameObject);
+    }
+}
+```
+
+## 📊 성능 최적화
+
+### 캐싱 전략
+- **AddressableService**: Dictionary로 로드된 에셋 캐싱
+- **Firebase 데이터**: 로컬 캐싱으로 불필요한 네트워크 호출 감소
+- **프리팹 재사용**: 이미 로드된 프리팹은 재로드하지 않음
+
+### 비동기 처리
+- **UniTask 활용**: 모든 네트워크 작업 비동기 처리
+- **로딩 최적화**: 필요한 시점에만 프리팹 로드
+- **메모리 관리**: UnloadAsset으로 사용하지 않는 리소스 해제
+
+## 📝 주의사항
+
+1. **초기화 순서**: GameInitSystem에서 NetworkService → EquipSystem 순서 관리
+2. **CSV 파일 위치**: Resources/AddressKey/ 폴더에 배치
+3. **Addressable 설정**: 장비 프리팹은 반드시 Addressable로 마킹
+4. **DI 설정**: Zenject Installer에서 서비스 바인딩 및 초기화 관리
+5. **네트워크 에러**: 오프라인 모드 대비 로컬 캐싱 구현 권장
+
+## 🔮 확장 가능성
+
+- **장비 강화 시스템**: 강화 레벨 데이터 추가
+- **세트 효과**: 세트 아이템 보너스 로직 구현
+- **거래 시스템**: 플레이어 간 장비 거래 기능
+- **장비 내구도**: 사용 횟수에 따른 내구도 시스템
+- **시즌 장비**: 기간 한정 장비 관리 시스템
 ---
 ### 📋 다음 개발 예정 사항
 - MainLobbyScene 구성
