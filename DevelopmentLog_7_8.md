@@ -7,6 +7,7 @@
 - [2025-08-02 - ~Health UI 시스템~ -> 중앙화, UISystem 수정](#5)
 - [2025-08-03 - Firebase 통신, 크리스탈, 경험치 시스템 구현](#6)
 - [2025-08-04 - Health 관련 로직 중앙화 변경](#7)
+- [2025-08-08 - AddressableService, 전투 시스템, 게임 초기화, 데이터 관리, 에디터 도구 구현](#8)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -583,4 +584,85 @@ flowchart LR
 ### 📋 다음 개발 예정 사항
 - 전투 시스템 개발
 - HealthSystem 검증/로깅 등 비즈니스 로직 처리 -> Policy로 변경
+---
+<a id=8></a>
+# 📅 2025-08-08
+## 🎯 AddressableService, 전투 시스템, 게임 초기화, 데이터 관리, 에디터 도구 구현
+
+#### 1. AddressableService 구현
+- **`AddressableService<TKey, TAsset>`**: 제네릭 기반 에셋 로드 서비스
+- **캐싱**: Dictionary로 로드된 에셋 관리 -> 중복 로드 방지
+- **비동기 로드**: UniTask 활용 -> 성능 최적화
+- **메모리 관리**: AsyncOperationHandle 추적 -> 언로드 시 메모리 해제
+
+#### 2. EquipService 구현
+- **`EquipService`**: CSV 기반 주소 키 자동 등록
+- **프리팹 로드**: 생성된 객체 DI 자동 주입
+- **Firebase 연동**: 장비 데이터 저장/로드 -> 클라우드 동기화
+- **장비 관리**: 무기/방어구/악세사리 별도 관리
+
+#### 3. WeaponComponent 구현
+- **`WeaponComponent`**: IWeapon 인터페이스 구현 -> 무기 시스템 통합
+- **스킬 연동**: SkillDataService로 데이터 로드 -> 동적 스킬 적용
+- **범위 공격**: Circle/Sector/Rectangle/Line 타입 지원
+- **데미지 계산**: (무기공격력 + 스킬추가데미지) * 스킬배율
+
+#### 4. AnimControllComponent 구현
+- **`AnimControllComponent`**: Animator 이벤트 브리지
+- **상태 관리**: Attack/Move/Debuff/Death 애니메이션 제어
+- **속도 제어**: AttackSpeed/MoveSpeed 파라미터 -> 동적 속도 조절
+- **이벤트 전달**: IAnimAttackReceiver 인터페이스 -> 공격 타이밍 동기화
+
+#### 5. EquipSystem 구현
+- **`EquipSystem`**: 장비 데이터 관리 시스템
+- **초기화**: Firebase에서 장비 데이터 로드 -> EquipModel 동기화
+- **무기 인스턴스**: InstanceWeapon() -> 장착된 무기 프리팹 생성
+- **데이터 저장**: EquipModel -> EquipData 변환 -> Firebase 저장
+
+#### 6. GameInitSystem 구현
+- **`GameInitSystem`**: 게임 초기화 총괄 시스템
+- **비동기 초기화**: UniTask로 순차적 초기화 -> 의존성 보장
+- **시스템 초기화 순서**: NetworkService -> CrystalSystem -> EquipSystem
+
+#### 7. CSVReader 유틸리티 구현
+- **`CSVReader`**: CSV 파일 파싱 유틸리티
+- **Dictionary 변환**: Key-Value 형태로 자동 파싱
+- **다중 컬럼 지원**: List<Dictionary> 형태 -> 복잡한 데이터 처리
+- **타입 자동 변환**: 제네릭으로 int/float/string 자동 파싱
+
+#### 8. SkillDataEditor 에디터 도구 구현
+- **`SkillDataEditor`**: 스킬 범위 시각화 에디터
+- **실시간 프리뷰**: Inspector에서 스킬 범위 미리보기
+- **4가지 범위 타입**: Circle/Sector/Rectangle/Line 시각화
+
+---
+### AddressableService 상세
+```mermaid
+flowchart LR
+    A[LoadAssetAsync] --> B{캐시 확인}
+    B -->|있음| C[즉시 반환]
+    B -->|없음| D[Addressables.LoadAssetAsync]
+    D --> E[캐시 저장]
+    E --> F[에셋 반환]
+```
+**주요 기능:**
+- 제네릭 타입으로 다양한 에셋 지원
+- CSV 파일로 주소 키 일괄 등록
+- 비동기 로드 및 자동 캐싱
+- 메모리 안전한 언로드
+
+**주요 구성 요소:**
+#### 1. Dictionary 캐시 시스템 (메모리)
+- _loadedAssets: 로드된 에셋 저장
+- _handles: AsyncOperationHandle 추적
+- _keyToAddressMap: 키-주소 매핑
+
+#### 2. CSV 기반 자동 등록 (설정)
+- EquipAddressKey.csv: 장비 주소 매핑
+- SkillAddressKey.csv: 스킬 주소 매핑
+
+---
+### 📋 다음 개발 예정 사항
+- MainLobbyScene 구성
+- LoadingScene 구성
 ---
