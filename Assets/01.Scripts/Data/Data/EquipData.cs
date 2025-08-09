@@ -1,20 +1,20 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Game.Core;
 namespace Game.Data {
     /// <summary>
-    /// Firebase¿¡ ÀúÀåµÉ Àåºñ µ¥ÀÌÅÍ ±¸Á¶
+    /// Firebaseì— ì €ì¥ë  ì¥ë¹„ ë°ì´í„° êµ¬ì¡°
     /// </summary>
     [Serializable]
     public class EquipData {
-        [Header("ÀåÂøµÈ Àåºñ")]
-        public string equippedWeapon;    // ÀåÂøµÈ ¹«±â
-        public string equippedArmor;     // ÀåÂøµÈ ¹æ¾î±¸
-        public string equippedAccessory; // ÀåÂøµÈ ¾Ç¼¼»ç¸®
+        [Header("ì¥ì°©ëœ ì¥ë¹„")]
+        public string equippedWeapon;    // ì¥ì°©ëœ ë¬´ê¸°
+        public string equippedArmor;     // ì¥ì°©ëœ ë°©ì–´êµ¬
+        public string equippedAccessory; // ì¥ì°©ëœ ì•…ì„¸ì‚¬ë¦¬
 
-        [Header("º¸À¯ Àåºñ ¸ñ·Ï")]
-        public List<string> ownedEquipments; // º¸À¯ÇÑ Àåºñ ¸ñ·Ï
+        [Header("ë³´ìœ  ì¥ë¹„ ëª©ë¡")]
+        public List<string> ownedEquipments; // ë³´ìœ í•œ ì¥ë¹„ ëª©ë¡
 
         public EquipData() {
             equippedWeapon = EquipName.None.ToString();
@@ -31,7 +31,7 @@ namespace Game.Data {
         }
 
         /// <summary>
-        /// Àåºñ°¡ ÀåÂøµÇ¾î ÀÖ´ÂÁö È®ÀÎ
+        /// ì¥ë¹„ê°€ ì¥ì°©ë˜ì–´ ìˆëŠ”ì§€ í™•ì¸
         /// </summary>
         public bool IsEquipped(EquipName equipName) {
             string equipStr = equipName.ToString();
@@ -41,14 +41,14 @@ namespace Game.Data {
         }
 
         /// <summary>
-        /// Àåºñ¸¦ º¸À¯ÇÏ°í ÀÖ´ÂÁö È®ÀÎ
+        /// ì¥ë¹„ë¥¼ ë³´ìœ í•˜ê³  ìˆëŠ”ì§€ í™•ì¸
         /// </summary>
         public bool HasEquipment(EquipName equipName) {
             return ownedEquipments.Contains(equipName.ToString());
         }
 
         /// <summary>
-        /// Àåºñ Ãß°¡ (Áßº¹ ¹æÁö)
+        /// ì¥ë¹„ ì¶”ê°€ (ì¤‘ë³µ ë°©ì§€)
         /// </summary>
         public void AddEquipment(EquipName equipName) {
             string equipStr = equipName.ToString();
@@ -58,22 +58,22 @@ namespace Game.Data {
         }
 
         /// <summary>
-        /// Àåºñ Á¦°Å
+        /// ì¥ë¹„ ì œê±°
         /// </summary>
         public bool RemoveEquipment(EquipName equipName) {
             string equipStr = equipName.ToString();
 
-            // ÀåÂøµÈ Àåºñ¸é ÇØÁ¦
+            // ì¥ì°©ëœ ì¥ë¹„ë©´ í•´ì œ
             if (equippedWeapon == equipStr) equippedWeapon = EquipName.None.ToString();
             if (equippedArmor == equipStr) equippedArmor = EquipName.None.ToString();
             if (equippedAccessory == equipStr) equippedAccessory = EquipName.None.ToString();
 
-            // º¸À¯ ¸ñ·Ï¿¡¼­ Á¦°Å
+            // ë³´ìœ  ëª©ë¡ì—ì„œ ì œê±°
             return ownedEquipments.Remove(equipStr);
         }
 
         /// <summary>
-        /// ¹«±â ÀåÂø
+        /// ë¬´ê¸° ì¥ì°©
         /// </summary>
         public void EquipWeapon(EquipName equipName) {
             if (HasEquipment(equipName)) {
@@ -82,7 +82,7 @@ namespace Game.Data {
         }
 
         /// <summary>
-        /// ¹æ¾î±¸ ÀåÂø
+        /// ë°©ì–´êµ¬ ì¥ì°©
         /// </summary>
         public void EquipArmor(EquipName equipName) {
             if (HasEquipment(equipName)) {
@@ -91,7 +91,7 @@ namespace Game.Data {
         }
 
         /// <summary>
-        /// ¾Ç¼¼»ç¸® ÀåÂø
+        /// ì•…ì„¸ì‚¬ë¦¬ ì¥ì°©
         /// </summary>
         public void EquipAccessory(EquipName equipName) {
             if (HasEquipment(equipName)) {
@@ -100,28 +100,28 @@ namespace Game.Data {
         }
 
         /// <summary>
-        /// ÀåÂøµÈ ¹«±â °¡Á®¿À±â
+        /// ì¥ì°©ëœ ë¬´ê¸° ê°€ì ¸ì˜¤ê¸°
         /// </summary>
         public EquipName GetEquippedWeapon() {
             return System.Enum.TryParse<EquipName>(equippedWeapon, out var weapon) ? weapon : EquipName.None;
         }
 
         /// <summary>
-        /// ÀåÂøµÈ ¹æ¾î±¸ °¡Á®¿À±â
+        /// ì¥ì°©ëœ ë°©ì–´êµ¬ ê°€ì ¸ì˜¤ê¸°
         /// </summary>
         public EquipName GetEquippedArmor() {
             return System.Enum.TryParse<EquipName>(equippedArmor, out var armor) ? armor : EquipName.None;
         }
 
         /// <summary>
-        /// ÀåÂøµÈ ¾Ç¼¼»ç¸® °¡Á®¿À±â
+        /// ì¥ì°©ëœ ì•…ì„¸ì‚¬ë¦¬ ê°€ì ¸ì˜¤ê¸°
         /// </summary>
         public EquipName GetEquippedAccessory() {
             return System.Enum.TryParse<EquipName>(equippedAccessory, out var accessory) ? accessory : EquipName.None;
         }
 
         /// <summary>
-        /// º¸À¯ Àåºñ ¸ñ·ÏÀ» EquipName ¸®½ºÆ®·Î ¹İÈ¯
+        /// ë³´ìœ  ì¥ë¹„ ëª©ë¡ì„ EquipName ë¦¬ìŠ¤íŠ¸ë¡œ ë°˜í™˜
         /// </summary>
         public List<EquipName> GetOwnedEquipments() {
             var result = new List<EquipName>();

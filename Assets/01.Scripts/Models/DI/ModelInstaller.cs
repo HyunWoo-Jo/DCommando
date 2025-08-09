@@ -12,7 +12,6 @@ namespace Game.Models
         [SerializeField] private SceneName _sceneName;
 
         public override void InstallBindings() {
-            BindModel();
             switch (_sceneName) {
                 case SceneName.MainLobby:
                 break;
@@ -22,15 +21,8 @@ namespace Game.Models
                 BindCombatSceneModel();
                 break;
             }
-            Debug.Log(GetType().Name + " Bind 완료");
         }
 
-        // 전체에서 사용되는 바인딩
-        private void BindModel() {
-            Container.BindInterfacesAndSelfTo<CameraModel>().AsSingle();
-            Container.BindInterfacesAndSelfTo<CrystalModel>().AsSingle();
-            Container.BindInterfacesAndSelfTo<EquipModel>().AsSingle();
-        }
 
         /// <summary>
         /// 플레이어 관련 모델 바인딩

@@ -12,6 +12,12 @@ GameObject:
   - component: {fileID: 6648622381475251089}
   - component: {fileID: -5139227020338677881}
   - component: {fileID: -7874016286001539281}
+  - component: {fileID: -1897094512750192339}
+  - component: {fileID: -7079636068803029415}
+  - component: {fileID: 7400104252835170535}
+  - component: {fileID: -2311650095334638974}
+  - component: {fileID: 8485505322665300186}
+  - component: {fileID: -1501230950356720287}
   m_Layer: 0
   m_Name: ProjectContext
   m_TagString: Untagged
@@ -50,6 +56,12 @@ MonoBehaviour:
   _monoInstallers:
   - {fileID: -5139227020338677881}
   - {fileID: -7874016286001539281}
+  - {fileID: -1897094512750192339}
+  - {fileID: -7079636068803029415}
+  - {fileID: 7400104252835170535}
+  - {fileID: -2311650095334638974}
+  - {fileID: 8485505322665300186}
+  - {fileID: -1501230950356720287}
   _installerPrefabs: []
   _parentNewObjectsUnderContext: 1
   _editorReflectionBakingCoverageMode: 0
@@ -89,3 +101,75 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game.Core::Game.Core.ProjectContext
   _enableDebugMode: 0
+--- !u!114 &-1897094512750192339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508331556052953293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47cf9a4f706b2bd4c969bca3e3dc623b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Data::Game.Data.DataProjectInstaller
+--- !u!114 &-7079636068803029415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508331556052953293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f275786383722bf49a69e287a1790957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Models::Game.Models.ModelProjectInstaller
+--- !u!114 &7400104252835170535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508331556052953293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7d27b9fea3eec0488db8521a4df067c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Policies::Game.Policies.PolicyProjectInstaller
+--- !u!114 &-2311650095334638974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508331556052953293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e058cf1627abf1649a7f6d5f8d7dbf36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Systems::Game.Systems.SystemProjectInstaller
+--- !u!114 &8485505322665300186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508331556052953293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1764ed364925145478f07a05281f27ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Services::Game.Services.ServiceProjectInstaller
+--- !u!114 &-1501230950356720287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508331556052953293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebc1f65f8616e7b4bae4bc0cc34b23c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.ViewModels::Game.ViewModels.ViewModelProjectInstaller

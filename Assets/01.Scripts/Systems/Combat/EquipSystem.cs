@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+ï»¿using Cysharp.Threading.Tasks;
 using Game.Models;
 using Game.Services;
 using UnityEngine;
@@ -17,7 +17,7 @@ namespace Game.Systems
         public async UniTask InitializeAsync() {
             try {
                 var data = await _equipService.LoadEquipDataAsync();
-                _equipModel.UpdateFromEquipData(data); // µ¥ÀÌÅÍ °»½Å
+                _equipModel.UpdateFromEquipData(data); // ë°ì´í„° ê°±ì‹ 
                 _isInit = true;
             } catch {
                 throw;
@@ -34,10 +34,10 @@ namespace Game.Systems
         }
 
         public async UniTask<IWeapon> InstanceWeapon() {
-            await UniTask.WaitUntil(() => _isInit); // ÃÊ±âÈ­ ¿Ï·á ±îÁö ´ë±â
+            await UniTask.WaitUntil(() => _isInit); // ì´ˆê¸°í™” ì™„ë£Œ ê¹Œì§€ ëŒ€ê¸°
             var weapon = (await _equipService.LoadEquipInstancePrefabAsync(_equipModel.EquippedWeapon.CurrentValue)).GetComponent<IWeapon>();
             if (weapon == null) {
-                GameDebug.LogError($"{_equipModel.EquippedWeapon.CurrentValue.ToString()}WeaponComponent°¡ Á¸ÀçÇÏÁö ¾ÊÀ½");
+                GameDebug.LogError($"{_equipModel.EquippedWeapon.CurrentValue.ToString()}WeaponComponentê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŒ");
             }
             return weapon;
         }

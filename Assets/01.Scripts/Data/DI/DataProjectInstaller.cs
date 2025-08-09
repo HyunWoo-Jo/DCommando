@@ -1,18 +1,11 @@
-﻿using Zenject;
-using UnityEngine;
-using Game.Core;
-namespace Game.Data {
-    /// <summary>
-    /// Data 계층 DI 바인딩
-    /// ScriptableObject, Config, DB 모델
-    /// </summary>
-    public class DataInstaller : MonoInstaller {
+﻿using UnityEngine;
+using Zenject;
+namespace Game.Data
+{
+    public class DataProjectInstaller : MonoInstaller
+    {
         public override void InstallBindings() {
-
             BindScriptableObjects();
-            BindConfigurations();
-            BindDatabaseModels();
-            GameDebug.Log(GetType().Name + " Bind 완료");
         }
 
         /// <summary>
@@ -29,18 +22,5 @@ namespace Game.Data {
             Container.Bind<SO_CameraConfig>().FromScriptableObjectResource("Configs/CameraConfig").AsSingle();
         }
 
-        /// <summary>
-        /// 설정 데이터 바인딩
-        /// </summary>
-        private void BindConfigurations() {
-
-        }
-
-        /// <summary>
-        /// 데이터베이스 모델 바인딩
-        /// </summary>
-        private void BindDatabaseModels() {
-
-        }
     }
 }
