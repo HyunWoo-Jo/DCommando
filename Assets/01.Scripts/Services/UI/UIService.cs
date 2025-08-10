@@ -101,7 +101,9 @@ namespace Game.Services {
         #endregion
 
         #region UI 로드 API
-
+        public GameObject LoadUIGameObject(UIName uiName) {
+            return LoadDirectUIGameObject(uiName);
+        }
         /// <summary>
         /// UI를 Component 타입으로 로드합니다
         /// </summary>
@@ -150,6 +152,39 @@ namespace Game.Services {
             try {
                 // AddressableService를 통해 프리팹 로드
                 var prefab = await _addressableService.LoadAssetAsync(uiName);
+                if (prefab == null) {
+                    GameDebug.LogError($"UI 프리팹 로드 실패: {uiName}");
+                    return null;
+                }
+
+                // DI 주입과 함께 인스턴스화
+                instance = DIHelper.InstantiateWithInjection(prefab);
+
+                // 참조 카운트 증가 및 인스턴스 추적
+                IncreaseRefCount(uiName);
+                _activeInstances.Add(instance);
+
+                GameDebug.Log($"UI 인스턴스 생성 완료: {uiName}");
+                return instance;
+            } catch (Exception e) {
+                GameDebug.LogError($"UI 로드 실패: {uiName}, 에러: {e.Message}");
+
+                // 실패 시 자원 정리
+                if (instance != null) {
+                    ReleaseUI(instance);
+                }
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 동기 로드
+        /// </summary>
+        private GameObject LoadDirectUIGameObject(UIName uiName) {
+            GameObject instance = null;
+            try {
+                // AddressableService를 통해 프리팹 로드
+                var prefab = _addressableService.LoadAsset(uiName);
                 if (prefab == null) {
                     GameDebug.LogError($"UI 프리팹 로드 실패: {uiName}");
                     return null;
@@ -327,6 +362,8 @@ namespace Game.Services {
         }
 
   
+
+
 
         #endregion
     }

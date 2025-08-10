@@ -13,9 +13,9 @@ namespace Game.Models
 
         public override void InstallBindings() {
             switch (_sceneName) {
-                case SceneName.MainLobby:
+                case SceneName.MainScene:
                 break;
-                case SceneName.Play:
+                case SceneName.PlayScene:
                 BindPlayerModels();
                 BindGameModels();
                 BindCombatSceneModel();

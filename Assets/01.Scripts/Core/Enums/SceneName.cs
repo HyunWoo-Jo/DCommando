@@ -4,7 +4,9 @@ namespace Game.Core
 {
     public enum SceneName
     {
-        MainLobby,
-        Play
+        LoadingScene,
+        MainScene,
+        PlayScene,
+        None
     }
 }

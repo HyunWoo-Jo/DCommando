@@ -45,7 +45,7 @@ namespace Game.Systems {
             if (_isUseUI) {
                 // UI 생성 Bind
                 EventBus.Subscribe<UIOpenedNotificationEvent>(OnOpenHealthUI).AddTo(_Initdisposable);
-                EventBus.Publish(new UICreationEvent(id, UIName.Health_UI));
+                EventBus.Publish(new UICreationEventAsync(id, UIName.Health_UI));
 
                 // UI Hide
                 EventBus.Subscribe<CharacterDeathEvent>(OnDeathHideUI).AddTo(_disposable);

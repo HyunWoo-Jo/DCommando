@@ -9,17 +9,16 @@ namespace Game.ViewModels
 
             // 공통 Bind
             BindViewModels();
-            BindUIViewModels();
         }
         /// <summary>
         /// 공통 Bind
         /// </summary>
         private void BindViewModels() {
+            Container.Bind<SceneViewModel>().AsSingle();
+
             Container.BindInterfacesAndSelfTo<CrystalViewModel>().AsSingle();
         }
 
-        private void BindUIViewModels() {
-            Container.Bind<UIViewModel>().AsSingle();
-        }
+      
     }
 }

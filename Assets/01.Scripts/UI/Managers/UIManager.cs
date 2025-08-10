@@ -23,7 +23,7 @@ namespace Game.UI
         private Dictionary<UIName, Vector3> _uiAnchorPosDictionary = new();
 
         private readonly CompositeDisposable _disposables = new();
-
+        #region 초기화
         private void Awake()
         {
             var anchorList = GetComponentsInChildren<UIAnchor>();
@@ -33,22 +33,39 @@ namespace Game.UI
                 Destroy(anchor.gameObject);
             }
            
+            EventBus.Subscribe<UICreationEventAsync>(CreationEventAsync).AddTo(_disposables);
             EventBus.Subscribe<UICreationEvent>(CreationEvent).AddTo(_disposables);
             EventBus.Subscribe<UICloseEvent>(CloseEvent).AddTo(_disposables);
+            Debug.Log("등록 :" + Time.time);
         }
         private void OnDestroy() {
             _disposables?.Dispose();
         }
-
-        public async void CreationEvent(UICreationEvent creationEvent) {
+        #endregion
+        #region Event
+        private async void CreationEventAsync(UICreationEventAsync creationEvent) {
             GameDebug.Log($"{creationEvent.uiName} Creation Event 발생");
             Transform tr = await OpenUIMoveToAnchorAsync<Transform>(creationEvent.id, creationEvent.uiName);
+        }
+
+        private void CreationEvent(UICreationEvent creationEvent) {
+            OpenUIMoveToAnchor(creationEvent.id, creationEvent.uiName);
         }
 
         public void CloseEvent(UICloseEvent closeEvent) {
             _viewModel.CloseUI(closeEvent.id, closeEvent.uiName, closeEvent.uiObj);
         }
-
+        #endregion
+        #region 유틸
+        public GameObject OpenUIMoveToAnchor(int id, UIName uiName) {
+            var obj = OpenUI(id, uiName);
+            if (obj == null) {
+                GameDebug.Log($"{uiName.ToString()} 생성 실패");
+                return null;
+            }
+            MoveToAnchor(uiName, obj.transform);
+            return obj;
+        }
 
         /// <summary>
         /// 생성 이동
@@ -74,14 +91,18 @@ namespace Game.UI
                 pos.position = anchorPos;
             }
         }
-
-
+        #endregion
+        #region ViewModel 호출 
         /// <summary>
         /// UI 열기
         /// </summary>
         public async UniTask<T> OpenUIAsync<T>(int id, UIName uiName) where T : Component
         {
             return await _viewModel.OpenUIAsync<T>(id, uiName);
+        }
+
+        public GameObject OpenUI(int id, UIName uiName) {
+            return _viewModel.OpenUI(id, uiName);
         }
         
         
@@ -92,6 +113,6 @@ namespace Game.UI
         {
             _viewModel.CloseUI(id, uiName, uiObj);
         }
-
+        #endregion
     }
 }

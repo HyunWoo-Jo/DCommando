@@ -6,6 +6,7 @@ namespace Game.Systems
     {
         public override void InstallBindings() {
             BindSystem();
+            BindListener();
         }
 
         private void BindSystem() {
@@ -18,14 +19,18 @@ namespace Game.Systems
 
             Container.Bind<IUpdater>().To<Updater>().FromNewComponentOn(obj).AsSingle().NonLazy();
 
-            Container.BindInterfacesAndSelfTo<UISystem>().AsSingle().NonLazy();
-
+            Container.BindInterfacesAndSelfTo<SceneSystem>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<CameraSystem>().AsSingle().NonLazy();
-
             Container.BindInterfacesAndSelfTo<CrystalSystem>().AsSingle().NonLazy();
-
             Container.BindInterfacesAndSelfTo<EquipSystem>().AsSingle().NonLazy();
+
         }
+
+        private void BindListener() {
+            Container.BindInterfacesAndSelfTo<SceneChangeListener>().AsSingle().NonLazy();
+        }
+
+        
 
     }
 }

@@ -13,10 +13,11 @@ namespace Game.Systems {
         [SerializeField] private SceneName _sceneName;
 
         public override void InstallBindings() {
+            BindSystems();
             switch (_sceneName) {
-                case SceneName.MainLobby:
+                case SceneName.MainScene:
                 break;
-                case SceneName.Play:
+                case SceneName.PlayScene:
                 BindInputStrategies();
                 BindGameplaySystems();
                 BindCombatSystems();
@@ -38,6 +39,11 @@ namespace Game.Systems {
             Container.Bind<IInputStrategy>().To<PCInputStrategy>().AsCached();
 #endif
         }
+        // 핵심 System 바인드
+        private void BindSystems() {
+            Container.BindInterfacesAndSelfTo<UISystem>().AsCached().NonLazy();
+        }
+
 
         /// <summary>
         /// 게임플레이 시스템 바인딩
@@ -45,8 +51,6 @@ namespace Game.Systems {
         private void BindGameplaySystems() {
 
             Container.BindInterfacesAndSelfTo<InputSystem>().AsCached();
-
-
             Container.BindInterfacesAndSelfTo<GoldSystem>().AsCached();
         }
 

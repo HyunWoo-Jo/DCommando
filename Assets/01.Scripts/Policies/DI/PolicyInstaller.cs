@@ -15,9 +15,9 @@ namespace Game.Policies
 
         public override void InstallBindings() {
             switch (_sceneName) {
-                case SceneName.MainLobby:
+                case SceneName.MainScene:
                 break;
-                case SceneName.Play:
+                case SceneName.PlayScene:
                 BindGamePolicies();
                 break;
             }

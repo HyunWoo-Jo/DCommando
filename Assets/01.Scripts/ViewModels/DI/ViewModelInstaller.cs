@@ -11,13 +11,13 @@ namespace Game.ViewModels {
         [SerializeField] private SceneName _sceneName;
 
         public override void InstallBindings() {
-
+            BindUIViewModels();
             // Scene 별 Bind
             switch (_sceneName) {
-                case SceneName.MainLobby:
+                case SceneName.MainScene:
                 BindMainLobbySceneViewModels();
                 break;
-                case SceneName.Play:
+                case SceneName.PlayScene:
                 BindPlaySceneViewModels();
                 break;
             }
@@ -37,7 +37,9 @@ namespace Game.ViewModels {
 
             Container.BindInterfacesAndSelfTo<HealthViewModel>().AsCached();
         }
-
+        private void BindUIViewModels() {
+            Container.Bind<UIViewModel>().AsCached();
+        }
 
     }
 }

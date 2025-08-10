@@ -35,6 +35,35 @@ namespace Game.Services {
             }
         }
 
+        public TAsset LoadAsset(TKey key) {
+            if (_loadedAssets.TryGetValue(key, out TAsset cachedAsset)) {
+                return cachedAsset;
+            }
+            if (!_keyToAddressMap.TryGetValue(key, out string addressKey)) {
+                GameDebug.LogError($"주소 키를 찾을 수 없음: {key} ({typeof(TAsset).Name})");
+                return null;
+            }
+            try {
+                // Addressables로 로드
+                var handle = Addressables.LoadAssetAsync<TAsset>(addressKey);
+                
+                var asset = handle.WaitForCompletion();
+
+                if (asset != null) {
+                    _loadedAssets[key] = asset;
+                    _handles[key] = handle;
+                    GameDebug.Log($"에셋 로드 완료: {key} ({typeof(TAsset).Name})");
+                } else {
+                    GameDebug.LogError($"에셋 로드 결과가 null: {key}");
+                }
+
+                return asset;
+            } catch (System.Exception e) {
+                GameDebug.LogError($"에셋 로드 실패: {key}, 에러: {e.Message}");
+                return null;
+            }
+        }
+
         public async UniTask<TAsset> LoadAssetAsync(TKey key) {
             // 이미 로드된 경우 캐시에서 반환
             if (_loadedAssets.TryGetValue(key, out TAsset cachedAsset)) {

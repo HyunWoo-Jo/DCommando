@@ -40,6 +40,7 @@ namespace Game.Services
             Container.Bind<ICameraService>().To<CameraService>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<SkillDataService>().AsSingle().NonLazy();
+            Container.Bind<ISceneService>().To<SceneService>().AsSingle();
 
 
         }

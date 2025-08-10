@@ -20,6 +20,11 @@ namespace Game.Services {
         UniTask<TAsset> LoadAssetAsync(TKey key);
 
         /// <summary>
+        /// 에셋을 동기 로드
+        /// </summary>
+        TAsset LoadAsset(TKey key);
+
+        /// <summary>
         /// 해당 에셋이 로드되어 있는지 확인합니다
         /// </summary>
         bool HasAsset(TKey key);

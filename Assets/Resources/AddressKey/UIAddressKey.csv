@@ -8,3 +8,4 @@ Health_UI,HUD,Assets/02.Prefabs/UI/Health_UI.prefab
 MoveController_UI,Screen,Assets/02.Prefabs/UI/MoveController_UI.prefab
 Pause_UI,Screen,Assets/02.Prefabs/UI/PauseButton_UI.prefab
 PausePanel_UI,Popup,Assets/02.Prefabs/UI/PausePanel_UI.prefab
+WipeEffect_UI,Overlay,Assets/02.Prefabs/UI/WipeUI.prefab

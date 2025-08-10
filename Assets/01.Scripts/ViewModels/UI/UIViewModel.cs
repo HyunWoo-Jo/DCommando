@@ -11,8 +11,12 @@ namespace Game.ViewModels
     {
         [Inject] private UISystem _uiSystem;
 
+        public GameObject OpenUI(int id, UIName uiName) {
+            return _uiSystem.CreateUI(id, uiName);
+        }
+
         /// <summary>
-        /// Screen UI 열기
+        /// 비동기 Screen UI 열기
         /// </summary>
         public async UniTask<T> OpenUIAsync<T>(int id, UIName uiName) where T : Component
         {

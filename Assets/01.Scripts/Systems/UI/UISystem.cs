@@ -30,7 +30,7 @@ namespace Game.Systems {
         public void Initialize() {
             SetupInstanceUIParents();
         }
-       
+
         public void Dispose() {
             // 일반 단일 생성 UI 제거
             foreach (var kvp in _instanceUIs) {
@@ -77,19 +77,19 @@ namespace Game.Systems {
         private Canvas FindOrCreateCanvas() {
             var canvas = GameObject.FindFirstObjectByType<Canvas>();
             if (canvas == null) {
-               
+
             }
             return canvas;
         }
 
         private Transform CreateUILayer(Transform parent, string layerName, int baseSortingOrder, bool isRaycast = true) {
             var layerGO = new GameObject($"InstanceUI_{layerName}");
-            layerGO.transform.SetParent(parent, false);         
+            layerGO.transform.SetParent(parent, false);
             var layerCanvas = layerGO.AddComponent<Canvas>();
             layerCanvas.overrideSorting = true;
             layerCanvas.sortingOrder = baseSortingOrder;
 
-            if(isRaycast)
+            if (isRaycast)
                 layerGO.AddComponent<GraphicRaycaster>();
 
             // Resize
@@ -103,7 +103,32 @@ namespace Game.Systems {
         #endregion
 
         #region InstanceUI 관리
-        private async UniTask<T> InstanceUI<T>(int id, UIType type, UIName uiName) where T : Component {
+        // 동기
+        private GameObject InstanceUI(int id, UIType type, UIName uiName) {
+            if (_instanceUIs.ContainsKey(uiName)) {
+                GameDebug.LogError($"{uiName.ToString()} 중복 생성 불가능한 UI");
+                return null;
+            }
+            var obj = _uiService.LoadUIGameObject(uiName);
+            if (obj != null) {
+                obj.transform.SetParent(_instanceUIParents[type]);
+                _instanceUIs.Add(uiName, obj.gameObject); // dict에 추가
+                EventBus.Publish(new UIOpenedNotificationEvent(id, uiName, type, obj));
+            }
+            return obj;
+        }
+        // 동기
+        private GameObject InstanceHUD(int id, UIName uiName) {
+            var obj = _uiService.LoadUIGameObject(uiName);
+            if (obj != null) {
+                _instanceHudUIs[uiName].Add(obj.gameObject); // Object 추가
+                obj.transform.SetParent(_instanceUIParents[UIType.HUD]);
+                EventBus.Publish(new UIOpenedNotificationEvent(id, uiName, UIType.HUD, obj));
+            }
+            return obj;
+        }
+        // 비동기
+        private async UniTask<T> InstanceUIAsync<T>(int id, UIType type, UIName uiName) where T : Component {
             if (_instanceUIs.ContainsKey(uiName)) {
                 GameDebug.LogError($"{uiName.ToString()} 중복 생성 불가능한 UI");
                 return null;
@@ -116,8 +141,8 @@ namespace Game.Systems {
             }
             return uiComponent;
         }
-
-        private async UniTask<T> InstanceHudUI<T>(int id, UIName uiName) where T : Component {
+        // 비동기
+        private async UniTask<T> InstanceHudUIAsync<T>(int id, UIName uiName) where T : Component {
             T uiComponent = await _uiService.LoadUIAsync<T>(uiName);
             if (uiComponent != null) {
                 if (!_instanceHudUIs.ContainsKey(uiName)) _instanceHudUIs[uiName] = new List<GameObject>();
@@ -125,7 +150,7 @@ namespace Game.Systems {
                 uiComponent.transform.SetParent(_instanceUIParents[UIType.HUD]);
                 EventBus.Publish(new UIOpenedNotificationEvent(id, uiName, UIType.HUD, uiComponent.gameObject));
             }
-           
+
             return uiComponent;
         }
 
@@ -169,14 +194,14 @@ namespace Game.Systems {
 
         #region Prefab 관리
         public async UniTask<GameObject> LoadPrefabsAsync(UIName name) {
-            if(_prefabs.TryGetValue(name, out var obj)) {
+            if (_prefabs.TryGetValue(name, out var obj)) {
                 return obj;
             }
             var prefab = await _uiService.LoadUIPrefabAsync(name);
             _prefabs[name] = prefab;
             return _prefabs[name];
         }
-        public void ReleasePrefab(UIName name)  {
+        public void ReleasePrefab(UIName name) {
             _prefabs.Remove(name);
             _uiService.ReleaseUI(name);
         }
@@ -184,6 +209,17 @@ namespace Game.Systems {
 
 
         #region 편의 메서드
+
+        public GameObject CreateUI(int id, UIName uiName) {
+            UIType type = _uiService.GetUIType(uiName);
+            switch (type) {
+                case UIType.HUD:
+                return InstanceHUD(id, uiName);
+                default:
+                return InstanceUI(id, type, uiName);
+            }
+        }
+
         /// <summary>
         /// UI 생성 HUD 일경우 여러개 생성 가능
         /// </summary>
@@ -191,9 +227,9 @@ namespace Game.Systems {
             UIType type = _uiService.GetUIType(uiName);
             switch (type) {
                 case UIType.HUD:
-                return await InstanceHudUI<T>(id, uiName);
+                return await InstanceHudUIAsync<T>(id, uiName);
                 default:
-                return await InstanceUI<T>(id, type, uiName);
+                return await InstanceUIAsync<T>(id, type, uiName);
             }
         }
 

@@ -29,10 +29,10 @@ namespace Game.Core
         /// </summary>
         private void InstallSceneSpecificBindings(SceneName _sceneName) {
             switch (_sceneName) {
-                case SceneName.MainLobby:
+                case SceneName.MainScene:
                 BindMainLobbyScene();
                 break;
-                case SceneName.Play:
+                case SceneName.PlayScene:
                 BindPlayScene();
                 break;
             }

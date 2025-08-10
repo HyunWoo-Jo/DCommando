@@ -119,6 +119,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &67220163
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 67220165}
+  - component: {fileID: 67220164}
+  m_Layer: 0
+  m_Name: Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &67220164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67220163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ca9ad94b9f4712498bb6c0d3e86545f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+--- !u!4 &67220165
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67220163}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 720, y: 1280, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &405894435
 GameObject:
   m_ObjectHideFlags: 0
@@ -692,7 +736,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc68cd3876ad454ebc9f28fc8760e3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.ViewModels::ViewModels.ViewModelInstaller
-  _sceneName: 0
+  _sceneName: 1
 --- !u!114 &1665126135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -705,7 +749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e9c5bdde51e25644a5dea5dd7492407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Core::Core.SceneContext
-  _sceneName: 0
+  _sceneName: 1
 --- !u!114 &1665126136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -730,7 +774,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c01ddc39ca21e042acf72f18919c3ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Model::Models.ModelInstaller
-  _sceneName: 0
+  _sceneName: 1
 --- !u!114 &1665126138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -743,7 +787,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e88b126a1e2dc0546a18a8bf79e4af08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Policies::Policies.PolicyInstaller
-  _sceneName: 0
+  _sceneName: 1
 --- !u!114 &1665126139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -756,7 +800,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd73c98d2a5e8cd40a50ef8ebb2258d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Services::Services.ServiceInstaller
-  _sceneName: 0
+  _sceneName: 1
 --- !u!114 &1665126140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -769,7 +813,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2170df29205de5541be4362de596863c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Systems::Systems.SystemsInstaller
-  _sceneName: 0
+  _sceneName: 1
 --- !u!1 &2030381180
 GameObject:
   m_ObjectHideFlags: 0
@@ -803,7 +847,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 426, y: 1097}
+  m_AnchoredPosition: {x: 426, y: 1147}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2030381182
@@ -831,3 +875,4 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 1434421253}
+  - {fileID: 67220165}

@@ -5,6 +5,17 @@ using UnityEngine;
 
 namespace Game.Core.Event {
     /// <summary>
+    /// UI 생성 요청 이벤트 (비동기)
+    /// </summary>
+    public readonly struct UICreationEventAsync {
+        public readonly int id;
+        public readonly UIName uiName;
+        public UICreationEventAsync(int id, UIName name) {
+            this.id = id;
+            uiName = name;
+        }
+    }
+    /// <summary>
     /// UI 생성 요청 이벤트
     /// </summary>
     public readonly struct UICreationEvent {

@@ -3716,6 +3716,50 @@ MonoBehaviour:
     baseDefense: 0
     bonusDefense: 0
     defenseMultiplier: 1
+--- !u!1 &1463819685
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1463819687}
+  - component: {fileID: 1463819686}
+  m_Layer: 0
+  m_Name: Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1463819686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463819685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ca9ad94b9f4712498bb6c0d3e86545f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+--- !u!4 &1463819687
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463819685}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 720, y: 1280, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1470558857
 GameObject:
   m_ObjectHideFlags: 0
@@ -3992,7 +4036,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc68cd3876ad454ebc9f28fc8760e3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.ViewModels::ViewModels.ViewModelInstaller
-  _sceneName: 1
+  _sceneName: 2
 --- !u!114 &1665126135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4005,7 +4049,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e9c5bdde51e25644a5dea5dd7492407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Core::Core.SceneContext
-  _sceneName: 1
+  _sceneName: 2
 --- !u!114 &1665126136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4030,7 +4074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c01ddc39ca21e042acf72f18919c3ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Model::Models.ModelInstaller
-  _sceneName: 1
+  _sceneName: 2
 --- !u!114 &1665126138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4043,7 +4087,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e88b126a1e2dc0546a18a8bf79e4af08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Policies::Policies.PolicyInstaller
-  _sceneName: 1
+  _sceneName: 2
 --- !u!114 &1665126139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4056,7 +4100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd73c98d2a5e8cd40a50ef8ebb2258d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Services::Services.ServiceInstaller
-  _sceneName: 1
+  _sceneName: 2
 --- !u!114 &1665126140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4069,7 +4113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2170df29205de5541be4362de596863c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Systems::Systems.SystemsInstaller
-  _sceneName: 1
+  _sceneName: 2
 --- !u!1 &2078332575
 GameObject:
   m_ObjectHideFlags: 0
@@ -9491,3 +9535,4 @@ SceneRoots:
   - {fileID: 575497432}
   - {fileID: 887731940}
   - {fileID: 1413007884}
+  - {fileID: 1463819687}

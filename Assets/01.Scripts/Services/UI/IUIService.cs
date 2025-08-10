@@ -13,6 +13,12 @@ namespace Game.Services {
         UniTask<T> LoadUIAsync<T>(UIName uiName) where T : Component;
 
         /// <summary>
+        /// UI를 동기로 로드
+        /// </summary>
+
+        GameObject LoadUIGameObject(UIName uiName);
+
+        /// <summary>
         /// UI를 GameObject로 로드합니다
         /// </summary>
         UniTask<GameObject> LoadUIGameObjectAsync(UIName uiName);
