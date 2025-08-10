@@ -8,6 +8,7 @@
 - [2025-08-03 - Firebase 통신, 크리스탈, 경험치 시스템 구현](#6)
 - [2025-08-04 - Health 관련 로직 중앙화 변경](#7)
 - [2025-08-08 - AddressableService, 전투 시스템, 게임 초기화, 데이터 관리, 에디터 도구 구현](#8)
+- [2025-08-10 - Scene 관리, Addressables 동기 로직, UI 생성 분리, WipeEffect 구현](#9)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -802,4 +803,128 @@ public class PlayerController : MonoBehaviour
 ### 📋 다음 개발 예정 사항
 - MainLobbyScene 구성
 - LoadingScene 구성
+---
+<a id=9> </a>
+# 📅 2025-08-10
+## 🎯 Scene 관리, Addressables 동기 로직, UI 생성 분리, WipeEffect 구현
+
+#### 1. Scene 관리 구현
+- **`SceneSystem`**: 씬 전환 로직 관리 -> LoadScene, LoadSceneWithLoading
+- **`SceneService`**: 비동기 씬 로드 -> UniTask 기반 구현
+- **특징**: Loading Scene 경유 -> 최소 로딩 시간 보장
+- **이벤트**: SceneLoadingEvent -> 씬 전환 알림
+
+#### 2. Addressables 동기 로직 구현  
+- **`AddressableService`**: LoadAsset 동기 메서드 추가
+- **기술**: WaitForCompletion() -> 즉시 로드
+- **캐싱**: Dictionary 기반 -> 중복 로드 방지
+- **참조 카운트**: 메모리 효율적 관리
+
+#### 3. UI 생성 로직 분리 구현
+- **`UIManager`**: 동기/비동기 생성 -> CreationEvent/CreationEventAsync
+- **`UISystem`**: InstanceUI(동기), InstanceUIAsync(비동기) 분리
+- **`UIService`**: LoadUIGameObject(동기), LoadUIAsync(비동기) 구현
+- **최적화**: HUD는 다중 생성 -> Screen은 단일 생성
+
+#### 4. Scene 전환 WipeEffect 구현
+- **`WipeUI`**: Shader 기반 전환 효과 -> 4방향 지원
+- **`SceneChangeListener`**: 씬 변경 감지 -> WipeEffect 자동 생성
+- **방향**: 씬 로딩시 Left -> 씬 변경시 FillRight
+- **자동 제거**: 효과 완료시 -> UICloseEvent 발행
+
+---
+### Scene 시스템 상세
+```mermaid
+flowchart LR
+    A[SceneSystem] --> B[SceneService]
+    B --> C[LoadSceneAsync]
+    B --> D[LoadSceneWithLoadingAsync]
+    D --> E[LoadingScene] 
+    E --> F[TargetScene]
+```
+**주요 기능:**
+- 중복 로딩 방지 체크
+- 최소 로딩 시간 2초 보장
+- 이전/현재 씬 추적 관리
+
+---
+### WipeEffect 시스템 상세
+```mermaid
+flowchart TD
+    A[SceneLoadingEvent] --> B[SceneChangeListener]
+    B --> C{씬 상태}
+    C -->|로딩 요청| D[Left Wipe]
+    C -->|씬 변경됨| E[FillRight Wipe]
+    D --> F[UICreationEvent]
+    E --> F
+    F --> G[WipeUI 생성]
+    G --> H[Shader Progress 애니메이션]
+    H --> I{자동 제거}
+    I -->|Yes| J[UICloseEvent]
+    I -->|No| K[유지]
+```
+**주요 구성 요소:**
+#### 1. SceneChangeListener (Systems/UI)
+- activeSceneChanged 이벤트 구독
+- SceneLoadingEvent 이벤트 구독  
+- WipeEffect 방향/시간 결정
+- LoadingScene은 효과 제외
+
+#### 2. WipeUI (UI/UI)
+- Shader Property "_Progress" 제어
+- Coroutine 기반 애니메이션
+- 4방향 지원: Right, Left, FillLeft, FillRight
+- RectTransform 자동 조정
+
+#### 3. WipeDirection (Core/Contracts)
+- Right: 오른쪽으로 사라짐
+- Left: 왼쪽으로 사라짐
+- FillLeft: 왼쪽에서 채워짐
+- FillRight: 오른쪽에서 채워짐
+
+---
+### Addressables 동기 로드 상세
+```mermaid
+flowchart TD
+    A[LoadAsset 호출] --> B{캐시 확인}
+    B -->|있음| C[즉시 반환]
+    B -->|없음| D[WaitForCompletion]
+    D --> E[Dictionary 저장]
+    E --> F[Asset 반환]
+```
+**주요 기능:**
+- 동기 로드: WaitForCompletion() 사용
+- 비동기 로드: ToUniTask() 사용  
+- 참조 카운트 기반 언로드
+- 전체 언로드: UnloadAll()
+
+---
+### UI 생성 분리 구조
+```mermaid
+flowchart TD
+    A[UIManager] --> B{Event Type}
+    B -->|CreationEvent| C[동기 생성]
+    B -->|CreationEventAsync| D[비동기 생성]
+    C --> E[UISystem.CreateUI]
+    D --> F[UISystem.CreateUIAsync]
+    E --> G[UIService.LoadUIGameObject]
+    F --> H[UIService.LoadUIAsync]
+```
+**주요 구성 요소:**
+#### 1. UIManager (UI/Managers)
+- 이벤트 수신 -> 동기/비동기 분기
+- UIAnchor 위치 관리
+- ViewModel 호출 중계
+
+#### 2. UISystem (Systems/UI)
+- InstanceUI: 동기 생성
+- InstanceUIAsync: 비동기 생성
+- UI 타입별 부모 관리
+- 참조 카운트 관리
+
+#### 3. UIService (Services/UI)
+- LoadUIGameObject: 동기 로드
+- LoadUIAsync: 비동기 로드
+- Addressables 연동
+- DI 주입 처리
 ---
