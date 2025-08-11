@@ -9,6 +9,7 @@
 - [2025-08-04 - Health 관련 로직 중앙화 변경](#7)
 - [2025-08-08 - AddressableService, 전투 시스템, 게임 초기화, 데이터 관리, 에디터 도구 구현](#8)
 - [2025-08-10 - Scene 관리, Addressables 동기 로직, UI 생성 분리, WipeEffect 구현](#9)
+- [2025-08-11 - Inventory 시스템, UI 스타일링 구현](#10)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -927,4 +928,69 @@ flowchart TD
 - LoadUIAsync: 비동기 로드
 - Addressables 연동
 - DI 주입 처리
+---
+<a id=10></a>
+# 📅 2025-08-11
+## 🎯 Inventory 시스템, UI 스타일링 구현
+
+#### 1. Inventory 시스템 구현
+- **`InventoryView`**: MVVM 패턴 기반 인벤토리 UI 관리
+- **주요 특징**: 동적 슬롯 생성, 자동 스프라이트 크기 조정, 장비 착용/해제
+- **기술 요소**: R3 바인딩 -> 실시간 장비 상태 동기화
+- **제한사항**: 6x10 슬롯 (60개), 고정 높이 150px
+
+#### 2. EquipService Sprite Addressable 구현
+- **`EquipService`**: CSV 기반 스프라이트 주소 키 관리, 동적 로딩/언로딩
+- **주요 특징**: EquipSpriteAddressKey CSV -> Addressables 자동 바인딩
+- **기술 요소**: 이중 AddressableService -> GameObject/Sprite 분리 관리
+- **제한사항**: CSV 파일 기반, EquipName enum 일치 필수
+
+#### 3. UI 스타일 분리 구현
+- **`SO_InventoryStyle`**: ScriptableObject 기반 UI 설정 분리
+- **주요 특징**: 런타임 설정 변경 가능, 디자이너 친화적
+- **기술 요소**: 슬롯 간격/오프셋 -> 자동 레이아웃 생성
+- **제한사항**: 고정 높이 기준 가로세로 비율 유지
+
+---
+### Inventory 시스템 상세
+```mermaid
+flowchart LR
+    A[InventoryView] --> B[InventoryViewModel]
+    B --> C[EquipSystem]
+    B --> D[EquipModel]
+    C --> E[EquipService]
+    E --> F[AddressableService GameObject]
+    E --> G[AddressableService Sprite]
+    D --> H[ReactiveProperty]
+    
+    I[SO_InventoryStyle] --> A
+    J[EquipSpriteAddressKey CSV] --> E
+    K[EquipAddressKey CSV] --> E
+    
+    A --> L[동적 슬롯 생성]
+    A --> M[스프라이트 크기 조정]
+    A --> N[장비 착용/해제]
+```
+
+**주요 기능:**
+- 6x10 그리드 자동 생성 (60개 슬롯)
+- CSV 기반 스프라이트 주소 키 자동 등록 및 Addressables 로딩
+- 스프라이트 비율 유지하며 고정 높이 150px 적용
+- 장비 클릭 시 자동 착용 및 인벤토리에서 제거
+- R3 Observable로 실시간 장비 상태 동기화
+
+**주요 구성 요소:**
+#### 1. InventoryView (MonoBehaviour)
+- MVVM View 역할, ReactiveProperty 바인딩으로 실시간 UI 갱신
+#### 2. EquipService (Service Layer)
+- 이중 AddressableService로 GameObject와 Sprite 분리 관리
+#### 3. InventoryViewModel (Plain C#)
+- EquipSystem과 EquipModel 중계, 스프라이트 로딩 관리
+#### 4. SO_InventoryStyle (ScriptableObject)
+- UI 레이아웃 설정 분리, 디자이너가 에디터에서 직접 수정 가능
+
+---
+### 📋 다음 개발 예정 사항
+- BT 구현
+- Stage 구현현
 ---
