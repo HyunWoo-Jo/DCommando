@@ -937,7 +937,7 @@ flowchart TD
 - **`InventoryView`**: MVVM 패턴 기반 인벤토리 UI 관리
 - **주요 특징**: 동적 슬롯 생성, 자동 스프라이트 크기 조정, 장비 착용/해제
 - **기술 요소**: R3 바인딩 -> 실시간 장비 상태 동기화
-- **제한사항**: 6x10 슬롯 (60개), 고정 높이 150px
+- **제한사항**: 6x10 슬롯(slide), 고정 높이 150px
 
 #### 2. EquipService Sprite Addressable 구현
 - **`EquipService`**: CSV 기반 스프라이트 주소 키 관리, 동적 로딩/언로딩
@@ -973,9 +973,8 @@ flowchart LR
 ```
 
 **주요 기능:**
-- 6x10 그리드 자동 생성 (60개 슬롯)
-- CSV 기반 스프라이트 주소 키 자동 등록 및 Addressables 로딩
-- 스프라이트 비율 유지하며 고정 높이 150px 적용
+- 그리드 자동 생성 (60개 슬롯)
+- CSV 기반 Sprite 주소 키 자동 등록 및 Addressables 로딩 
 - 장비 클릭 시 자동 착용 및 인벤토리에서 제거
 - R3 Observable로 실시간 장비 상태 동기화
 
