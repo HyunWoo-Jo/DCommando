@@ -13,6 +13,7 @@ namespace Game.UI {
         [SerializeField] private GameObject _slotPrefab;
         [SerializeField] private Transform _inventoryContent;
         [SerializeField] private Transform _weaponParent;
+        [SerializeField] private SO_InventoryStyle _style;
         [Inject] private InventoryViewModel _viewModel;
 
         private readonly List<GameObject> _slots = new();
@@ -39,7 +40,6 @@ namespace Game.UI {
             // 무기 슬롯 오브젝트 생성
             Image weaponImage = GameObject.Instantiate(_slotPrefab, _weaponParent).GetComponent<Image>();
             weaponImage.transform.localPosition = Vector3.zero;
-      
 
             // 장착된 무기 업데이트
             _viewModel.RORP_EquippedWeapon
@@ -63,7 +63,7 @@ namespace Game.UI {
                     GameDebug.Log("장비 변경");
                     // 새로운 장비 목록으로 업데이트
                     foreach (var equipName in equipNameList) {
-                        
+
                         if (equipName != EquipName.None && !_equipDict.ContainsKey(equipName)) {
                             CreateEquipObject(equipName);
                         }
@@ -73,12 +73,14 @@ namespace Game.UI {
 
         // 슬롯 생성
         private void InstanceSlot() {
-            int x = 6;
-            int y = 10;
-            for (int i = 0; i < y; i++) {
-                for (int j = 0; j < x; j++) {
+            for (int i = 0; i < _style.slotRows; i++) {
+                for (int j = 0; j < _style.slotColumns; j++) {
                     GameObject obj = GameObject.Instantiate(_slotPrefab, _inventoryContent);
-                    obj.transform.localPosition = new Vector3(j * 200 - 500, i * -200 - 100, 0);
+                    obj.transform.localPosition = new Vector3(
+                        j * _style.slotSpacing.x + _style.slotOffset.x,
+                        i * -_style.slotSpacing.y + _style.slotOffset.y,
+                        0
+                    );
                     _slots.Add(obj);
                 }
             }
@@ -138,12 +140,11 @@ namespace Game.UI {
             float spriteWidth = rect.width;
             float spriteHeight = rect.height;
 
-            // y를 150으로 고정하고 x를 비율에 맞춰 계산
-            float fixedHeight = 150f;
+            // Style에서 고정 높이 가져와서 x를 비율에 맞춰 계산
             float aspectRatio = spriteWidth / spriteHeight;
-            float calculatedWidth = fixedHeight * aspectRatio;
+            float calculatedWidth = _style.fixedHeight * aspectRatio;
 
-            targetRect.sizeDelta = new Vector2(calculatedWidth, fixedHeight);
+            targetRect.sizeDelta = new Vector2(calculatedWidth, _style.fixedHeight);
         }
 
         // 사용 가능한 슬롯 인덱스 찾기
@@ -156,8 +157,6 @@ namespace Game.UI {
             }
             return -1; // 사용 가능한 슬롯이 없음
         }
-
-
 
         // 장비 클릭 이벤트 처리
         private void OnEquipClicked(EquipName equipName) {
