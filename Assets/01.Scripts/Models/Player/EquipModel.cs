@@ -42,8 +42,11 @@ namespace Game.Models {
         /// 무기 장착
         /// </summary>
         public void EquipWeapon(EquipName equipName) {
-            if (equipName == EquipName.None || _ownedEquipments.Contains(equipName)) {
+            UnequipWeapon();
+            if (equipName != EquipName.None && _ownedEquipments.Contains(equipName)) {
                 RP_equippedWeapon.Value = equipName;
+                _ownedEquipments.Remove(equipName);
+                _ownedEquipmentsSubject.OnNext(_ownedEquipments);
             }
         }
 
@@ -51,8 +54,11 @@ namespace Game.Models {
         /// 방어구 장착
         /// </summary>
         public void EquipArmor(EquipName equipName) {
-            if (equipName == EquipName.None || _ownedEquipments.Contains(equipName)) {
+            UnequipArmor();
+            if (equipName != EquipName.None && _ownedEquipments.Contains(equipName)) {
                 RP_equippedArmor.Value = equipName;
+                _ownedEquipments.Remove(equipName);
+                _ownedEquipmentsSubject.OnNext(_ownedEquipments);
             }
         }
 
@@ -60,25 +66,47 @@ namespace Game.Models {
         /// 악세사리 장착
         /// </summary>
         public void EquipAccessory(EquipName equipName) {
-            if (equipName == EquipName.None || _ownedEquipments.Contains(equipName)) {
+            UnequipAccessory();
+            if (equipName != EquipName.None && _ownedEquipments.Contains(equipName)) {
                 RP_equippedAccessory.Value = equipName;
+                _ownedEquipments.Remove(equipName);
+                _ownedEquipmentsSubject.OnNext(_ownedEquipments);
             }
         }
 
         /// <summary>
         /// 무기 해제
         /// </summary>
-        public void UnequipWeapon() => RP_equippedWeapon.Value = EquipName.None;
+        public void UnequipWeapon() {
+            if (RP_equippedWeapon.Value != EquipName.None) {
+                _ownedEquipments.Add(RP_equippedWeapon.CurrentValue);
+                GameDebug.Log(RP_equippedWeapon.CurrentValue.ToString() + "등록");
+                RP_equippedWeapon.Value = EquipName.None;
+                _ownedEquipmentsSubject.OnNext(_ownedEquipments);
+            }
+        }
 
         /// <summary>
         /// 방어구 해제
         /// </summary>
-        public void UnequipArmor() => RP_equippedArmor.Value = EquipName.None;
+        public void UnequipArmor() {
+            if (RP_equippedArmor.Value != EquipName.None) {
+                _ownedEquipments.Add(RP_equippedArmor.Value);
+                RP_equippedArmor.Value = EquipName.None;
+                _ownedEquipmentsSubject.OnNext(_ownedEquipments);
+            }
+        }
 
         /// <summary>
         /// 악세사리 해제
         /// </summary>
-        public void UnequipAccessory() => RP_equippedAccessory.Value = EquipName.None;
+        public void UnequipAccessory() {
+            if (RP_equippedAccessory.Value != EquipName.None) {
+                _ownedEquipments.Add(RP_equippedAccessory.Value);
+                RP_equippedAccessory.Value = EquipName.None;
+                _ownedEquipmentsSubject.OnNext(_ownedEquipments);
+            }
+        }
         #endregion
 
         #region 보유 장비 관리

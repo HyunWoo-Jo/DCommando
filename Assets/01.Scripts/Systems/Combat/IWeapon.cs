@@ -1,10 +1,15 @@
-﻿using UnityEngine;
+﻿using Game.Core;
+using UnityEngine;
 
 namespace Game.Systems
 {
     public interface IWeapon
     {
+        EquipName EquipName { get; }
+
         GameObject GameObj { get; }
+
+        void SetEquipName(EquipName equipName);
 
         void PerformAttack();
         /// <summary>

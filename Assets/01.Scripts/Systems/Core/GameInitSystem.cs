@@ -9,9 +9,9 @@ namespace Game.Systems
     /// 게임을 초기화 하는 System 
     /// </summary>
     public class GameInitSystem : MonoBehaviour {
-        [Inject] private INetworkService _networkService;
-        [Inject] private CrystalSystem _crystalSystem;
-        [Inject] private EquipSystem _equipSystem;
+        [Inject] private readonly INetworkService _networkService;
+        [Inject] private readonly CrystalSystem _crystalSystem;
+        [Inject] private readonly EquipSystem _equipSystem;
         private void Start() {
             _ = InitializeGameAsync();
         }

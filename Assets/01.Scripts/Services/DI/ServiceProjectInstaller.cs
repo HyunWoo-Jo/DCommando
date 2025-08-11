@@ -54,6 +54,10 @@ namespace Game.Services
                 .To<AddressableService<EquipName, GameObject>>()
                 .AsSingle();
 
+            Container.Bind<IAddressableService<EquipName, Sprite>>()
+                .To<AddressableService<EquipName, Sprite>>()
+                .AsSingle();
+
             Container.Bind<IAddressableService<UIName, GameObject>>()
                 .To<AddressableService<UIName, GameObject>>().AsSingle();
         }

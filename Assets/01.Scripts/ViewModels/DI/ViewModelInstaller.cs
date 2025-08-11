@@ -25,7 +25,7 @@ namespace Game.ViewModels {
         }
 
         private void BindMainLobbySceneViewModels() {
-
+            Container.BindInterfacesAndSelfTo<InventoryViewModel>().AsCached();
         }
 
 

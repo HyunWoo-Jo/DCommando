@@ -30,8 +30,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 400f84ca50ac94f20a75a7ecfbe2cfe8
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/0_Sword/Sword_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7342067c661ded440acc735796f301cf
     m_Address: Assets/02.Prefabs/UI/Gold_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d2e32343359643008ec8b92017bbf89
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/4_Spear/Soon_Spear.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -60,8 +70,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0bd2df7b6f3957439dfc46bdc8a867f
+    m_Address: Assets/02.Prefabs/Eqip/Weapon/Standard_Spear.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e46d88662d10e7744ac5e4d1ce1f6153
     m_Address: Assets/02.Prefabs/UI/WipeUI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f17058e2bd3c44745bd37eb71c41adf1
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/1_Axe/Axe_1.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

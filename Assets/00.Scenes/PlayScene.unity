@@ -8471,7 +8471,7 @@ MonoBehaviour:
     defenseMultiplier: 1
     baseAttackSpeed: 0
     bonusAttackSpeed: 0
-    attackSpeedMultiplier: 0.5
+    attackSpeedMultiplier: 1
 --- !u!1 &7753701071391436217
 GameObject:
   m_ObjectHideFlags: 0

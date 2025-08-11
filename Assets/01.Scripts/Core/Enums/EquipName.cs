@@ -8,5 +8,8 @@ namespace Game.Core {
 
         // Axe
         Standard_Axe,
+
+        // Spear
+        Standard_Spear,
     }
 }

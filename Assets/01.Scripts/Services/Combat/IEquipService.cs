@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Game.Data;
@@ -30,6 +30,26 @@ namespace Game.Services {
         /// 로드된 장비 프리팹을 가져옵니다
         /// </summary>
         GameObject GetLoadedEquipPrefab(EquipName equipName);
+
+        /// <summary>
+        /// 장비 스프라이트 로드
+        /// </summary>
+        Sprite LoadEquipSprite(EquipName equipName);
+
+        /// <summary>
+        /// 장비 스프라이트 비동기 로드
+        /// </summary>
+        UniTask<Sprite> LoadEquipSpriteAsync(EquipName equipName);
+
+        /// <summary>
+        /// 장비 스프라이트 언로드
+        /// </summary>
+        void UnloadEquipSprite(EquipName equipName);
+
+        /// <summary>
+        /// 로드된 장비 스프라이트 가져오기
+        /// </summary>
+        void UnloadSpriteAll();
         #endregion
 
         #region Firebase 데이터 관리

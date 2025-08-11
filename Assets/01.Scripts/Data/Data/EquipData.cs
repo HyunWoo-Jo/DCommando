@@ -76,27 +76,25 @@ namespace Game.Data {
         /// 무기 장착
         /// </summary>
         public void EquipWeapon(EquipName equipName) {
-            if (HasEquipment(equipName)) {
-                equippedWeapon = equipName.ToString();
-            }
+            equippedWeapon = equipName.ToString();
+            
         }
 
         /// <summary>
         /// 방어구 장착
         /// </summary>
         public void EquipArmor(EquipName equipName) {
-            if (HasEquipment(equipName)) {
-                equippedArmor = equipName.ToString();
-            }
+
+            equippedArmor = equipName.ToString();
+            
         }
 
         /// <summary>
         /// 악세사리 장착
         /// </summary>
         public void EquipAccessory(EquipName equipName) {
-            if (HasEquipment(equipName)) {
-                equippedAccessory = equipName.ToString();
-            }
+            equippedAccessory = equipName.ToString();
+            
         }
 
         /// <summary>

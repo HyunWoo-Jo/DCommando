@@ -8,6 +8,7 @@ using Game.Data;
 namespace Game.Services {
     public class EquipService : IEquipService, IInitializable {
         [Inject] private IAddressableService<EquipName, GameObject> _addressableService;
+        [Inject] private IAddressableService<EquipName, Sprite> _spriteAddressableService;
         [Inject] private INetworkService _networkService;
         #region 초기화
         public void Initialize() {
@@ -24,6 +25,18 @@ namespace Game.Services {
 
                 _addressableService.RegisterAddressKeys(convertedMap);
                 GameDebug.Log($"장비 주소 키 {convertedMap.Count}개 등록 완료");
+
+                // Sprite
+                var equipSpriteAddressMap = CSVReader.ReadToDictionary("AddressKey/EquipSpriteAddressKey");
+                var convertedSpriteMap = new Dictionary<EquipName, string>();
+                foreach (var kvp in equipSpriteAddressMap) {
+                    if (System.Enum.TryParse<EquipName>(kvp.Key, out var equipName)) {
+                        convertedSpriteMap[equipName] = kvp.Value;
+                    }
+                }
+                _spriteAddressableService.RegisterAddressKeys(convertedSpriteMap);
+
+
             } catch {
                 GameDebug.LogError("Equip CSV 파일 로드에 실패했습니다.");
             }
@@ -136,6 +149,24 @@ namespace Game.Services {
                 return new List<EquipName>();
             }
         }
+
+        #endregion
+        #region Sprite관련 로직
+        public Sprite LoadEquipSprite(EquipName equipName) {
+            return _spriteAddressableService.LoadAsset(equipName);
+        }
+
+        public async UniTask<Sprite> LoadEquipSpriteAsync(EquipName equipName) {
+            return await _spriteAddressableService.LoadAssetAsync(equipName);
+        }
+
+        public void UnloadEquipSprite(EquipName equipName) {
+           _spriteAddressableService.UnloadAsset(equipName);
+        }
+        public void UnloadSpriteAll() {
+            _spriteAddressableService.UnloadAll();
+        }
+
         #endregion
 
     }

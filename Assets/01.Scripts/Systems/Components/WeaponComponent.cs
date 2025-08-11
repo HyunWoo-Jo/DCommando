@@ -29,6 +29,7 @@ namespace Game.Systems.Weapon {
 
         // DI 주입
         [Inject] private readonly ISkillDataService _skillDataService;
+        [Inject] private readonly EquipSystem _equipSystem; 
         [Inject] private readonly CombatModel _combatModel;
         [Inject] private readonly CombatSystem _combatSystem;
 
@@ -44,9 +45,11 @@ namespace Game.Systems.Weapon {
         // 고유 ID
         private int _weaponId;
 
+        
        
 
         // 프로퍼티
+        public EquipName EquipName { get; private set; }
         public SkillName SkillName => _skillName;
         public SO_SkillData SkillData => _skillData;
         public bool IsInitialized => _isInitialized;
@@ -69,6 +72,9 @@ namespace Game.Systems.Weapon {
  
 
         #region 스탯 관리
+        public void SetEquipName(EquipName equipName ) {
+            EquipName = EquipName;
+        }
 
         /// <summary>
         /// 현재 최종 공격력 반환
@@ -452,6 +458,7 @@ namespace Game.Systems.Weapon {
                 _combatModel.AddBonusAttackSpeed(_weaponId, -_baseAttackSpeed);
                 _isInitialized = false;
                 _skillDataService.UnloadSkill(_skillName);
+                _equipSystem.UnLoadWeapon(this);
                 GameDebug.Log($"무기 해제: {_skillName}, ID: {_weaponId}");
             }
         }
