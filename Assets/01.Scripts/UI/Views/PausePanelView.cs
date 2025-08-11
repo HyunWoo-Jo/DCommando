@@ -5,12 +5,13 @@ using System;
 using Game.ViewModels;
 using UnityEngine.UI;
 using Game.Core.Event;
-////////////////////////////////////////////////////////////////////////////////////
-// Auto Generated Code
+using Game.Core;
+
 namespace Game.UI
 {
     public class PausePanelView : MonoBehaviour
     {
+        [Inject] private SceneViewModel _sceneViewModel;
         [Inject] private PausePanelViewModel _viewModel;
         [Header("Unity 레퍼")]
         [SerializeField] private Button _continueButton;
@@ -36,6 +37,9 @@ namespace Game.UI
         private void Bind() {
             _continueButton.onClick
                 .AddListener(() => _viewModel.OnContinueButton());
+
+            _giveupButton.onClick
+                .AddListener(() => _sceneViewModel.LoadSceneWithLoading(SceneName.MainScene, 0.5f));
         }
 
         private void Resize() {
@@ -51,8 +55,6 @@ namespace Game.UI
         private void UpdateUI() {
             
         }
-////////////////////////////////////////////////////////////////////////////////////
-        // your logic here
 
     }
 }

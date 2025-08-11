@@ -30,6 +30,11 @@ namespace Game.Services {
         }
         #endregion
         #region 장비 프리펩 로드
+
+        public GameObject LoadEquipInstancePrefab(EquipName equipName) {
+            return _addressableService.LoadAsset(equipName);
+        }
+
         public async UniTask<GameObject> LoadEquipInstancePrefabAsync(EquipName equipName) {
             var equipPrefab = await _addressableService.LoadAssetAsync(equipName);
 

@@ -30,7 +30,11 @@ namespace Game.Systems
         /// Model의 데이터에 접근
         private float MoveSpeed => _moveModel.RORP_MoveData.CurrentValue.moveSpeed;
         private float RotationSpeed => _moveModel.RORP_MoveData.CurrentValue.rotationSpeed;
-        
+
+        private float timer = 0f;
+
+        private float AttackSpeed => _combatComponent.AttackSpeed;
+
         private void Awake() {
 
             _animControll = GetComponentInChildren<AnimControllComponent>();
@@ -47,14 +51,19 @@ namespace Game.Systems
                 ContinueWith(AddWeapon); // 기본 무기 추가
         }
 
-        float timer;
-        private void Update() {
-            timer += Time.deltaTime;
-            if(timer > 2) {
-                _animControll.AttackAnim();
-                timer = 0;
-            }
 
+        private void Update() {
+            if (GameTime.IsPaused) return;
+            if (AttackSpeed < float.Epsilon) return;
+            timer += Time.deltaTime;
+            
+            // AttackSpeed를 초당 공격 횟수로 변환
+            float attackInterval = 1f / AttackSpeed;
+
+            if (timer > attackInterval) {
+                _animControll.AttackAnim();
+                timer -= attackInterval;
+            }
         }
 
 

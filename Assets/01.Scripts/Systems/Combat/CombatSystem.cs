@@ -38,9 +38,9 @@ namespace Game.Systems {
         /// <summary>
         /// 전투 캐릭터 등록 (전투 스탯)
         /// </summary>
-        public bool RegisterCombatCharacter(int characterId, int baseAttack, int baseDefense) {
+        public bool RegisterCombatCharacter(int characterId, int baseAttack, int baseDefense, float baseAttackSpeed) {
             // CombatModel에 전투 스탯 등록
-            _combatModel.RegisterCombat(characterId, baseAttack, baseDefense);
+            _combatModel.RegisterCombat(characterId, baseAttack, baseDefense, baseAttackSpeed);
 
             GameDebug.Log($"전투 캐릭터 등록 Character {characterId}: 공격력 {baseAttack}, 방어력 {baseDefense}");
             return true;
@@ -324,7 +324,9 @@ namespace Game.Systems {
         #endregion
 
         #region 상태 조회
-
+        public ReadOnlyReactiveProperty<CombatData> GetRORP_CombatData(int id) {
+            return _combatModel.GetRORP_CombatData(id);
+        }
         /// <summary>
         /// 캐릭터가 전투 가능한지 확인
         /// </summary>
@@ -348,6 +350,13 @@ namespace Game.Systems {
             return _combatModel.GetFinalDefense(characterId);
         }
 
+
+        
+
+        public float GetFinalAttackSpeed(int characterId) {
+            return _combatModel.GetFinalAttackSpeed(characterId);
+        }
+
         /// <summary>
         /// 전투 데이터 존재 여부 확인
         /// </summary>
@@ -368,6 +377,7 @@ namespace Game.Systems {
                 GameDebug.Log($"Character {characterId}: ATK {combatData.FinalAttack}, DEF {combatData.FinalDefense}, 전투가능: {canFight}");
             }
         }
+
 
         #endregion
 

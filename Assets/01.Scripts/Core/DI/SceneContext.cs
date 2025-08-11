@@ -16,7 +16,7 @@ namespace Game.Core
             DIHelper.Initialize(Container);
             // 씬별 특화 바인딩
             InstallSceneSpecificBindings();
-            Debug.Log(GetType().Name + " Bind 완료");
+
         }
 
 
@@ -42,14 +42,14 @@ namespace Game.Core
         /// 메인 로비 씬 바인딩
         /// </summary>
         private void BindMainLobbyScene() {
-            Debug.Log("MainLobby 씬 특화 바인딩 설정");
+           
         }
 
         /// <summary>
         /// 게임플레이 씬 바인딩
         /// </summary>
         private void BindPlayScene() {
-            Debug.Log("Gameplay 씬 특화 바인딩 설정");
+        
         }
     }
 }

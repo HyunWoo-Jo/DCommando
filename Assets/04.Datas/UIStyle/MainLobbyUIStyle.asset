@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bba52e180e7eda9439c1ee0b3b9e1527, type: 3}
+  m_Name: MainLobbyUIStyle
+  m_EditorClassIdentifier: Game.Core::Game.Core.SO_MainLobbyUIStyle
+  moveDuration: 0.3
+  referenceInterval: 1440
+  moveEase: 22
+  mainPanelPosX: 0
+  invenPanelPosX: -1440

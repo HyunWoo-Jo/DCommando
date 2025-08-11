@@ -24,16 +24,28 @@ namespace Game.Systems
         public Observable<Unit> OnAttackEnd => _attackEnd;
 
        
+        public float AttackSpeed { get; private set; }
+
+        private CompositeDisposable _disposables = new();
+       
+        
+
 
         #region 초기화
         private void OnDestroy() {
+            _disposables?.Dispose();
             // 해제
             _combatSystem.UnregisterCombatCharacter(gameObject.GetInstanceID());
+            
         }
 
         private void Awake() {
             // 등록
-            _combatSystem.RegisterCombatCharacter(gameObject.GetInstanceID(), _combatData.FinalAttack, _combatData.FinalDefense);
+            _combatSystem.RegisterCombatCharacter(gameObject.GetInstanceID(), _combatData.FinalAttack, _combatData.FinalDefense, _combatData.attackSpeedMultiplier);
+            var RORP = _combatSystem.GetRORP_CombatData(gameObject.GetInstanceID());
+            RORP.Subscribe((combatData) => { AttackSpeed = combatData.FinalAttackSpeed;
+            })
+                .AddTo(_disposables);
         }
         #endregion
   

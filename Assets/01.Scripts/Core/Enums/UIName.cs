@@ -13,7 +13,12 @@ namespace Game.Core
         Health_UI,
         Exp_UI,
         Damage_UI,
-        
+
+        PlayButton_UI,
+
+
         WipeEffect_UI,
+        
+       
     }
 }

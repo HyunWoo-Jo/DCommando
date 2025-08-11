@@ -11,7 +11,7 @@ namespace Game.Systems
     public class EquipSystem
     {
         [Inject] private readonly EquipModel _equipModel;
-        [Inject] private readonly EquipService _equipService;
+        [Inject] private readonly IEquipService _equipService;
 
         private bool _isInit = false;
         public async UniTask InitializeAsync() {

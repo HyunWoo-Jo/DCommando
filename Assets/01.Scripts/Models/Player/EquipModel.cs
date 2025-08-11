@@ -18,8 +18,10 @@ namespace Game.Models {
         #endregion
 
         #region 보유 장비 목록
-        private readonly ReactiveProperty<List<EquipName>> RP_ownedEquipments = new(new List<EquipName>());
-        public ReadOnlyReactiveProperty<List<EquipName>> OwnedEquipments => RP_ownedEquipments;
+        private readonly List<EquipName> _ownedEquipments = new(); // 직접 관리하는 List
+        private readonly Subject<List<EquipName>> _ownedEquipmentsSubject = new(); // 변경 알림용
+
+        public Observable<List<EquipName>> OwnedEquipments => _ownedEquipmentsSubject;
         #endregion
 
         #region 초기화
@@ -29,6 +31,9 @@ namespace Game.Models {
             RP_equippedWeapon.Value = EquipName.None;
             RP_equippedArmor.Value = EquipName.None;
             RP_equippedAccessory.Value = EquipName.None;
+
+            // 초기 알림
+            _ownedEquipmentsSubject.OnNext(_ownedEquipments);
         }
         #endregion
 
@@ -37,7 +42,7 @@ namespace Game.Models {
         /// 무기 장착
         /// </summary>
         public void EquipWeapon(EquipName equipName) {
-            if (equipName == EquipName.None || RP_ownedEquipments.Value.Contains(equipName)) {
+            if (equipName == EquipName.None || _ownedEquipments.Contains(equipName)) {
                 RP_equippedWeapon.Value = equipName;
             }
         }
@@ -46,7 +51,7 @@ namespace Game.Models {
         /// 방어구 장착
         /// </summary>
         public void EquipArmor(EquipName equipName) {
-            if (equipName == EquipName.None || RP_ownedEquipments.Value.Contains(equipName)) {
+            if (equipName == EquipName.None || _ownedEquipments.Contains(equipName)) {
                 RP_equippedArmor.Value = equipName;
             }
         }
@@ -55,7 +60,7 @@ namespace Game.Models {
         /// 악세사리 장착
         /// </summary>
         public void EquipAccessory(EquipName equipName) {
-            if (equipName == EquipName.None || RP_ownedEquipments.Value.Contains(equipName)) {
+            if (equipName == EquipName.None || _ownedEquipments.Contains(equipName)) {
                 RP_equippedAccessory.Value = equipName;
             }
         }
@@ -81,11 +86,9 @@ namespace Game.Models {
         /// 장비 추가 (중복 방지)
         /// </summary>
         public void AddEquipment(EquipName equipName) {
-            if (equipName != EquipName.None && !RP_ownedEquipments.Value.Contains(equipName)) {
-                var newList = new List<EquipName>(RP_ownedEquipments.Value) {
-                    equipName
-                };
-                RP_ownedEquipments.Value = newList;
+            if (equipName != EquipName.None && !_ownedEquipments.Contains(equipName)) {
+                _ownedEquipments.Add(equipName);
+                _ownedEquipmentsSubject.OnNext(_ownedEquipments); // 변경 알림
             }
         }
 
@@ -93,7 +96,7 @@ namespace Game.Models {
         /// 장비 제거 (장착된 경우 자동 해제)
         /// </summary>
         public bool RemoveEquipment(EquipName equipName) {
-            if (!RP_ownedEquipments.Value.Contains(equipName))
+            if (!_ownedEquipments.Contains(equipName))
                 return false;
 
             // 장착된 장비면 해제
@@ -102,10 +105,9 @@ namespace Game.Models {
             if (RP_equippedAccessory.Value == equipName) UnequipAccessory();
 
             // 보유 목록에서 제거
-            var newList = new List<EquipName>(RP_ownedEquipments.Value);
-            bool removed = newList.Remove(equipName);
+            bool removed = _ownedEquipments.Remove(equipName);
             if (removed) {
-                RP_ownedEquipments.Value = newList;
+                _ownedEquipmentsSubject.OnNext(_ownedEquipments); // 변경 알림
             }
             return removed;
         }
@@ -114,14 +116,14 @@ namespace Game.Models {
         /// 장비 보유 여부 확인
         /// </summary>
         public bool HasEquipment(EquipName equipName) {
-            return RP_ownedEquipments.Value.Contains(equipName);
+            return _ownedEquipments.Contains(equipName);
         }
 
         /// <summary>
         /// 읽기 전용 반복자
         /// </summary>
         public IEnumerable<EquipName> GetOwnedEquipments() {
-            return RP_ownedEquipments.Value;
+            return _ownedEquipments;
         }
         #endregion
 
@@ -163,8 +165,9 @@ namespace Game.Models {
             RP_equippedAccessory.Value = equipData.GetEquippedAccessory();
 
             // 보유 장비 목록 업데이트
-            var ownedList = equipData.GetOwnedEquipments();
-            RP_ownedEquipments.Value = new List<EquipName>(ownedList);
+            _ownedEquipments.Clear();
+            _ownedEquipments.AddRange(equipData.GetOwnedEquipments());
+            _ownedEquipmentsSubject.OnNext(_ownedEquipments); // 변경 알림
         }
 
         /// <summary>
@@ -184,7 +187,7 @@ namespace Game.Models {
                 equipData.EquipAccessory(RP_equippedAccessory.Value);
 
             // 보유 장비 목록 설정
-            foreach (var equipment in RP_ownedEquipments.Value) {
+            foreach (var equipment in _ownedEquipments) {
                 equipData.AddEquipment(equipment);
             }
 
@@ -207,7 +210,7 @@ namespace Game.Models {
         /// <summary>
         /// 보유 장비 변경 스트림
         /// </summary>
-        public Observable<List<EquipName>> OnOwnedEquipmentsChanged => RP_ownedEquipments;
+        public Observable<List<EquipName>> OnOwnedEquipmentsChanged => _ownedEquipmentsSubject;
         #endregion
     }
 }

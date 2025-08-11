@@ -75,4 +75,18 @@ namespace Game.Core.Event {
         }
     }
 
+    #region 이동
+    /// <summary>
+    /// 특정위치로 UI 이동을 명령하는 Event
+    /// </summary>
+    public readonly struct UIGoToEvent {
+        public readonly UIMoveName targetName;
+
+        public UIGoToEvent(UIMoveName targetName) {
+            this.targetName = targetName;
+        }
+    }
+
+    #endregion
+
 }

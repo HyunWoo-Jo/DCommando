@@ -6,7 +6,7 @@ using Game.Models;
 using Game.Core.Event;
 
 namespace Game.ViewModels {
-    public class ExpViewModel : IInitializable, IDisposable {
+    public class ExpViewModel : IDisposable {
 
         [Inject] private ExpModel _expModel;
 
@@ -25,6 +25,7 @@ namespace Game.ViewModels {
         private CompositeDisposable _disposable = new();
 
         #region Zenject 에서 관리
+        [Inject]
         public void Initialize() {
             // 레벨 변경
             RORP_LevelText = _expModel.RORP_CurrentLevel

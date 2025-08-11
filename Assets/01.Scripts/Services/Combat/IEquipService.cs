@@ -10,6 +10,10 @@ namespace Game.Services {
         /// <summary>
         /// 장비 인스턴스 프리팹을 로드하고 DI 주입
         /// </summary>
+        GameObject LoadEquipInstancePrefab(EquipName equipName);
+        /// <summary>
+        /// 장비 인스턴스 프리팹을 로드하고 DI 주입 비동기
+        /// </summary>
         UniTask<GameObject> LoadEquipInstancePrefabAsync(EquipName equipName);
 
         /// <summary>

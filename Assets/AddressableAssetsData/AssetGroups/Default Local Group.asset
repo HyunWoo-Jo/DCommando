@@ -46,7 +46,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a2f7cbb6246c234478092c1874c3b6e2
-    m_Address: Assets/02.Prefabs/Eqip/Weapon/Standard_Sword.prefab
+    m_Address: Assets/02.Prefabs/Eqip/Weapon/Standard_Axe.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -67,6 +67,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f4a2a23b8d743f54988cefac19c5f769
     m_Address: Assets/02.Prefabs/UI/Health_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f5e8b42804ca9a645b143ab0140bce49
+    m_Address: Assets/02.Prefabs/Eqip/Weapon/Standard_Sword.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

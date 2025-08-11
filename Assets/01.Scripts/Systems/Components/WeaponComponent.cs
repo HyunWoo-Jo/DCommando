@@ -21,6 +21,7 @@ namespace Game.Systems.Weapon {
         [Header("기본 스탯")]
         [SerializeField] private int _baseAttack = 10;
         [SerializeField] private int _baseDefense = 0;
+        [SerializeField] private float _baseAttackSpeed = 1;
         [SerializeField] private int _rangeMultiplier = 1; // 길이 배율
         [SerializeField] private int _widthOrAngleMultiplier = 1; // 너비, 각도  배율
         [Header("디버그")]
@@ -52,6 +53,7 @@ namespace Game.Systems.Weapon {
         public bool IsAttacking => _isAttacking;
         public int WeaponId => _weaponId;
 
+        public float AttackSpeed => _baseAttackSpeed;
         public Vector2 Forward => -_attackPoint.right;
 
         public GameObject GameObj => this.gameObject;
@@ -80,7 +82,7 @@ namespace Game.Systems.Weapon {
         /// Combat 데이터 반환
         /// </summary>
         public CombatData GetCombatData() {
-            if (!_isInitialized) return new CombatData(_baseAttack, _baseDefense);
+            if (!_isInitialized) return new CombatData(_baseAttack, _baseDefense, _baseAttackSpeed);
             return _combatModel.GetCombatData(_weaponId);
         }
         #endregion
@@ -429,7 +431,7 @@ namespace Game.Systems.Weapon {
                 // CombatModel에 무기 데이터 등록
                 _combatModel.AddBonusAttack(_weaponId, _baseAttack);
                 _combatModel.AddBonusDefense(_weaponId, _baseDefense);
-
+                _combatModel.AddBonusAttackSpeed(_weaponId, _baseAttackSpeed);
                 _isInitialized = true;
                 GameDebug.Log($"무기 초기화 완료: {_skillName}, Range: {_skillData.Range}, Attack: {GetFinalAttack()}");
 
@@ -447,6 +449,7 @@ namespace Game.Systems.Weapon {
                 _skillData = null;
                 _combatModel.AddBonusAttack(_weaponId, -_baseAttack);
                 _combatModel.AddBonusDefense(_weaponId, -_baseDefense);
+                _combatModel.AddBonusAttackSpeed(_weaponId, -_baseAttackSpeed);
                 _isInitialized = false;
                 _skillDataService.UnloadSkill(_skillName);
                 GameDebug.Log($"무기 해제: {_skillName}, ID: {_weaponId}");

@@ -17,13 +17,20 @@ namespace Game.Models
         public int bonusDefense;        // 추가 방어력 (장비, 버프 등)
         public float defenseMultiplier; // 방어력 배율
 
-        public CombatData(int baseAttack, int baseDefense) {
+        [Header("공격 속도")]
+        public float baseAttackSpeed;
+        public float bonusAttackSpeed;
+        public float attackSpeedMultiplier;
+        public CombatData(int baseAttack, int baseDefense, float baseAttackSpeed) {
             this.baseAttack = baseAttack;
             this.baseDefense = baseDefense;
             this.bonusAttack = 0;
             this.bonusDefense = 0;
             this.attackMultiplier = 1.0f;
             this.defenseMultiplier = 1.0f;
+            this.baseAttackSpeed = 0f;
+            this.bonusAttackSpeed = 0f;
+            this.attackSpeedMultiplier = baseAttackSpeed;
         }
 
         // 최종 공격력 계산
@@ -31,5 +38,8 @@ namespace Game.Models
 
         // 최종 방어력 계산
         public int FinalDefense => Mathf.RoundToInt((baseDefense + bonusDefense) * defenseMultiplier);
+
+        // 최종 공격 속도 계산
+        public float FinalAttackSpeed => Mathf.Max(0, (baseAttackSpeed + bonusAttackSpeed) * attackSpeedMultiplier);
     }
 }

@@ -16,6 +16,7 @@ namespace Game.Models {
 
         private const int DEFAULT_BASE_ATTACK = 5; // 기본 
         private const int DEFAULT_BASE_DEFENSE = 0;
+        private const float DEFAULT_ATTACK_SPEED = 1;
 
         private const float DEFAULT_MULTIPLIER = 1.0f; // 기본 배율
 
@@ -25,6 +26,11 @@ namespace Game.Models {
         private bool _disposed = false;
 
 
+        public ReadOnlyReactiveProperty<CombatData> GetRORP_CombatData(int id) {
+             if (!_combatDataDict.TryGetValue(id, out var property)) return null;
+            return property;
+        }
+
         #region 초기화, 등록
         // 초기화
         public void Initialize() {
@@ -32,13 +38,13 @@ namespace Game.Models {
         }
 
         // 데이터 생성
-        public void RegisterCombat(int id, int baseAttack = DEFAULT_BASE_ATTACK, int baseDefense = DEFAULT_BASE_DEFENSE) {
+        public void RegisterCombat(int id, int baseAttack = DEFAULT_BASE_ATTACK, int baseDefense = DEFAULT_BASE_DEFENSE, float attackSpeed = DEFAULT_ATTACK_SPEED) {
             if (_combatDataDict.ContainsKey(id)) {
                 GameDebug.LogError($"이미 생성된 전투 데이터 ID: {id}");
                 return;
             }
 
-            var combatData = new CombatData(baseAttack, baseDefense);
+            var combatData = new CombatData(baseAttack, baseDefense, attackSpeed);
             _combatDataDict[id] = new ReactiveProperty<CombatData>(combatData);
         }
 
@@ -158,6 +164,13 @@ namespace Game.Models {
             data.defenseMultiplier = Mathf.Max(0f, multiplier);
             property.Value = data;
         }
+        // 공격속도 배율 설정
+        public void SetAttackSpeedMultiplier(int id, float multiplier) {
+            if (!_combatDataDict.TryGetValue(id, out var property)) return;
+            var data = property.Value;
+            data.attackMultiplier = Mathf.Max(0f, multiplier);
+            property.Value = data;
+        }
 
         // 방어력 증가/감소
         public void AddBaseDefense(int id, int amount) {
@@ -175,6 +188,15 @@ namespace Game.Models {
             data.bonusDefense = Mathf.Max(0, data.bonusDefense + amount);
             property.Value = data;
         }
+
+        public void AddBonusAttackSpeed(int id, float amount) {
+            if (!_combatDataDict.TryGetValue(id, out var property)) return;
+
+            var data = property.Value;
+            data.bonusAttackSpeed = Mathf.Max(0, data.bonusAttackSpeed + amount);
+            property.Value = data;
+        }
+       
 
         public void MultiplyDefense(int id, float multiplier) {
             if (!_combatDataDict.TryGetValue(id, out var property)) return;
@@ -230,10 +252,15 @@ namespace Game.Models {
             return property.Value.defenseMultiplier;
         }
 
+        public float GetFinalAttackSpeed(int id) {
+            if (!_combatDataDict.TryGetValue(id, out var property)) return 0.0f;
+            return property.Value.FinalAttackSpeed;
+        }
+
         // 전체 전투 데이터 조회
         public CombatData GetCombatData(int id) {
             if (!_combatDataDict.TryGetValue(id, out var property))
-                return new CombatData(0, 0);
+                return new CombatData(0, 0, 0);
             return property.Value;
         }
 
