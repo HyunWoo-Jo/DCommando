@@ -10,6 +10,7 @@
 - [2025-08-08 - AddressableService, 전투 시스템, 게임 초기화, 데이터 관리, 에디터 도구 구현](#8)
 - [2025-08-10 - Scene 관리, Addressables 동기 로직, UI 생성 분리, WipeEffect 구현](#9)
 - [2025-08-11 - Inventory 시스템, UI 스타일링 구현](#10)
+- [2025-08-13 - 스테이지 시스템, 스테이지 에디터 도구 구현](#11)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -991,5 +992,76 @@ flowchart LR
 ---
 ### 📋 다음 개발 예정 사항
 - BT 구현
-- Stage 구현현
+- Stage 구현
+---
+<a id=11> </a>
+# 📅 2025-08-13
+## 🎯 스테이지 시스템, 스테이지 에디터 도구 구현
+
+#### 1. 스테이지 시스템 구현
+- **`StageSystem`**: 스테이지 진행 및 적 생성 관리
+- **`StageService`**: Addressables 기반 적/스테이지 데이터 로딩
+- **이벤트 흐름**: StartStageEvent -> 적 생성 -> EnemyDefeatedEvent -> 스테이지 종료
+- **자동 진행**: autoStartNextStage 설정으로 연속 스테이지 진행
+
+#### 2. 스테이지 데이터 구조 구현
+- **`SO_StageConfig`**: 여러 스테이지 데이터 통합 관리
+- **`StageData`**: 스테이지별 적 배치, 보상 정보 저장
+- **`EnemyData`**: 적 종류, 위치, 체력, 보상 설정
+- **CSV 연동**: 적/스테이지 Addressables 키 매핑
+
+#### 3. 스테이지 설정 에디터 도구 구현
+- **`StageConfigWindowEditor`**: 비주얼 스테이지 편집 도구
+- **맵 편집기**: 좌클릭으로 적 배치, 우클릭으로 제거
+- **3개 탭 구조**: Config 관리 / Stage 편집 / Enemy 배치
+- **시각적 그리드**: 줌/패닝 가능한 2D 맵 뷰어
+
+---
+### 스테이지 시스템 상세
+```mermaid
+flowchart LR
+    A[StartStageEvent] --> B[StageService 로드]
+    B --> C[Enemy 생성]
+    C --> D[전투 진행]
+    D --> E[EnemyDefeatedEvent]
+    E --> F{남은 적 확인}
+    F -->|있음| D
+    F -->|없음| G[StageEndedEvent]
+    G --> H{자동 진행?}
+    H -->|Yes| A
+    H -->|No| I[대기]
+```
+
+**주요 기능:**
+- CSV 기반 Addressables 키 등록
+- 스테이지별 적 배치 데이터 관리
+- 적 처치 카운트 자동 추적
+- 스테이지 클리어 후 자동/수동 진행
+
+---
+### 스테이지 에디터 도구 상세
+```mermaid
+flowchart TD
+    A[Stage Config Manager] --> B[Config 관리 탭]
+    A --> C[Stage 편집 탭]
+    A --> D[Enemy 배치 탭]
+    
+    B --> E[Config 생성/로드]
+    C --> F[Stage 추가/삭제]
+    D --> G[비주얼 맵 에디터]
+    
+    G --> H[좌클릭: 적 배치]
+    G --> I[우클릭: 적 제거]
+    G --> J[줌/패닝 컨트롤]
+```
+
+**주요 기능:**
+- 시각적 적 배치 시스템
+- 스테이지별 경계선 표시
+- 적 타입별 색상 구분
+- 실시간 데이터 편집 및 저장
+
+---
+### 📋 다음 개발 예정 사항
+- BT 구현
 ---
