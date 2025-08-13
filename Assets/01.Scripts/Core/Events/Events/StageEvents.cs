@@ -1,4 +1,4 @@
-namespace Game.Core {
+﻿namespace Game.Core {
     // Stage 시작 요청 이벤트
     public readonly struct StartStageEvent {
         public readonly StageName stageNage;
@@ -51,4 +51,7 @@ namespace Game.Core {
             this.stageId = stageId;
         }
     }
+
+
+
 }

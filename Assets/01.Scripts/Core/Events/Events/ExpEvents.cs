@@ -1,4 +1,8 @@
 ﻿namespace Game.Core.Event {
+
+
+
+
     // 경험치 획득 이벤트(경험치 처리후 발생)
     public readonly struct ExpGainedEvent {
         public readonly int amount;

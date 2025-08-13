@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using DG.Tweening;
 namespace Game.Core
 {
@@ -10,7 +10,7 @@ namespace Game.Core
         [SerializeField] private Ease moveEase = Ease.InOutCirc;
         [Header("Panel Positions")]
         [SerializeField] private float mainPanelPosX = 0f;
-        [SerializeField] private float invenPanelPosX = -1440f; // ¹Ì¸® °è»êµÈ °ª
+        [SerializeField] private float invenPanelPosX = -1440f; // ë¯¸ë¦¬ ê³„ì‚°ëœ ê°’
 
         public float MoveDuration => moveDuration;
         public float ReferenceInterval => referenceInterval;

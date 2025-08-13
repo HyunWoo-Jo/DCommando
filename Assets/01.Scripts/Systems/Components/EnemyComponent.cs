@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
 using Game.Core;
 using Game.Core.Event;
@@ -83,7 +83,7 @@ namespace Game.Systems
             EventBus.Publish(new EnemyDefeatedEvent(enemyId, expReward, goldReward));
 
             // 경험치 획득 이벤트 발행
-            EventBus.Publish(new ExpGainedEvent(expReward, 0));
+            EventBus.Publish(new ExpRewardEvent(expReward));
 
             // 골드 획득 이벤트 발행  
             EventBus.Publish(new GoldGainedEvent(goldReward));

@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Game.Core
+namespace Game.Core.Event
 {
     /// <summary>
     /// 게임 정지 이벤트
@@ -28,17 +28,17 @@ namespace Game.Core
             this.delay = delay;
         }
     }
-    
+
     /// <summary>
-    /// 골드 획득 이벤트
+    /// 게임을 승리했을때 발생하는 이벤트
     /// </summary>
-    public readonly struct GoldGainedEvent
-    {
-        public readonly int amount;
-        
-        public GoldGainedEvent(int amount)
-        {
-            this.amount = amount;
+    public readonly struct GameWinEvent {
+        public readonly StageName stageName;
+        public readonly int stageLevel;
+
+        public GameWinEvent(StageName stageName, int stageLevel) {
+            this.stageName = stageName;
+            this.stageLevel = stageLevel;
         }
     }
 }

@@ -1,4 +1,4 @@
-using Game.ViewModels;
+Ôªøusing Game.ViewModels;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -13,7 +13,7 @@ namespace Game.UI
 
         private void Awake() {
 #if UNITY_EDITOR
-            Assert.IsNotNull(_button, "button ¿Ã «“¥Á æ»µ ");
+            Assert.IsNotNull(_button, "button Ïù¥ Ìï†Îãπ ÏïàÎê®");
 #endif
 
             _button.onClick.AddListener(OnClick);

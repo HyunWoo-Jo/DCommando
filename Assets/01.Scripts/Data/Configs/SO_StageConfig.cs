@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Game.Data;
 
 namespace Game.Data
@@ -8,9 +8,8 @@ namespace Game.Data
     {
         [Header("Stage 설정")]
         public StageData[] stages;
-        
-        [Header("보상 배수")]
-        public float hardModeDifficultyMultiplier = 1.5f;
-        public float hardModeRewardMultiplier = 2.0f;
+
+        [Header("Stage 크기")]
+        public Rect stageSize = new Rect(-6, -10, 6, 10);
     }
 }

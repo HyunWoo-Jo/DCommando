@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using Game.Core;
@@ -51,7 +51,8 @@ namespace Game.Systems {
             // Load
             var stageSo = await _stageService.GetStageConfigAsync(stageName);
             if (stageSo.stages.Length < _stageLevel) {
-                GameDebug.LogWarning("최대 스테이지를 초과했습니다.");
+                EventBus.Publish(new GameWinEvent(_stageName, _stageLevel - 1));
+                GameTime.Pause();
                 return;
             }
             _currentStageData = stageSo.stages[_stageLevel - 1];

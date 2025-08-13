@@ -1,9 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Game.Core
-{
-    public enum EnemyName
-    {
+namespace Game.Core {
+    public enum EnemyName {
+        None,
         WormBlack,
     }
 }

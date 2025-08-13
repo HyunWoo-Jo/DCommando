@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Assertions;
 using System.Collections.Generic;
 using Zenject;
@@ -37,11 +37,11 @@ namespace Game.UI {
         }
 
         private void Bind() {
-            // ¹«±â ½½·Ô ¿ÀºêÁ§Æ® »ı¼º
+            // ë¬´ê¸° ìŠ¬ë¡¯ ì˜¤ë¸Œì íŠ¸ ìƒì„±
             Image weaponImage = GameObject.Instantiate(_slotPrefab, _weaponParent).GetComponent<Image>();
             weaponImage.transform.localPosition = Vector3.zero;
 
-            // ÀåÂøµÈ ¹«±â ¾÷µ¥ÀÌÆ®
+            // ì¥ì°©ëœ ë¬´ê¸° ì—…ë°ì´íŠ¸
             _viewModel.RORP_EquippedWeapon
                 .ThrottleLastFrame(1)
                 .Subscribe(equipName => {
@@ -56,12 +56,12 @@ namespace Game.UI {
                     }
                 }).AddTo(this);
 
-            // º¸À¯ Àåºñ ¸ñ·Ï ¾÷µ¥ÀÌÆ®
+            // ë³´ìœ  ì¥ë¹„ ëª©ë¡ ì—…ë°ì´íŠ¸
             _viewModel.Ob_OwnedEquipments
                 .ThrottleLastFrame(1)
                 .Subscribe(equipNameList => {
-                    GameDebug.Log("Àåºñ º¯°æ");
-                    // »õ·Î¿î Àåºñ ¸ñ·ÏÀ¸·Î ¾÷µ¥ÀÌÆ®
+                    GameDebug.Log("ì¥ë¹„ ë³€ê²½");
+                    // ìƒˆë¡œìš´ ì¥ë¹„ ëª©ë¡ìœ¼ë¡œ ì—…ë°ì´íŠ¸
                     foreach (var equipName in equipNameList) {
 
                         if (equipName != EquipName.None && !_equipDict.ContainsKey(equipName)) {
@@ -71,7 +71,7 @@ namespace Game.UI {
                 }).AddTo(this);
         }
 
-        // ½½·Ô »ı¼º
+        // ìŠ¬ë¡¯ ìƒì„±
         private void InstanceSlot() {
             for (int i = 0; i < _style.slotRows; i++) {
                 for (int j = 0; j < _style.slotColumns; j++) {
@@ -86,7 +86,7 @@ namespace Game.UI {
             }
         }
 
-        // ±âÁ¸ Àåºñ ¿ÀºêÁ§Æ®µé Á¦°Å
+        // ê¸°ì¡´ ì¥ë¹„ ì˜¤ë¸Œì íŠ¸ë“¤ ì œê±°
         private void ClearEquipObjects() {
             foreach (var kvp in _equipDict) {
                 if (kvp.Value != null) {
@@ -96,20 +96,20 @@ namespace Game.UI {
             _equipDict.Clear();
         }
 
-        // Àåºñ ¿ÀºêÁ§Æ® »ı¼º
+        // ì¥ë¹„ ì˜¤ë¸Œì íŠ¸ ìƒì„±
         private void CreateEquipObject(EquipName equipName) {
-            // ºó ½½·Ô Ã£±â
+            // ë¹ˆ ìŠ¬ë¡¯ ì°¾ê¸°
             int availableSlotIndex = GetAvailableSlotIndex();
             if (availableSlotIndex == -1) {
-                GameDebug.LogWarning("ÀÎº¥Åä¸® ½½·ÔÀÌ °¡µæÂü");
+                GameDebug.LogWarning("ì¸ë²¤í† ë¦¬ ìŠ¬ë¡¯ì´ ê°€ë“ì°¸");
                 return;
             }
 
-            // Àåºñ ¿ÀºêÁ§Æ® »ı¼º
+            // ì¥ë¹„ ì˜¤ë¸Œì íŠ¸ ìƒì„±
             GameObject equipObj = GameObject.Instantiate(_slotPrefab, _slots[availableSlotIndex].transform);
             equipObj.transform.localPosition = Vector3.zero;
 
-            // ½ºÇÁ¶óÀÌÆ® ¼³Á¤
+            // ìŠ¤í”„ë¼ì´íŠ¸ ì„¤ì •
             Image equipImage = equipObj.GetComponent<Image>();
             if (equipImage != null) {
                 equipImage.sprite = _viewModel.GetSprite(equipName);
@@ -117,7 +117,7 @@ namespace Game.UI {
                 equipImage.gameObject.SetActive(true);
             }
 
-            // Å¬¸¯ ÀÌº¥Æ® Ãß°¡ (ÀåÂø/ÇØÁ¦ ±â´É)
+            // í´ë¦­ ì´ë²¤íŠ¸ ì¶”ê°€ (ì¥ì°©/í•´ì œ ê¸°ëŠ¥)
             Button equipButton = equipObj.GetComponent<Button>();
             if (equipButton == null) {
                 equipButton = equipObj.AddComponent<Button>();
@@ -126,12 +126,12 @@ namespace Game.UI {
             equipButton.onClick.RemoveAllListeners();
             equipButton.onClick.AddListener(() => OnEquipClicked(equipName));
 
-            // ÇÒ´ç
+            // í• ë‹¹
             _equipDict[equipName] = equipObj;
         }
 
         /// <summary>
-        /// Sprite ºñÀ²À» È®ÀÎÇØ »çÀÌÁî Á¤ÇÔ
+        /// Sprite ë¹„ìœ¨ì„ í™•ì¸í•´ ì‚¬ì´ì¦ˆ ì •í•¨
         /// </summary>
         /// <param name="targetRect"></param>
         /// <param name="sprite"></param>
@@ -140,32 +140,32 @@ namespace Game.UI {
             float spriteWidth = rect.width;
             float spriteHeight = rect.height;
 
-            // Style¿¡¼­ °íÁ¤ ³ôÀÌ °¡Á®¿Í¼­ x¸¦ ºñÀ²¿¡ ¸ÂÃç °è»ê
+            // Styleì—ì„œ ê³ ì • ë†’ì´ ê°€ì ¸ì™€ì„œ xë¥¼ ë¹„ìœ¨ì— ë§ì¶° ê³„ì‚°
             float aspectRatio = spriteWidth / spriteHeight;
             float calculatedWidth = _style.fixedHeight * aspectRatio;
 
             targetRect.sizeDelta = new Vector2(calculatedWidth, _style.fixedHeight);
         }
 
-        // »ç¿ë °¡´ÉÇÑ ½½·Ô ÀÎµ¦½º Ã£±â
+        // ì‚¬ìš© ê°€ëŠ¥í•œ ìŠ¬ë¡¯ ì¸ë±ìŠ¤ ì°¾ê¸°
         private int GetAvailableSlotIndex() {
             for (int i = 0; i < _slots.Count; i++) {
-                // ½½·Ô¿¡ ÀÚ½ÄÀÌ ¾ø´Â °æ¿ì
+                // ìŠ¬ë¡¯ì— ìì‹ì´ ì—†ëŠ” ê²½ìš°
                 if (_slots[i].transform.childCount == 0) {
                     return i;
                 }
             }
-            return -1; // »ç¿ë °¡´ÉÇÑ ½½·ÔÀÌ ¾øÀ½
+            return -1; // ì‚¬ìš© ê°€ëŠ¥í•œ ìŠ¬ë¡¯ì´ ì—†ìŒ
         }
 
-        // Àåºñ Å¬¸¯ ÀÌº¥Æ® Ã³¸®
+        // ì¥ë¹„ í´ë¦­ ì´ë²¤íŠ¸ ì²˜ë¦¬
         private void OnEquipClicked(EquipName equipName) {
             if (_viewModel.RORP_EquippedWeapon.CurrentValue != equipName) {
-                // ÀåÂøµÇÁö ¾ÊÀº °æ¿ì ÀåÂø
+                // ì¥ì°©ë˜ì§€ ì•Šì€ ê²½ìš° ì¥ì°©
                 GameObject.DestroyImmediate(_equipDict[equipName]);
                 _equipDict.Remove(equipName);
                 _viewModel.EquipItem(equipName);
-                GameDebug.Log($"Àåºñ ÀåÂø: {equipName}");
+                GameDebug.Log($"ì¥ë¹„ ì¥ì°©: {equipName}");
             }
         }
     }

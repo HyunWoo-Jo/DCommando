@@ -1,4 +1,4 @@
-using Game.Core;
+ï»¿using Game.Core;
 using Game.Core.Event;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -15,8 +15,8 @@ namespace Game.UI
 
         public void Awake() {
 #if UNITY_EDITOR
-            Assert.IsNotNull(panelParent, "panelParent°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù");
-            Assert.IsNotNull(_style, "style Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù");
+            Assert.IsNotNull(panelParent, "panelParentê°€ ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤");
+            Assert.IsNotNull(_style, "style ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤");
 #endif
             EventBus.Subscribe<UIGoToEvent>(OnNavigate);
         }

@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace Game.Core
 {
     /// <summary>
-    /// Go To Event¸¦ »ç¿ëÇÒ UI ÀÌ¸§
+    /// Go To Eventë¥¼ ì‚¬ìš©í•  UI ì´ë¦„
     /// </summary>
     public enum UIMoveName {
         Main,
