@@ -25,6 +25,28 @@ namespace Game.Systems {
         private CompositeDisposable _Initdisposable = new(); // 초기화용 1회성
         private CompositeDisposable _disposable = new();
 
+
+        public Action OnDeath;
+        
+
+        private void Start() {
+            int id = gameObject.GetInstanceID();
+            _healthSystem.RegisterCharacter(id, _healthData.maxHp);
+            _healthSystem.SetCurrentHp(id, _healthData.currentHp);
+
+            _healthSystem.GetRORP_HealthProperty(id)
+                .Subscribe(OnEvent)
+                .AddTo(_disposable);
+
+            if (_isUseUI) {
+                // UI 생성 Bind
+                OnCreateUI(id);
+                // UI Hide
+                //EventBus.Subscribe<CharacterDeathEvent>(OnDeathHideUI).AddTo(_disposable);
+            }
+
+        }
+
         // 해제
         private void OnDestroy() {
             _healthSystem.UnregisterCharacter(gameObject.GetInstanceID());
@@ -35,22 +57,24 @@ namespace Game.Systems {
             }
         }
 
+        public void Initialize(int hp) {
+            var healthData = _healthData;
+            healthData.maxHp = healthData.currentHp = hp;
+        }
+
+
+
+        private void OnEvent(HealthData healthData) {
+            
+            if(healthData.currentHp <= 0) {
+                OnDeath?.Invoke();
+            }
+        }
         
 
-        private void Start() {
-            int id = gameObject.GetInstanceID();
-            _healthSystem.RegisterCharacter(id, _healthData.maxHp);
-            _healthSystem.SetCurrentHp(id, _healthData.currentHp);
-
-            if (_isUseUI) {
-                // UI 생성 Bind
-                EventBus.Subscribe<UIOpenedNotificationEvent>(OnOpenHealthUI).AddTo(_Initdisposable);
-                EventBus.Publish(new UICreationEventAsync(id, UIName.Health_UI));
-
-                // UI Hide
-                EventBus.Subscribe<CharacterDeathEvent>(OnDeathHideUI).AddTo(_disposable);
-            }
-            
+        private void OnCreateUI(int id) {
+            EventBus.Subscribe<UIOpenedNotificationEvent>(OnOpenHealthUI).AddTo(_Initdisposable);
+            EventBus.Publish(new UICreationEventAsync(id, UIName.Health_UI));
         }
 
         /// <summary>

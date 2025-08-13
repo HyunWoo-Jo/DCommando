@@ -5,6 +5,7 @@ using Game.Core;
 using Game.Core.Event;
 using System;
 using static PlasticGui.PlasticTableCell;
+using R3;
 
 namespace Game.Systems {
     public class HealthSystem {
@@ -236,6 +237,8 @@ namespace Game.Systems {
 
         // 전체 캐릭터 수 조회
         public int GetCharacterCount() => _healthModel?.GetHealthCount() ?? 0;
+
+        public ReadOnlyReactiveProperty<HealthData> GetRORP_HealthProperty(int id) => _healthModel.GetHealthProperty(id);
         #endregion
 
         #region 내부 메서드

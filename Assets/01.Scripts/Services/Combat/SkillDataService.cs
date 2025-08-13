@@ -12,17 +12,7 @@ namespace Game.Services {
         public void Initialize() {
             try {
                 var skillAddressMap = CSVReader.ReadToDictionary("AddressKey/SkillAddressKey");
-
-                // SkillName으로 변환하여 등록
-                var convertedMap = new Dictionary<SkillName, string>();
-                foreach (var kvp in skillAddressMap) {
-                    if (System.Enum.TryParse<SkillName>(kvp.Key, out var skillName)) {
-                        convertedMap[skillName] = kvp.Value;
-                    }
-                }
-
-                _addressableService.RegisterAddressKeys(convertedMap);
-                GameDebug.Log($"스킬 주소 키 {convertedMap.Count}개 등록 완료");
+                _addressableService.RegisterAddressKeys(skillAddressMap.ToEnumKey<SkillName>());
             } catch {
                 GameDebug.LogError("Skill CSV 파일 로드에 실패했습니다.");
             }

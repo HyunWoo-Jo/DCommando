@@ -19,10 +19,21 @@ namespace Game.Services
                 case SceneName.MainScene:
                 break;
                 case SceneName.PlayScene:
+                BindStageService();
                 break;
             }
 
         }
 
+
+        private void BindStageService() {
+            Container.BindInterfacesAndSelfTo<StageService>().AsCached();
+
+            Container.Bind<IAddressableService<EnemyName, GameObject>>()
+             .To<AddressableService<EnemyName, GameObject>>().AsCached();
+
+            Container.Bind<IAddressableService<StageName, SO_StageConfig>>()
+             .To<AddressableService<StageName, SO_StageConfig>>().AsCached();
+        }
     }
 }

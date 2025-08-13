@@ -22,6 +22,7 @@ namespace Game.Systems {
                 BindGameplaySystems();
                 BindCombatSystems();
                 BindPlayerSystems();
+                BindEnemySystem();
                 break;
             }
             Debug.Log(GetType().Name + " Bind 완료");
@@ -68,5 +69,9 @@ namespace Game.Systems {
             Container.BindInterfacesAndSelfTo<CombatSystem>().AsCached().NonLazy();
         }
 
+
+        private void BindEnemySystem() {
+            Container.BindInterfacesAndSelfTo<StageSystem>().AsCached().NonLazy();
+        }
     }
 }

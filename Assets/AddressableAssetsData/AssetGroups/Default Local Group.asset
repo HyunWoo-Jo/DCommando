@@ -25,6 +25,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3634d226ff9d2c94296e7ae5ddde9614
+    m_Address: Assets/02.Prefabs/Enemys/WormBlack.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3a2491242235e6840a27821eb7f4bee2
     m_Address: Assets/02.Prefabs/UI/PauseButton_UI.prefab
     m_ReadOnly: 0
@@ -57,6 +62,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a2f7cbb6246c234478092c1874c3b6e2
     m_Address: Assets/02.Prefabs/Eqip/Weapon/Standard_Axe.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a37b7cc1baaad5546b44a1afb35e0809
+    m_Address: Assets/04.Datas/Stage/Normal_StageConfig.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

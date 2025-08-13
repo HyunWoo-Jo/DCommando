@@ -7,6 +7,7 @@ using DG.Tweening;
 
 using Game.ViewModels;
 using Game.Core;
+using static UnityEditor.PlayerSettings;
 
 namespace Game.UI.Views {
     public class HealthView : MonoBehaviour, IHealthInitializable {
@@ -53,8 +54,10 @@ namespace Game.UI.Views {
             _lastColor = _normalHealthColor;
 
             // UI 위치 업데이트 구독
-            Observable.EveryValueChanged(_ownerTr, tr => tr.position)
-                .Where(_ => _ownerTr != null)   
+            Observable.EveryUpdate()
+                .Where(_ => _ownerTr != null && _ownerTr)  // Unity destroyed 객체 체크
+                .Select(_ => _ownerTr.position)
+                .DistinctUntilChanged()  // 위치가 변경될 때만 업데이트
                 .Subscribe(pos => UpdateWorldToScreen(pos))
                 .AddTo(_disposables);
 

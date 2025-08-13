@@ -6,7 +6,7 @@ using Game.Core;
 using System;
 using Game.Data;
 namespace Game.Services {
-    public class EquipService : IEquipService, IInitializable {
+    public class EquipService : IEquipService, IInitializable, IDisposable {
         [Inject] private IAddressableService<EquipName, GameObject> _addressableService;
         [Inject] private IAddressableService<EquipName, Sprite> _spriteAddressableService;
         [Inject] private INetworkService _networkService;
@@ -14,32 +14,21 @@ namespace Game.Services {
         public void Initialize() {
             try {
                 var equipAddressMap = CSVReader.ReadToDictionary("AddressKey/EquipAddressKey");
-
-                // EquipName으로 변환하여 등록
-                var convertedMap = new Dictionary<EquipName, string>();
-                foreach (var kvp in equipAddressMap) {
-                    if (System.Enum.TryParse<EquipName>(kvp.Key, out var equipName)) {
-                        convertedMap[equipName] = kvp.Value;
-                    }
-                }
-
-                _addressableService.RegisterAddressKeys(convertedMap);
-                GameDebug.Log($"장비 주소 키 {convertedMap.Count}개 등록 완료");
+                _addressableService.RegisterAddressKeys(equipAddressMap.ToEnumKey<EquipName>());
 
                 // Sprite
                 var equipSpriteAddressMap = CSVReader.ReadToDictionary("AddressKey/EquipSpriteAddressKey");
-                var convertedSpriteMap = new Dictionary<EquipName, string>();
-                foreach (var kvp in equipSpriteAddressMap) {
-                    if (System.Enum.TryParse<EquipName>(kvp.Key, out var equipName)) {
-                        convertedSpriteMap[equipName] = kvp.Value;
-                    }
-                }
-                _spriteAddressableService.RegisterAddressKeys(convertedSpriteMap);
+                _spriteAddressableService.RegisterAddressKeys(equipSpriteAddressMap.ToEnumKey<EquipName>());
 
 
             } catch {
                 GameDebug.LogError("Equip CSV 파일 로드에 실패했습니다.");
             }
+        }
+        public void Dispose() {
+            _addressableService.UnloadAll();
+            _spriteAddressableService.UnloadAll();
+
         }
         #endregion
         #region 장비 프리펩 로드
