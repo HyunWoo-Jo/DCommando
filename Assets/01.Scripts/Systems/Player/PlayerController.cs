@@ -16,6 +16,7 @@ namespace Game.Systems
         [Inject] private readonly EquipSystem _equipSystem;
 
         [Inject] private readonly PlayerMoveModel _moveModel;
+        [Inject] private readonly StageModel _stageModel;
         [Header("캐릭터 스텟")]
         [SerializeField] private CharacterMoveData _characterMoveData;
         
@@ -49,6 +50,8 @@ namespace Game.Systems
             // 무기 생성
             _equipSystem.InstanceWeapon().
                 ContinueWith(AddWeapon); // 기본 무기 추가
+
+            _stageModel.SetPlayerTransform(this.transform);
         }
 
 

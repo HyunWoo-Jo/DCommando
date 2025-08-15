@@ -9,10 +9,11 @@ using R3;
 using Cysharp.Threading.Tasks;
 using System;
 using DG.Tweening;
+using Game.Models;
 namespace Game.Systems {
     public class StageSystem : IInitializable, IDisposable {
         [Inject] private IStageService _stageService;
-
+        [Inject] private StageModel _stageModel;
 
 
         private Transform _enemyContainer;
@@ -22,9 +23,7 @@ namespace Game.Systems {
 
         private StageName _stageName;
         private StageData _currentStageData;
-        private List<GameObject> _spawnedEnemies = new List<GameObject>();
-        private int _stageLevel = 0;
-        private int _remainingEnemyCount;
+
         #region 초기화 Zenject에서 관리
         public void Initialize() {
             _enemyContainer = new GameObject("Enemy Container").transform;
@@ -45,24 +44,24 @@ namespace Game.Systems {
         /// 스테이지 시작
         /// </summary>
         public async UniTask StartStageAsync(StageName stageName) {
-            ++_stageLevel;
+            _stageModel.AddStageLevel();
             _stageName = stageName;
-
+            int stageLevel = _stageModel.StageLevel;
             // Load
             var stageSo = await _stageService.GetStageConfigAsync(stageName);
-            if (stageSo.stages.Length < _stageLevel) {
-                EventBus.Publish(new GameWinEvent(_stageName, _stageLevel - 1));
+            if (stageSo.stages.Length < stageLevel) {
+                EventBus.Publish(new GameWinEvent(_stageName, stageLevel - 1));
                 GameTime.Pause();
                 return;
             }
-            _currentStageData = stageSo.stages[_stageLevel - 1];
+            _currentStageData = stageSo.stages[stageLevel - 1];
 
 
             ClearEnemies();
             await SpawnEnemiesAsync();
 
-            EventBus.Publish(new StageStartedEvent(_stageLevel, _currentStageData));
-            GameDebug.Log($"Stage {_stageLevel} 시작 완료: {_remainingEnemyCount}개 Enemy 생성됨");
+            EventBus.Publish(new StageStartedEvent(stageLevel, _currentStageData));
+            GameDebug.Log($"Stage {stageLevel} 시작 완료: {_stageModel.RemainingEnemyCount}개 Enemy 생성됨");
         }
 
         private async UniTask SpawnEnemiesAsync() {
@@ -70,8 +69,6 @@ namespace Game.Systems {
                 GameDebug.LogWarning("Stage에 Enemy Wave 데이터가 없음");
                 return;
             }
-
-            _remainingEnemyCount = 0;
 
             // 모든 Enemy 스폰
             foreach (var enemyData in _currentStageData.enemyDatas) {
@@ -94,9 +91,7 @@ namespace Game.Systems {
             if (healthComponent != null) {
                 healthComponent.Initialize(enemyData.enemyHealth);
             }
-
-            _spawnedEnemies.Add(enemyInstance);
-            _remainingEnemyCount++;
+            _stageModel.AddEnemy(enemyInstance);
 
             GameDebug.Log($"Enemy 생성: {enemyData.enemyName} at {enemyData.spawnPosition}");
         }
@@ -105,20 +100,18 @@ namespace Game.Systems {
 
 
         private void OnEnemyDefeated(EnemyDefeatedEvent evt) {
-            _remainingEnemyCount--;
-            _spawnedEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
+            _stageModel.RemoveEnemy(evt.enemyId);
+            GameDebug.Log($"Enemy 처치됨. 남은 Enemy: {_stageModel.RemainingEnemyCount}");
 
-            GameDebug.Log($"Enemy 처치됨. 남은 Enemy: {_remainingEnemyCount}");
-
-            if (_remainingEnemyCount <= 0) {
+            if (_stageModel.RemainingEnemyCount <= 0) {
                 EndStage();
             }
         }
 
         private void EndStage() {
-            GameDebug.Log($"Stage {_stageLevel} 종료");
+            GameDebug.Log($"Stage {_stageModel.StageLevel} 종료");
 
-            EventBus.Publish(new StageEndedEvent(_stageLevel, _currentStageData));
+            EventBus.Publish(new StageEndedEvent(_stageModel.StageLevel, _currentStageData));
             ClearEnemies();
 
             if (_currentStageData.autoStartNextStage) {
@@ -127,26 +120,21 @@ namespace Game.Systems {
         }
 
         private void ClearEnemies() {
-            foreach (var enemy in _spawnedEnemies) {
-                if (enemy != null) {
-                    GameObject.Destroy(enemy);
-                }
-            }
-
-            _spawnedEnemies.Clear();
-            _remainingEnemyCount = 0;
+            _stageModel.ClearDestroyEnemy();
         }
+
+
 
         public StageData GetCurrentStageData() {
             return _currentStageData;
         }
 
         public int GetCurrentStageId() {
-            return _stageLevel;
+            return _stageModel.StageLevel;
         }
 
         public int GetRemainingEnemyCount() {
-            return _remainingEnemyCount;
+            return _stageModel.RemainingEnemyCount;
         }
 
 

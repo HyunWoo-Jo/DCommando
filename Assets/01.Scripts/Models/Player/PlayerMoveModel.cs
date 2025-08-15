@@ -9,6 +9,7 @@ namespace Game.Models
     /// 플레이어 이동 데이터 모델
     /// </summary>
     public class PlayerMoveModel : IDisposable {
+
         private readonly ReactiveProperty<Vector2> RP_moveDirection = new(Vector2.zero, AlwaysFalseComparer<Vector2>.Instance);
         private readonly ReactiveProperty<CharacterMoveData> RP_moveData = new ();
         private readonly ReactiveProperty<bool> RP_isMoving = new(false);
