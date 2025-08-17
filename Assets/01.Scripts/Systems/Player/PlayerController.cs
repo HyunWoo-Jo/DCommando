@@ -27,6 +27,7 @@ namespace Game.Systems
         [SerializeField] private Transform _weaponPivot;
 
         private List<IWeapon> _weapons = new();
+        private bool _isDeath = false;
 
         /// Model의 데이터에 접근
         private float MoveSpeed => _moveModel.RORP_MoveData.CurrentValue.moveSpeed;
@@ -52,11 +53,20 @@ namespace Game.Systems
                 ContinueWith(AddWeapon); // 기본 무기 추가
 
             _stageModel.SetPlayerTransform(this.transform);
+
+            HealthComponent healthComp = GetComponent<HealthComponent>();
+
+            healthComp.OnDeath += OnDeath;
         }
 
+        private void OnDeath() {
+            _isDeath = true;
+            _animControll.DeathAnim(true);
+        }
+       
 
         private void Update() {
-            if (GameTime.IsPaused) return;
+            if (GameTime.IsPaused || _isDeath) return;
             if (AttackSpeed < float.Epsilon) return;
             timer += Time.deltaTime;
             
@@ -108,9 +118,10 @@ namespace Game.Systems
         /// </summary>
         /// <param name="dir"></param>
         private void MoveAndRotate(Vector2 dir) {
+            if (_isDeath || GameTime.IsPaused) return;
             if (dir.sqrMagnitude > 0.0001f) {                
                 // 이동 + 회전 처리
-                transform.SetPositionAndRotation((Vector2)transform.position + MoveSpeed * Time.deltaTime * dir, GetRotateQuaternion(dir));
+                transform.SetPositionAndRotation((Vector2)transform.position + MoveSpeed * Time.deltaTime * dir, transform.ToRotateQuaternion(dir, _characterMoveData.rotationSpeed, Time.deltaTime));
 
                 _animControll.MoveAnim(true);
             } else {

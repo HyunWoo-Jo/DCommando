@@ -121,6 +121,7 @@ namespace Game.Systems {
         private GameObject InstanceHUD(int id, UIName uiName) {
             var obj = _uiService.LoadUIGameObject(uiName);
             if (obj != null) {
+                 if (!_instanceHudUIs.ContainsKey(uiName)) _instanceHudUIs[uiName] = new List<GameObject>();
                 _instanceHudUIs[uiName].Add(obj.gameObject); // Object 추가
                 obj.transform.SetParent(_instanceUIParents[UIType.HUD]);
                 EventBus.Publish(new UIOpenedNotificationEvent(id, uiName, UIType.HUD, obj));

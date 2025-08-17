@@ -1,4 +1,4 @@
-using Game.Models;
+ï»¿using Game.Models;
 using UnityEngine;
 using Zenject;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 namespace Game.Systems
 {
     /// <summary>
-    /// AI°¡ ÇÊ¿äÇÑ µ¥ÀÌÅÍ¸¦ °ø±ŞÇØÁÖ´Â Å¬·¹½º ÆíÀÇ¸¦ À§ÇØ (Zenject¿¡¼­ static ÆÛ»çµå·Î °ü¸®)
+    /// AIê°€ í•„ìš”í•œ ë°ì´í„°ë¥¼ ê³µê¸‰í•´ì£¼ëŠ” í´ë ˆìŠ¤ í¸ì˜ë¥¼ ìœ„í•´ (Zenjectì—ì„œ static í¼ì‚¬ë“œë¡œ ê´€ë¦¬)
     /// </summary>
     public class AIDataProvider : IDisposable {
         private static AIDataProvider _instance;
@@ -18,53 +18,54 @@ namespace Game.Systems
         [Inject] private CombatModel _combatModel;
         [Inject] private HealthModel _healthModel;
 
-        #region ÃÊ±âÈ­ Zenject¿¡¼­ °ü¸®
+        #region ì´ˆê¸°í™” Zenjectì—ì„œ ê´€ë¦¬
         [Inject]
         public void Initialize(AIDataProvider provider) {
             _instance = provider;
-            GameDebug.Log("AIDataProvider Static Facade ÃÊ±âÈ­ ¿Ï·á");
+            GameDebug.Log("AIDataProvider Static Facade ì´ˆê¸°í™” ì™„ë£Œ");
         }
 
         public void Dispose() {
             _instance = null;
-            GameDebug.Log("AIDataProvider Static Facade ÇØÁ¦");
+            GameDebug.Log("AIDataProvider Static Facade í•´ì œ");
         }
         #endregion
 
-        #region static facade ·ÎÁ÷
-        // ÇÃ·¹ÀÌ¾î °ü·Ã
+        #region static facade ë¡œì§
+        // í”Œë ˆì´ì–´ ê´€ë ¨
         public static GameObject GetPlayer() => _instance?.GetPlayerInternal();
         public static Transform GetPlayerTransform() => _instance?.GetPlayerTransformInternal();
         public static Vector3 GetPlayerPosition() => _instance?.GetPlayerPositionInternal() ?? Vector3.zero;
+        public static bool GetPlayerIsDie() => _instance?.GetPlayerDead() ?? true;
         public static float GetPlayerHealth() => _instance?.GetPlayerHealthInternal() ?? -1;
         public static float GetPlayerMaxHealth() => _instance?.GetPlayerMaxHealthInternal() ?? -1;
         public static float GetPlayerHealthRatio() => _instance?.GetPlayerHealthRatioInternal() ?? -1;
 
-        // Àû °ü·Ã
+        // ì  ê´€ë ¨
         public static Transform GetEnemyTransform(int enemyId) => _instance?.GetEnemyTransformInternal(enemyId);
         public static Vector3 GetEnemyPosition(int enemyId) => _instance?.GetEnemyPositionInternal(enemyId) ?? Vector3.zero;
         public static bool IsEnemyAlive(int enemyId) => _instance?.IsEnemyAliveInternal(enemyId) ?? false;
         public static IDictionary<int, GameObject> GetAllEnemies() => _instance.GetAllEnemiesInternal();
         public static Transform GetNearestEnemy(Vector3 position) => _instance?.GetNearestEnemyInternal(position);
 
-        // °Å¸® °è»ê
+        // ê±°ë¦¬ ê³„ì‚°
         public static float GetDistanceBetween(Vector3 pos1, Vector3 pos2) => Vector3.Distance(pos1, pos2);
         public static float GetDistanceToPlayer(Vector3 position) => _instance?.GetDistanceToPlayerInternal(position) ?? float.MaxValue;
         public static bool IsInRange(Vector3 from, Vector3 to, float range) => Vector3.Distance(from, to) <= range;
 
 
-        // ÀüÅõ °ü·Ã
+        // ì „íˆ¬ ê´€ë ¨
         public static bool CanDealDamage(int attackerId, int targetId) => _instance?.CanDealDamageInternal(attackerId, targetId) ?? false;
         public static void DealDamage(int attackerId, int targetId, float damage) => _instance?.DealDamageInternal(attackerId, targetId, damage);
 
-        // °ÔÀÓ »óÅÂ
+        // ê²Œì„ ìƒíƒœ
         public static bool IsGamePaused() => _instance.IsGamePausedInternal();
       
         #endregion
 
-        #region ³»ºÎ ±¸Çö
+        #region ë‚´ë¶€ êµ¬í˜„
 
-        // ÇÃ·¹ÀÌ¾î °ü·Ã ±¸Çö
+        // í”Œë ˆì´ì–´ ê´€ë ¨ êµ¬í˜„
         private GameObject GetPlayerInternal() {
             return GetPlayerTransformInternal().gameObject;
         }
@@ -80,6 +81,10 @@ namespace Game.Systems
         private int GetPlayerInstanceID() {
             return GetPlayerInternal().GetInstanceID();
         }
+        private bool GetPlayerDead() {
+            return _healthModel.IsDead(GetPlayerInstanceID());
+        }
+
 
         private float GetPlayerHealthInternal() {
             return _healthModel.GetCurrentHp(GetPlayerInstanceID());
@@ -94,7 +99,7 @@ namespace Game.Systems
             return _healthModel.GetHpRatio(GetPlayerInstanceID());
         }
 
-        // Àû °ü·Ã ±¸Çö
+        // ì  ê´€ë ¨ êµ¬í˜„
         private Transform GetEnemyTransformInternal(int enemyId) {
             return _stageModel.GetEnemyObject(enemyId).transform;
         }
@@ -131,28 +136,28 @@ namespace Game.Systems
             return nearest;
         }
 
-        // °Å¸® °è»ê ±¸Çö
+        // ê±°ë¦¬ ê³„ì‚° êµ¬í˜„
         private float GetDistanceToPlayerInternal(Vector3 position) {
             var playerPos = GetPlayerPositionInternal();
             return Vector3.Distance(position, playerPos);
         }
 
 
-        // ÀüÅõ °ü·Ã ±¸Çö
+        // ì „íˆ¬ ê´€ë ¨ êµ¬í˜„
         private bool CanDealDamageInternal(int attackerId, int targetId) {
-            // CombatModelÀ» ÅëÇÑ °ø°İ °¡´É ¿©ºÎ È®ÀÎ
+            // CombatModelì„ í†µí•œ ê³µê²© ê°€ëŠ¥ ì—¬ë¶€ í™•ì¸
             return _combatModel != null && IsEnemyAliveInternal(targetId);
         }
 
         private void DealDamageInternal(int attackerId, int targetId, float damage) {
-            // CombatModelÀ» ÅëÇÑ ½ÇÁ¦ µ¥¹ÌÁö Ã³¸®
+            // CombatModelì„ í†µí•œ ì‹¤ì œ ë°ë¯¸ì§€ ì²˜ë¦¬
             if (_combatModel != null) {
-                GameDebug.Log($"µ¥¹ÌÁö Ã³¸® Attacker {attackerId} -> Target {targetId}: {damage} damage");
+                GameDebug.Log($"ë°ë¯¸ì§€ ì²˜ë¦¬ Attacker {attackerId} -> Target {targetId}: {damage} damage");
                 // _combatModel.ProcessDamage(attackerId, targetId, damage);
             }
         }
 
-        // °ÔÀÓ »óÅÂ ±¸Çö
+        // ê²Œì„ ìƒíƒœ êµ¬í˜„
         private bool IsGamePausedInternal() {
             return GameTime.IsPaused;
         }

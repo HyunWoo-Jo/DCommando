@@ -328,7 +328,7 @@ GameObject:
   - component: {fileID: 478599415}
   - component: {fileID: 478599416}
   m_Layer: 5
-  m_Name: '[Exp_UI]'
+  m_Name: '[PlayerHealth_UI]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -600,7 +600,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c3f25bf84db62a47a7022682ce38751, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Systems::Game.Systems.PlaySceneUIConstructor
-  _uiNames: 0100000003000000040000000700000002000000
+  _uiNames: 0100000003000000040000000800000002000000
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -8284,6 +8284,7 @@ MonoBehaviour:
     isDead: 0
   _offset: {x: 0, y: 0.7}
   _isUseUI: 1
+  _isPlayer: 1
 --- !u!114 &7735736051104636710
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9289,8 +9290,8 @@ SortingGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1891453497661646357}
   m_Enabled: 1
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -44025399
+  m_SortingLayer: 2
   m_SortingOrder: 10
   m_SortAtRoot: 0
 --- !u!114 &9209207251079127627

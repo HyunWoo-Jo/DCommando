@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using R3;
 namespace Game.Models {
@@ -11,7 +11,7 @@ namespace Game.Models {
         
 
 
-        #region ÇÁ·ÎÆÛÆ¼
+        #region í”„ë¡œí¼í‹°
         public Transform PlayerTransform => _playerTr;
 
         public ReadOnlyReactiveProperty<int> RORP_RemainingEnemyCount => RP_remainingEnemyCount;
@@ -19,7 +19,7 @@ namespace Game.Models {
         public int StageLevel => RP_stageLevel.Value;
         public int RemainingEnemyCount => RP_remainingEnemyCount.Value;
         #endregion
-        #region Enemy °ü·Ã
+        #region Enemy ê´€ë ¨
 
         public GameObject GetEnemyObject(int id) {
             return _spawnedEnemies[id];
@@ -54,7 +54,7 @@ namespace Game.Models {
         }
         #endregion
 
-        #region Stage °ü·Ã
+        #region Stage ê´€ë ¨
         public void SetStageLevel(int level) {
             RP_stageLevel.Value = level;
         }
@@ -64,7 +64,7 @@ namespace Game.Models {
         }
         #endregion
 
-        #region Player °ü·Ã
+        #region Player ê´€ë ¨
         public void SetPlayerTransform(Transform playerTransform) {
             _playerTr = playerTransform;
         }

@@ -4,6 +4,7 @@ using System;
 using Game.Models;
 using Game.Core;
 using R3;
+using Game.Core.Event;
 
 namespace Game.Systems {
     /// <summary>
@@ -25,6 +26,7 @@ namespace Game.Systems {
         #region 초기화, 해제
         public void Initialize() {
             GameDebug.Log("CombatSystem 초기화 완료");
+            EventBus.Subscribe<DamageRequestEvent>(OnProcessRequest).AddTo(_disposables);
         }
 
         public void Dispose() {
@@ -60,6 +62,11 @@ namespace Game.Systems {
 
         #region 공격 처리 (WeaponSystem 호환)
 
+        public void OnProcessRequest(DamageRequestEvent drEvent) {
+            ProcessAttack(drEvent.ownerID, drEvent.targetID, drEvent.damageType, false);
+        }
+
+
         /// <summary>
         /// 타입별 공격 처리 (커스텀 데미지 지원 - WeaponSystem용)
         /// </summary>
@@ -74,7 +81,7 @@ namespace Game.Systems {
         }
 
         /// <summary>
-        /// 타입별 공격 처리 (기존 방식)
+        /// 타입별 공격 처리 (몬스터 처리)
         /// </summary>
         public bool ProcessAttack(int attackerId, int targetId, DamageType damageType, bool isCritical = false) {
             if (!ValidateAttack(attackerId, targetId)) return false;
@@ -230,10 +237,10 @@ namespace Game.Systems {
                 string criticalText = isCritical ? " (크리티컬!)" : "";
                 GameDebug.Log($"캐릭터 {attackerId}가 {targetId}에게 {finalDamage} {damageType} 데미지{criticalText}");
 
-                // 흡혈 효과 확인 (물리/마법 데미지만)
-                if (damageType == DamageType.Physical || damageType == DamageType.Magic) {
-                    ProcessLifesteal(attackerId, targetId, finalDamage);
-                }
+                //// 흡혈 효과 확인 (물리/마법 데미지만)
+                //if (damageType == DamageType.Physical || damageType == DamageType.Magic) {
+                //    ProcessLifesteal(attackerId, targetId, finalDamage);
+                //}
             } else {
                 GameDebug.LogWarning($"데미지 적용 실패 {attackerId} -> {targetId}");
             }

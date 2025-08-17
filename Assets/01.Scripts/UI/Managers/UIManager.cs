@@ -44,7 +44,8 @@ namespace Game.UI
         #endregion
         #region Event
         private async void CreationEventAsync(UICreationEventAsync creationEvent) {
-            GameDebug.Log($"{creationEvent.uiName} Creation Event 발생");
+            GameDebug.Log($"{creationEvent.id} - {creationEvent.uiName} Creation Event 발생");
+            
             Transform tr = await OpenUIMoveToAnchorAsync<Transform>(creationEvent.id, creationEvent.uiName);
         }
 

@@ -28,6 +28,20 @@ namespace Game.Core.Event {
     #endregion
 
     #region 데미지 관련 이벤트
+
+    public readonly struct DamageRequestEvent {
+        public readonly int ownerID;
+        public readonly int targetID;
+        public readonly DamageType damageType;
+
+        public DamageRequestEvent(int ownerID, int targetID, DamageType damageType) {
+            this.ownerID = ownerID;
+            this.targetID = targetID;
+            this.damageType = damageType;
+        }
+    }
+
+
     /// <summary>
     /// 데미지 받음 이벤트
     /// </summary>

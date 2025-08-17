@@ -15,6 +15,20 @@ MonoBehaviour:
   stages:
   - stageId: 0
     stageName: 
+    description: "Stage 2 \uC124\uBA85"
+    enemyDatas:
+    - enemyName: 1
+      spawnPosition: {x: 0, y: -4}
+      enemyHealth: 100
+      power: 10
+      expReward: 10
+      goldReward: 5
+    goldReward: 100
+    expReward: 50
+    autoStartNextStage: 1
+    timeLimit: 0
+  - stageId: 1
+    stageName: 
     description: 
     enemyDatas:
     - enemyName: 1
@@ -79,6 +93,62 @@ MonoBehaviour:
       goldReward: 1
     goldReward: 7
     expReward: 8
+    autoStartNextStage: 1
+    timeLimit: 0
+  - stageId: 2
+    stageName: 
+    description: "Stage 1 \uC124\uBA85"
+    enemyDatas:
+    - enemyName: 2
+      spawnPosition: {x: -3, y: -8}
+      enemyHealth: 10
+      power: 5
+      expReward: 1
+      goldReward: 1
+    - enemyName: 2
+      spawnPosition: {x: -1, y: -8}
+      enemyHealth: 10
+      power: 5
+      expReward: 1
+      goldReward: 1
+    - enemyName: 2
+      spawnPosition: {x: 1, y: -8}
+      enemyHealth: 10
+      power: 5
+      expReward: 1
+      goldReward: 1
+    - enemyName: 2
+      spawnPosition: {x: 3, y: -8}
+      enemyHealth: 10
+      power: 5
+      expReward: 1
+      goldReward: 1
+    - enemyName: 2
+      spawnPosition: {x: 5, y: -6}
+      enemyHealth: 10
+      power: 5
+      expReward: 1
+      goldReward: 1
+    - enemyName: 2
+      spawnPosition: {x: -5, y: -6}
+      enemyHealth: 10
+      power: 5
+      expReward: 1
+      goldReward: 1
+    - enemyName: 2
+      spawnPosition: {x: -4, y: -4}
+      enemyHealth: 10
+      power: 5
+      expReward: 1
+      goldReward: 1
+    - enemyName: 2
+      spawnPosition: {x: 4, y: -4}
+      enemyHealth: 10
+      power: 5
+      expReward: 1
+      goldReward: 1
+    goldReward: 100
+    expReward: 50
     autoStartNextStage: 1
     timeLimit: 0
   stageSize:

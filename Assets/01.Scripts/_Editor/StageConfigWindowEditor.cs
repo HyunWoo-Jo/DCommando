@@ -23,7 +23,6 @@ public class StageConfigWindowEditor : EditorWindow {
     private Vector2 _enemyMapScrollPosition;
     private float _mapZoom = 1.0f;
     private Vector2 _mapOffset = Vector2.zero;
-    private bool _isDragging = false;
     private Vector2 _lastMousePosition;
 
     // 생성 설정

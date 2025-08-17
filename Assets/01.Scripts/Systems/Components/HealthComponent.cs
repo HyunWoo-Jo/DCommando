@@ -19,18 +19,22 @@ namespace Game.Systems {
 
         [SerializeField] private Vector2 _offset;
         [SerializeField] private bool _isUseUI = true; // UI 사용 여부
-
+        [SerializeField] private bool _isPlayer = false; // Player의 경우 PlayerUI 생성
+        private UIName _healthUIName;
         private GameObject _uiObject;
 
         private CompositeDisposable _Initdisposable = new(); // 초기화용 1회성
         private CompositeDisposable _disposable = new();
 
 
-        public Action OnDeath;
+        public event Action OnDeath;
         
 
         private void Start() {
             int id = gameObject.GetInstanceID();
+
+            _healthUIName = _isPlayer ? UIName.PlayerHealth_UI : UIName.Health_UI;
+
             _healthSystem.RegisterCharacter(id, _healthData.maxHp);
             _healthSystem.SetCurrentHp(id, _healthData.currentHp);
 
@@ -53,7 +57,7 @@ namespace Game.Systems {
             _Initdisposable?.Dispose();
             _disposable?.Dispose();
             if (_uiObject != null) {
-                EventBus.Publish(new UICloseEvent(gameObject.GetInstanceID(), UIName.Health_UI, _uiObject));
+                EventBus.Publish(new UICloseEvent(gameObject.GetInstanceID(), _healthUIName, _uiObject));
             }
         }
 
@@ -74,7 +78,7 @@ namespace Game.Systems {
 
         private void OnCreateUI(int id) {
             EventBus.Subscribe<UIOpenedNotificationEvent>(OnOpenHealthUI).AddTo(_Initdisposable);
-            EventBus.Publish(new UICreationEventAsync(id, UIName.Health_UI));
+            EventBus.Publish(new UICreationEventAsync(id, _healthUIName));
         }
 
         /// <summary>
@@ -82,7 +86,7 @@ namespace Game.Systems {
         /// </summary>
         /// <param name="openEvent"></param>
         private void OnOpenHealthUI(UIOpenedNotificationEvent openEvent) {
-            if (openEvent.id == gameObject.GetInstanceID() && openEvent.uiName == UIName.Health_UI) {
+            if (openEvent.id == gameObject.GetInstanceID() && openEvent.uiName == _healthUIName) {
                 _uiObject = openEvent.uiObject;
                 openEvent.uiObject.GetComponent<IHealthInitializable>().InitHealth(this.gameObject, _offset);
                 _Initdisposable?.Dispose(); 

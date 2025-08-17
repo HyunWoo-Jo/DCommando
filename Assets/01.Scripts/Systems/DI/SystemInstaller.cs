@@ -72,6 +72,7 @@ namespace Game.Systems {
 
         private void BindEnemySystem() {
             Container.BindInterfacesAndSelfTo<StageSystem>().AsCached().NonLazy();
+            Container.BindInterfacesAndSelfTo<AIDataProvider>().AsCached().NonLazy();
         }
     }
 }

@@ -46,6 +46,7 @@ namespace Game.Models
         /// 게임 관련 모델 바인딩
         /// </summary>
         private void BindGameModels() {
+            Container.BindInterfacesAndSelfTo<StageModel>().AsCached();
             Container.BindInterfacesAndSelfTo<UIModel>().AsCached();
             
         }

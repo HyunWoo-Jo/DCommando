@@ -1,37 +1,38 @@
+ï»¿using Game.Core;
 using UnityEngine;
 
 namespace Game.Systems
 {
     /// <summary>
-    /// AI µ¿ÀÛÀ» Á¦¾îÇÏ´Â ÄÄÆ÷³ÍÆ®
+    /// AI ë™ì‘ì„ ì œì–´í•˜ëŠ” ì»´í¬ë„ŒíŠ¸
     /// </summary>
     public class AIComponent : MonoBehaviour{
-        [SerializeField] private float _updateInterval = 0.1f; // AI ¾÷µ¥ÀÌÆ® °£°İ
+        [SerializeField] private SO_BehaviourTree _behaviourTree;
 
-        private BehaviourTree _behaviourTree;
-        private float _lastUpdateTime;
-
-        public BehaviourTree BehaviourTree => _behaviourTree;
-
+        public SO_BehaviourTree BehaviourTree => _behaviourTree;
+        public bool isStop;
         private void Awake() {
-            _behaviourTree = new BehaviourTree(gameObject.GetInstanceID() );
+            _behaviourTree = _behaviourTree.CreateCopy();
+            _behaviourTree.SetID(gameObject.GetInstanceID());
+
+            var health = GetComponent<HealthComponent>();
+
+            health.OnDeath += OnDeath;
         }
 
-        private void Start() {
-            BuildBehaviourTree();
+        private void OnDestroy() {
+            var health = GetComponent<HealthComponent>();
+            health.OnDeath -= OnDeath;
+        }
+
+
+        public void OnDeath() {
+            isStop = true;
         }
 
         public void Update() {
-            if (Time.time - _lastUpdateTime >= _updateInterval) {
-                _behaviourTree.Update();
-                _lastUpdateTime = Time.time;
-            }
-        }
-
-
-
-        protected virtual void BuildBehaviourTree() {
-            // ÇÏÀ§ Å¬·¡½º¿¡¼­ ±¸Çö
+            if (GameTime.IsPaused || isStop) return;
+            _behaviourTree.Update();
         }
 
         public void SetBehaviourTree(BehaviourNodeBase rootNode) {

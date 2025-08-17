@@ -17,7 +17,7 @@ namespace Game.Systems.Weapon {
         [SerializeField] private SkillName _skillName;
         [SerializeField] private Transform _attackPoint;
         [SerializeField] private LayerMask _targetLayers;
-
+        [SerializeField] private DamageType _damageType = DamageType.Physical;
         [Header("기본 스탯")]
         [SerializeField] private int _baseAttack = 10;
         [SerializeField] private int _baseDefense = 0;
@@ -117,9 +117,6 @@ namespace Game.Systems.Weapon {
 
             // 공격 완료
             _isAttacking = false;
-
-            // 공격 완료 이벤트
-            OnAttackCompleted(targets);
         }
 
         /// <summary>
@@ -219,13 +216,6 @@ namespace Game.Systems.Weapon {
         /// 개별 타겟에 대한 공격 처리
         /// </summary>
         private void ProcessAttackTarget(Collider2D target) {
-            // CombatComponent 찾기
-            var combatComponent = target.GetComponent<CombatComponent>();
-            if (combatComponent == null) {
-                GameDebug.LogWarning($"CombatComponent를 찾을 수 없음: {target.name}");
-                return;
-            }
-
             // 최종 데미지 계산
             float finalDamage = CalculateFinalDamage();
 
@@ -262,12 +252,9 @@ namespace Game.Systems.Weapon {
         /// 무기 타입에 따른 데미지 타입 반환 (확장 가능)
         /// </summary>
         protected virtual DamageType GetWeaponDamageType() {
-            return DamageType.Physical; // 기본은 물리 데미지
+            return _damageType;
         }
 
-        protected virtual void OnAttackCompleted(List<Collider2D> targets) {
-            // 자식 클래스에서 오버라이드 가능
-        }
         #endregion
 
         #region 디버그

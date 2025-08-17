@@ -80,6 +80,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b6af90b1ce6f40640bf0046482df002f
+    m_Address: Assets/02.Prefabs/UI/PlayerHealth_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d0bd2df7b6f3957439dfc46bdc8a867f
     m_Address: Assets/02.Prefabs/Eqip/Weapon/Standard_Spear.prefab
     m_ReadOnly: 0
@@ -87,6 +92,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e46d88662d10e7744ac5e4d1ce1f6153
     m_Address: Assets/02.Prefabs/UI/WipeUI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e930ab305202b8149a11c55331d287e3
+    m_Address: Assets/02.Prefabs/Enemys/SlimeGreen.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
