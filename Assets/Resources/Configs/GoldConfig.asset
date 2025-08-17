@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::SO_GoldConfig
   minGold: 0
   maxGold: 999999
-  startingGold: 1000
+  startingGold: 0

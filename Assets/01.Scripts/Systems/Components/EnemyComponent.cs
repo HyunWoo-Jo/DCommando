@@ -83,10 +83,10 @@ namespace Game.Systems
             EventBus.Publish(new EnemyDefeatedEvent(enemyId, expReward, goldReward));
 
             // 경험치 획득 이벤트 발행
-            EventBus.Publish(new ExpRewardEvent(expReward));
+            EventBus.Publish(new ExpDropRequestEvent(this.transform.position, expReward));
 
             // 골드 획득 이벤트 발행  
-            EventBus.Publish(new GoldGainedEvent(goldReward));
+            EventBus.Publish(new GoldDropRequestEvent(this.transform.position, goldReward));
 
             // 오브젝트 제거
             Destroy(gameObject);

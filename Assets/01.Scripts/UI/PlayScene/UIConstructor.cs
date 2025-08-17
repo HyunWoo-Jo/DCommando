@@ -9,6 +9,7 @@ namespace Game.UI {
     /// <summary>
     /// UI를 생성함
     /// </summary>
+    [DefaultExecutionOrder(1000)] // 모든 이벤트가 구독되고 실행이 되도록 늦게 실행
     public class UIConstructor : MonoBehaviour {
 
         [Header("생성할 UI")]

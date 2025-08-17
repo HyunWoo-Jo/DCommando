@@ -15,7 +15,6 @@ namespace Game.Systems
         }
 
         public override BehaviourNodeBase DeepCopy() {
-            Debug.Log("?");
             return this;
         }
     }

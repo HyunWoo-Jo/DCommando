@@ -108,12 +108,13 @@ namespace Game.Systems {
             }
         }
 
-        private void EndStage() {
+        private async void EndStage() {
             GameDebug.Log($"Stage {_stageModel.StageLevel} 종료");
 
+            await UniTask.Delay(500); // 0.5초 대기 후 이벤트 발생
             EventBus.Publish(new StageEndedEvent(_stageModel.StageLevel, _currentStageData));
             ClearEnemies();
-
+            await UniTask.Delay(500); // 0.5초 대기 후 이벤트 발생
             if (_currentStageData.autoStartNextStage) {
                 EventBus.Publish(new StartStageEvent(_stageName));
             }
