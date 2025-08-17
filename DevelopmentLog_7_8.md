@@ -1090,22 +1090,6 @@ flowchart TD
 
 ---
 ### BehaviourTree 시스템 상세
-```mermaid
-flowchart TD
-    A[SO_BehaviourTree Asset] --> B[Deep Copy on Awake]
-    B --> C[AIComponent Instance]
-    C --> D[Root Node]
-    D --> E{Node Type}
-    E --> F[Composite]
-    E --> G[Decorator]  
-    E --> H[Action]
-    E --> I[Condition]
-    F --> J[Selector/Sequence/Parallel]
-    G --> K[Inverter/Repeater/Cooldown]
-    H --> L[Chase/Attack/Delay]
-    I --> M[InRange/IsDead]
-```
-
 **주요 기능:**
 - ScriptableObject 기반 트리 저장 및 로드
 - 런타임 Deep Copy로 인스턴스별 독립 실행
