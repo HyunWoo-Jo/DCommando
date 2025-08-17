@@ -11,6 +11,7 @@
 - [2025-08-10 - Scene 관리, Addressables 동기 로직, UI 생성 분리, WipeEffect 구현](#9)
 - [2025-08-11 - Inventory 시스템, UI 스타일링 구현](#10)
 - [2025-08-13 - 스테이지 시스템, 스테이지 에디터 도구 구현](#11)
+- [2025-08-17 - BehaviourTree AI, 비주얼 에디터, 노드 시스템 구현](#12)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -1064,4 +1065,94 @@ flowchart TD
 ---
 ### 📋 다음 개발 예정 사항
 - BT 구현
+---
+<a id=12> </a>
+# 📅 2025-08-17
+## 🎯 BehaviourTree AI, 비주얼 에디터, 노드 시스템 구현
+
+#### 1. BehaviourTree 프레임워크 구현
+- **`SO_BehaviourTree`**: ScriptableObject 기반 트리 에셋 관리
+- **노드 시스템**: Action, Condition, Composite, Decorator 노드
+- **Deep Copy**: 인스턴스별 독립적인 트리 복사
+- **ID 관리**: GameObject별 고유 ID로 AI 인스턴스 분리
+
+#### 2. 비주얼 에디터 도구 구현
+- **`BehaviourTreeWindowEditor`**: 드래그 앤 드롭 노드 편집
+- **계층 구조 시각화**: 트리 구조 실시간 표시
+- **노드 상세 편집**: Inspector 통합 파라미터 조정
+- **노드 아이콘**: ◆ Composite, ◇ Decorator, ▶ Action, ? Condition
+
+#### 3. AI 컴포넌트 시스템 구현
+- **`AIComponent`**: Unity GameObject -> BT 연동
+- **자동 복사**: Awake시 트리 Deep Copy로 독립 실행
+- **GameTime 연동**: 일시정지 시스템 통합
+- **Health 연동**: 사망시 AI 자동 정지
+
+---
+### BehaviourTree 시스템 상세
+```mermaid
+flowchart TD
+    A[SO_BehaviourTree Asset] --> B[Deep Copy on Awake]
+    B --> C[AIComponent Instance]
+    C --> D[Root Node]
+    D --> E{Node Type}
+    E --> F[Composite]
+    E --> G[Decorator]  
+    E --> H[Action]
+    E --> I[Condition]
+    F --> J[Selector/Sequence/Parallel]
+    G --> K[Inverter/Repeater/Cooldown]
+    H --> L[Chase/Attack/Delay]
+    I --> M[InRange/IsDead]
+```
+
+**주요 기능:**
+- ScriptableObject 기반 트리 저장 및 로드
+- 런타임 Deep Copy로 인스턴스별 독립 실행
+- 노드별 Success/Failure/Running 상태 관리
+- 비주얼 에디터로 직관적 AI 설계
+
+---
+### 노드 구현 상세
+
+**주요 구성 요소:**
+#### 1. Composite 노드 (복합)
+- **Selector**: 하나라도 성공하면 성공 반환
+- **Sequence**: 모두 성공해야 성공 반환  
+- **Parallel**: 모든 자식 동시 실행
+
+#### 2. Action 노드 (행동)
+- **ChasePlayerAction**: 플레이어 추적 이동
+- **DamageToPlayerAction**: 플레이어 공격
+- **DelayAction**: 지정 시간 대기
+
+#### 3. Condition 노드 (조건)
+- **IsPlayerInRange**: 플레이어 범위 체크
+- **IsPlayerDead**: 플레이어 생존 확인
+
+#### 4. Decorator 노드 (장식)
+- **Cooldown**: 쿨타임 제한
+- **Inverter**: 결과 반전
+- **Repeater**: 반복 실행
+
+---
+### 에디터 도구 기능
+
+**비주얼 에디터 특징:**
+- 실시간 노드 추가/삭제/이동
+- 드래그 앤 드롭 인터페이스
+- 노드별 파라미터 직접 편집
+- 트리 구조 계층적 표시
+
+**노드 편집 기능:**
+- ChasePlayerAction: 이동/회전 속도 조정
+- DelayAction: 대기 시간 설정
+- IsPlayerInRange: 감지 범위 설정
+- Cooldown: 쿨타임 설정
+
+---
+### 📋 다음 개발 예정 사항
+- 런타임 디버깅 시각화 기능 추가
+- 노드 실행 통계 및 프로파일링
+- 커스텀 노드 템플릿 시스템
 ---
