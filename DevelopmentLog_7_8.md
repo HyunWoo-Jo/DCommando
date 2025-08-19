@@ -12,6 +12,7 @@
 - [2025-08-11 - Inventory 시스템, UI 스타일링 구현](#10)
 - [2025-08-13 - 스테이지 시스템, 스테이지 에디터 도구 구현](#11)
 - [2025-08-17 - BehaviourTree AI, 비주얼 에디터, 노드 시스템 구현](#12)
+- [2025-08-19 - 드롭 시스템, 업그레이드 시스템 구현](#13)
 ---
 <a id="1"></a>
 ## 📅 2025-07-26 
@@ -1139,4 +1140,91 @@ flowchart TD
 - 런타임 디버깅 시각화 기능 추가
 - 노드 실행 통계 및 프로파일링
 - 커스텀 노드 템플릿 시스템
+---
+<a id=13> </a>
+# 📅 2025-08-20
+## 🎯 드롭 시스템, 업그레이드 시스템 구현
+
+#### 1. 드롭 시스템 구현
+- **`DropSystem`**: Object Pool 기반 Gold/Exp 드롭 관리
+- **Pool 관리**: 자동 회수, 용량 제한 (기본 20, 최대 100)
+- **애니메이션**: DOTween으로 UI 위치로 이동 -> 보상 지급
+- **제한**: 최대 용량 초과시 경고 출력
+
+#### 2. 업그레이드 시스템 구현
+- **`UpgradeSystem`**: 레벨업시 업그레이드 선택지 제공
+- **조건 시스템**: PlayerLevel, StageCleared, TotalGold 등 다양한 조건
+- **리롤 기능**: 선택지 재생성 (횟수 제한)
+- **MVVM 구조**: Model-ViewModel-View 완전 분리
+
+#### 3. 이벤트 시스템 확장
+- **드롭 이벤트**: `GoldDropRequestEvent`, `ExpDropRequestEvent`
+- **업그레이드 이벤트**: `UpgradeRerollEvent`, `UpgradeAppliedEvent`, `StatChangeEvent`
+- **스테이지 이벤트**: `StageEndedEvent`로 드롭 아이템 일괄 수집
+
+---
+### 드롭 시스템 상세
+```mermaid
+flowchart LR
+    A[Enemy 처치] --> B[DropRequestEvent]
+    B --> C[Object Pool에서 Get]
+    C --> D[위치에 스폰]
+    D --> E[Stage 종료시]
+    E --> F[UI로 이동 애니메이션]
+    F --> G[RewardEvent 발행]
+    G --> H[Pool로 Return]
+```
+
+**주요 기능:**
+- 내부 DropObjectPool 클래스로 제네릭 풀 관리
+- AmountGameObject 구조체로 드롭 아이템별 수량 추적
+- LiveObjects 리스트로 활성 오브젝트 관리
+
+---
+### 업그레이드 시스템 상세
+```mermaid
+flowchart TD
+    A[레벨업 이벤트] --> B[GameTime.Pause]
+    B --> C[업그레이드 선택지 생성]
+    C --> D[조건 확인]
+    D --> E[UI 패널 표시]
+    E --> F{선택/리롤}
+    F -->|선택| G[스탯 적용]
+    F -->|리롤| H[선택지 재생성]
+    G --> I[GameTime.Resume]
+    H --> E
+```
+
+**주요 구성 요소:**
+#### 1. UpgradeSystem (Systems)
+- 업그레이드 선택지 생성 및 필터링
+- 조건 체크 로직 (8가지 조건 연산자 지원)
+- 스탯 변경 이벤트 발행
+
+#### 2. UpgradeModel (Models)
+- ReactiveProperty 기반 상태 관리
+- 선택 가능한 업그레이드 2개 슬롯
+- UI용 UpgradeOptionData 변환 스트림
+
+#### 3. UpgradeViewModel (ViewModels)
+- Model과 View 중개
+- Sprite 로딩 처리
+- 리롤/선택 커맨드 처리
+
+#### 4. UpgradeView (UI/Views)
+- UpgradeSlot[] 관리
+- 리롤 카운트 표시
+- 자동 리사이즈 처리
+
+**업그레이드 타입:**
+- Power, MaxHealth, Heal
+- AttackSpeed, Defense
+- AttackRange, AttackWidth
+- MoveSpeed
+
+**조건 타입:**
+- PlayerLevel, StageCleared
+- TotalGold, UpgradeOwned
+- ItemOwned
+
 ---
