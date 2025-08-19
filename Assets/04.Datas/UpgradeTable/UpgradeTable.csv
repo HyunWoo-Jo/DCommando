@@ -1,0 +1,12 @@
+﻿upgradeName,UpgradeID,upgradeCount,upgradeTypes,values,upgradeConditionTypes,conditionOperators,conditionValues,spriteAddressableKey
+HP 회복,100,1,Heal,50,,,,
+최대 HP 증가,101,1,MaxHealth,30,,,,
+공격력 증가,102,1,Power,5,,,,
+방어력 증가,103,1,Defense,2,,,,
+공격 속도 증가,104,1,AttackSpeed,0.1,,,,
+공격 거리 증가,105,1,AttackRange,0.1,,,,
+공격 너비 증가,106,1,AttackWidth,0.1,,,,
+이동 속도 증가,107,1,MoveSpeed,1,,,,
+경량화,301,2,MoveSpeed/AttackSpeed,0.5/0.1,UpgradeOwned,NotHas,301,
+경량화2,302,2,MoveSpeed/AttackSpeed,1/0.2,PlayerLevel/UpgradeOwned,Greater/NotHas,3/302,
+경량화3,303,2,MoveSpeed/AttackSpeed,2/0.3,PlayerLevel/UpgradeOwned,Greater/NotHas,5/303,

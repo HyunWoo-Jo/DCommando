@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections.Generic;
 using Game.Core.Event;
@@ -13,10 +13,10 @@ using Random = UnityEngine.Random;
 namespace Game.Systems
 {
     /// <summary>
-    /// Object Pool·Î Exp¿Í Goldµå·ÓÀ» °ü¸®ÇÏ´Â ½Ã½ºÅÛ
+    /// Object Poolë¡œ Expì™€ Goldë“œë¡­ì„ ê´€ë¦¬í•˜ëŠ” ì‹œìŠ¤í…œ
     /// </summary>
 
-    // ºü¸£°Ô µî·ÏµÇµµ·Ï ½ÇÇà
+    // ë¹ ë¥´ê²Œ ë“±ë¡ë˜ë„ë¡ ì‹¤í–‰
     [DefaultExecutionOrder(0)]
     public class DropSystem : MonoBehaviour {
         private struct AmountGameObject {
@@ -29,20 +29,20 @@ namespace Game.Systems
             }
         }
         private class DropObjectPool {
-          
 
+            private GameObject _parent;
             private GameObject _prefab;
             private ObjectPool<GameObject> _pool;
             private List<AmountGameObject> _liveAmountList;
             private int _defaultCapacity;
             private int _maxSize;
-
             public int ActiveCount => _pool?.CountActive ?? 0;
             public int InactiveCount => _pool?.CountInactive ?? 0;
             public List<AmountGameObject> LiveObjects => _liveAmountList;
 
-            // »ı¼ºÀÚ
+            // ìƒì„±ì
             public DropObjectPool(GameObject prefab, int defaultCapacity = 20, int maxSize = 100) {
+                _parent = new GameObject(prefab.name + "Parent");
                 _prefab = prefab;
                 _defaultCapacity = defaultCapacity;
                 _maxSize = maxSize;
@@ -54,6 +54,7 @@ namespace Game.Systems
                 _pool = new ObjectPool<GameObject>(
                     createFunc: () => {
                         GameObject obj = Instantiate(_prefab);
+                        obj.transform.SetParent(_parent.transform);
                         obj.SetActive(false);
                         return obj;
                     },
@@ -75,36 +76,36 @@ namespace Game.Systems
 
             }
 
-            // ¿ÀºêÁ§Æ® ½ºÆù
+            // ì˜¤ë¸Œì íŠ¸ ìŠ¤í°
             public GameObject Spawn(Vector3 position, int amount = 0) {
                 if (_pool.CountActive >= _maxSize) {
-                    GameDebug.LogWarning($"Ç® ÃÖ´ë ¿ë·® ÃÊ°ú {_prefab.name} - Active: {_pool.CountActive}");
+                    GameDebug.LogWarning($"í’€ ìµœëŒ€ ìš©ëŸ‰ ì´ˆê³¼ {_prefab.name} - Active: {_pool.CountActive}");
                     return null;
                 }
 
                 GameObject obj = _pool.Get();
                 obj.transform.position = position;
 
-                // ¸®½ºÆ®¿¡ Ãß°¡
+                // ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€
                 _liveAmountList.Add(new AmountGameObject(obj, amount));
 
                 return obj;
             }
 
-            // Try ÆĞÅÏ ½ºÆù
+            // Try íŒ¨í„´ ìŠ¤í°
             public bool TrySpawn(Vector3 position, int amount, out GameObject obj) {
                 obj = Spawn(position, amount);
                 return obj != null;
             }
 
-            // ¿ÀºêÁ§Æ® ¹İÈ¯
+            // ì˜¤ë¸Œì íŠ¸ ë°˜í™˜
             public void Return(GameObject obj) {
                 if (obj != null && IsLiveObject(obj)) {
                     _pool.Release(obj);
                 }
             }
 
-            // ¸ğµç È°¼º ¿ÀºêÁ§Æ® ¹İÈ¯
+            // ëª¨ë“  í™œì„± ì˜¤ë¸Œì íŠ¸ ë°˜í™˜
             public void ReturnAll() {
                 for (int i = _liveAmountList.Count - 1; i >= 0; i--) {
                     _liveAmountList[i].obj.transform.DOKill();
@@ -112,7 +113,7 @@ namespace Game.Systems
                 }
             }
 
-            // Amount ¾÷µ¥ÀÌÆ®
+            // Amount ì—…ë°ì´íŠ¸
             public void UpdateAmount(GameObject obj, int newAmount) {
                 for (int i = 0; i < _liveAmountList.Count; i++) {
                     if (_liveAmountList[i].obj == obj) {
@@ -124,13 +125,13 @@ namespace Game.Systems
                 }
             }
 
-            // Amount °¡Á®¿À±â
+            // Amount ê°€ì ¸ì˜¤ê¸°
             public int GetAmount(GameObject obj) {
                 var item = _liveAmountList.FirstOrDefault(x => x.obj == obj);
                 return item.obj != null ? item.amount : 0;
             }
 
-            // ¿À·¡µÈ ¿ÀºêÁ§Æ® ÀÚµ¿ È¸¼ö
+            // ì˜¤ë˜ëœ ì˜¤ë¸Œì íŠ¸ ìë™ íšŒìˆ˜
             public void RecycleOldest(int keepCount) {
                 if (_liveAmountList.Count > keepCount) {
                     int recycleCount = _liveAmountList.Count - keepCount;
@@ -139,26 +140,26 @@ namespace Game.Systems
                             _pool.Release(_liveAmountList[0].obj);
                         }
                     }
-                    GameDebug.Log($"{_prefab.name} {recycleCount}°³ ÀÚµ¿ È¸¼ö");
+                    GameDebug.Log($"{_prefab.name} {recycleCount}ê°œ ìë™ íšŒìˆ˜");
                 }
             }
 
-            // È°¼º ¿ÀºêÁ§Æ®ÀÎÁö È®ÀÎ
+            // í™œì„± ì˜¤ë¸Œì íŠ¸ì¸ì§€ í™•ì¸
             private bool IsLiveObject(GameObject obj) {
                 return _liveAmountList.Any(x => x.obj == obj);
             }
 
-            // ¸®½ºÆ®¿¡¼­ Á¦°Å
+            // ë¦¬ìŠ¤íŠ¸ì—ì„œ ì œê±°
             private void RemoveFromLiveList(GameObject obj) {
                 _liveAmountList.RemoveAll(x => x.obj == obj);
             }
 
-            // Ç® »óÅÂ ·Î±×
+            // í’€ ìƒíƒœ ë¡œê·¸
             public void LogStatus() {
-                GameDebug.Log($"{_prefab.name} Ç® - È°¼º: {_pool.CountActive}, ºñÈ°¼º: {_pool.CountInactive}, ÀüÃ¼: {_pool.CountAll}");
+                GameDebug.Log($"{_prefab.name} í’€ - í™œì„±: {_pool.CountActive}, ë¹„í™œì„±: {_pool.CountInactive}, ì „ì²´: {_pool.CountAll}");
             }
 
-            // Á¤¸®
+            // ì •ë¦¬
             public void Dispose() {
                 ReturnAll();
                 _pool?.Dispose();
@@ -190,9 +191,9 @@ namespace Game.Systems
             Assert.IsNotNull( _expPrefab );
 #endif
 
-            // Gold Ç® »ı¼º
+            // Gold í’€ ìƒì„±
             _goldPool = new DropObjectPool(_goldPrefab);
-            // Exp Ç® »ı¼º
+            // Exp í’€ ìƒì„±
             _expPool = new DropObjectPool(_expPrefab);
 
             _initDisposable = EventBus.Subscribe<UIOpenedNotificationEvent>(OnSetUITransform);
@@ -200,7 +201,7 @@ namespace Game.Systems
             EventBus.Subscribe<ExpDropRequestEvent>(OnExpDrop).AddTo(_disposables);
             EventBus.Subscribe<StageEndedEvent>(OnStageEnd).AddTo(_disposables);
         }
-        // Á¤¸®
+        // ì •ë¦¬
         private void OnDestroy() {
             _initDisposable?.Dispose();
             _goldPool?.Dispose();
@@ -211,7 +212,7 @@ namespace Game.Systems
         public void OnGoldDrop(GoldDropRequestEvent e) {
             if (e.amount <= 0) return;
             _goldPool.Spawn(e.position + new Vector3(Random.Range(-_RAND_RANGE, _RAND_RANGE), Random.Range(-_RAND_RANGE, _RAND_RANGE), 0), e.amount);
-            Debug.Log("°ñµå »ı¼º");
+            Debug.Log("ê³¨ë“œ ìƒì„±");
         }
 
         public void OnExpDrop(ExpDropRequestEvent e) {
@@ -239,12 +240,14 @@ namespace Game.Systems
                 amountObject.obj.transform.DOMove(goldPos, _MOVE_DURATION)
                     .OnComplete(() => {
                         EventBus.Publish(new GoldRewardEvent(amountObject.amount));
+                        _goldPool.Return(amountObject.obj);
                     });
             }
             foreach (var amountObject in _expPool.LiveObjects) {
                 amountObject.obj.transform.DOMove(expPos, _MOVE_DURATION)
                     .OnComplete(() => {
                         EventBus.Publish(new ExpRewardEvent(amountObject.amount));
+                        _expPool.Return(amountObject.obj);
                     });
             }
         }

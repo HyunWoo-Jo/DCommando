@@ -123,7 +123,7 @@ namespace Game.UI {
 
         // Health UI 생성 시 위치 등록
         private void OnOpenedHealthUI(UIOpenedNotificationEvent openedEvent) {
-            if (openedEvent.uiName == UIName.Health_UI) {
+            if (openedEvent.uiName == UIName.Health_UI || openedEvent.uiName == UIName.PlayerHealth_UI) {
                 _healthPositionDict[openedEvent.id] = openedEvent.uiObject.transform;
                 GameDebug.Log($"Health UI 위치 등록 Character {openedEvent.id}");
             }
@@ -131,7 +131,7 @@ namespace Game.UI {
 
         // Health UI 제거 시 위치 해제
         private void OnClosedHealthUI(UIClosedNotificationEvent closedEvent) {
-            if (closedEvent.uiName == UIName.Health_UI) {
+            if (closedEvent.uiName == UIName.Health_UI || closedEvent.uiName == UIName.PlayerHealth_UI) {
                 // ID를 직접 가져올 수 없으므로 null인 Transform 제거
                 var keysToRemove = new List<int>();
                 foreach (var kvp in _healthPositionDict) {

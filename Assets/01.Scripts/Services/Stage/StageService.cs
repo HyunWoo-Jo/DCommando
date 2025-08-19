@@ -17,10 +17,10 @@ namespace Game.Services
 
         #region 초기화 Zenject에서 관리
         public void Initialize() {
-            var enemyKeyDict = CSVReader.ReadToDictionary("AddressKey/EnemyAddressKey");
+            var enemyKeyDict = CSVReader.ReadToDictionary("AddressKey/EnemyAddressKey.csv");
             _enemyAddressableService.RegisterAddressKeys(enemyKeyDict.ToEnumKey<EnemyName>());
 
-            var stageKeyDict = CSVReader.ReadToDictionary("AddressKey/StageConfigAddressKey");
+            var stageKeyDict = CSVReader.ReadToDictionary("AddressKey/StageConfigAddressKey.csv");
             _stageConfigAddressableService.RegisterAddressKeys(stageKeyDict.ToEnumKey<StageName>());
         }
 

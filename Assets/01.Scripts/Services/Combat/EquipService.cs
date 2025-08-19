@@ -13,11 +13,11 @@ namespace Game.Services {
         #region 초기화
         public void Initialize() {
             try {
-                var equipAddressMap = CSVReader.ReadToDictionary("AddressKey/EquipAddressKey");
+                var equipAddressMap = CSVReader.ReadToDictionary("AddressKey/EquipAddressKey.csv");
                 _addressableService.RegisterAddressKeys(equipAddressMap.ToEnumKey<EquipName>());
 
                 // Sprite
-                var equipSpriteAddressMap = CSVReader.ReadToDictionary("AddressKey/EquipSpriteAddressKey");
+                var equipSpriteAddressMap = CSVReader.ReadToDictionary("AddressKey/EquipSpriteAddressKey.csv");
                 _spriteAddressableService.RegisterAddressKeys(equipSpriteAddressMap.ToEnumKey<EquipName>());
 
 

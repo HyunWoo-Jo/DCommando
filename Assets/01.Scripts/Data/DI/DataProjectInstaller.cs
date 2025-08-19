@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Zenject;
+using Game.Core;
 namespace Game.Data
 {
     public class DataProjectInstaller : MonoInstaller
@@ -14,12 +15,12 @@ namespace Game.Data
         private void BindScriptableObjects() {
 
             // ScriptableObject들 Configs
-            Container.Bind<SO_InputConfig>().FromScriptableObjectResource("Configs/InputConfig").AsSingle();
-            Container.Bind<SO_GoldConfig>().FromScriptableObjectResource("Configs/GoldConfig").AsSingle();
-            Container.Bind<SO_CrystalConfig>().FromScriptableObjectResource("Configs/CrystalConfig").AsSingle();
-            Container.Bind<SO_ExpConfig>().FromScriptableObjectResource("Configs/ExpConfig").AsSingle();
+            Container.BindAddressable<SO_InputConfig>("Configs/InputConfig.asset").AsSingle();
+            Container.BindAddressable<SO_GoldConfig>("Configs/GoldConfig.asset").AsSingle();
+            Container.BindAddressable<SO_CrystalConfig>("Configs/CrystalConfig.asset").AsSingle();
+            Container.BindAddressable<SO_ExpConfig>("Configs/ExpConfig.asset").AsSingle();
 
-            Container.Bind<SO_CameraConfig>().FromScriptableObjectResource("Configs/CameraConfig").AsSingle();
+            Container.BindAddressable<SO_CameraConfig>("Configs/CameraConfig.asset").AsSingle();
         }
 
     }

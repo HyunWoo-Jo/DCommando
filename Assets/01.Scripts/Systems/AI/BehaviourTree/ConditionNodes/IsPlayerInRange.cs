@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using Game.Core;
 namespace Game.Systems {
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î°¡ ¹üÀ§ ³»¿¡ Á¸ÀçÇÏ³ª Ã¼Å©
+    /// í”Œë ˆì´ì–´ê°€ ë²”ìœ„ ë‚´ì— ì¡´ì¬í•˜ë‚˜ ì²´í¬
     /// </summary>
     [Serializable]
     public class IsPlayerInRange : ConditionNodeBase {

@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using Game.Core;
 namespace Game.Systems {
     /// <summary>
-    /// Áö¿¬ ³ëµå
+    /// ì§€ì—° ë…¸ë“œ
     /// </summary>
     [Serializable]
     public class DelayAction : ActionNodeBase {

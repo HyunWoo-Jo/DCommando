@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Cysharp.Threading.Tasks;
+using UnityEngine.AddressableAssets;
+using UnityEditor.VersionControl;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Game.Core {
     public static class CSVReader {
@@ -8,12 +12,11 @@ namespace Game.Core {
         /// CSV를 Key-Value Dictionary로 읽기 (첫 번째 열=Key, 두 번째 열=Value)
         /// </summary>
         public static Dictionary<string, string> ReadToDictionary(string fileName) {
-            TextAsset csvFile = Resources.Load<TextAsset>(fileName);
-            if (csvFile == null) {
-                Debug.LogError($"Resources에서 CSV 파일을 찾을 수 없음: {fileName}");
-                return new Dictionary<string, string>();
-            }
-            return ReadToDictionaryFromText(csvFile.text);
+            var asset = ReadAddressables(fileName, out var handle);
+            var dict = ReadToDictionaryFromText(asset.text);
+            Addressables.Release(handle); // Dictionary로 변환후 핸들 해제
+            return dict;
+
         }
 
         /// <summary>
@@ -54,12 +57,10 @@ namespace Game.Core {
         /// CSV를 다중 컬럼 Dictionary로 읽기 (첫 번째 열=Key, 나머지 열들=List<string>)
         /// </summary>
         public static Dictionary<string, List<string>> ReadToMultiColumnDictionary(string fileName) {
-            TextAsset csvFile = Resources.Load<TextAsset>(fileName);
-            if (csvFile == null) {
-                Debug.LogError($"Resources에서 CSV 파일을 찾을 수 없음: {fileName}");
-                return new Dictionary<string, List<string>>();
-            }
-            return ReadToMultiColumnDictionaryFromText(csvFile.text);
+            var asset = ReadAddressables(fileName, out var handle);
+            var dict = ReadToMultiColumnDictionaryFromText(asset.text);
+            Addressables.Release(handle); // Dictionary로 변환후 핸들 해제
+            return dict;
         }
 
         /// <summary>
@@ -101,58 +102,17 @@ namespace Game.Core {
         }
 
         /// <summary>
-        /// 일반적인 List<Dictionary> 방식 (기존 호환성)
+        /// CSV파일을 Addressables를 통해 읽어오기
         /// </summary>
-        public static List<Dictionary<string, T>> ReadFromResources<T>(string fileName) {
-            TextAsset csvFile = Resources.Load<TextAsset>(fileName);
-            if (csvFile == null) {
-                Debug.LogError($"Resources에서 CSV 파일을 찾을 수 없음: {fileName}");
-                return new List<Dictionary<string, T>>();
+        private static TextAsset ReadAddressables(string key, out AsyncOperationHandle<TextAsset> handle) {
+            try {
+                handle = Addressables.LoadAssetAsync<TextAsset>(key);
+                var asset = handle.WaitForCompletion();
+                return asset;
+            } catch (Exception e) {
+                GameDebug.Log("CSV 읽기 실패" + e.Message);
+                throw;
             }
-            return ReadFromText<T>(csvFile.text);
-        }
-
-        public static List<Dictionary<string, T>> ReadFromText<T>(string csvText) {
-            var list = new List<Dictionary<string, T>>();
-            string[] lines = csvText.Split('\n');
-
-            if (lines.Length <= 1) return list;
-
-            // 헤더 행 처리
-            string[] headers = SplitCSVLine(lines[0]);
-
-            // 데이터 행 처리
-            for (int i = 1; i < lines.Length; i++) {
-                string[] values = SplitCSVLine(lines[i]);
-
-                if (values.Length == 0 || string.IsNullOrEmpty(values[0])) continue;
-
-                var entry = new Dictionary<string, T>();
-
-                for (int j = 0; j < headers.Length && j < values.Length; j++) {
-                    string value = values[j].Trim();
-                    string key = headers[j].Trim();
-
-                    try {
-                        T convertedValue = ParseValue<T>(value);
-                        entry[key] = convertedValue;
-                    } catch (Exception e) {
-                        Debug.LogWarning($"CSV 값 변환 실패: [{key}] = '{value}' to {typeof(T).Name}. 에러: {e.Message}");
-                        entry[key] = default;
-                    }
-                }
-
-                list.Add(entry);
-            }
-
-            return list;
-        }
-
-        /// <summary>
-        /// CSV를 간단한 문자열 리스트로 읽기 (string 타입 특화)
-        /// </summary>
-        public static List<Dictionary<string, string>> ReadAsStringList(string fileName) {
-            return ReadFromResources<string>(fileName);
         }
 
         /// <summary>

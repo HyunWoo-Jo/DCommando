@@ -15,6 +15,16 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 42b1425f30a27a6459141f16baadb193
   m_SerializeEntries:
+  - m_GUID: 0861c81925ebe1140a92f28a69c24730
+    m_Address: Styles/GoldStyle.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0ba782b88f56536458545359c3a24465
+    m_Address: AddressKey/EnemyAddressKey.csv
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2b4dea0f3f33daf47862d8ff82b5044d
     m_Address: Assets/02.Prefabs/UI/PausePanel_UI.prefab
     m_ReadOnly: 0
@@ -40,8 +50,58 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 46008638141ce5c4aa586d97065e9be2
+    m_Address: Configs/InputConfig.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50406782d3ed03548a73dddf4669756f
+    m_Address: AddressKey/EquipSpriteAddressKey.csv
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 595f254b1014d7d49b34ff75e8a74ef3
+    m_Address: Configs/CameraConfig.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5e382166c9e06cb42aa138a34ad1488b
+    m_Address: AddressKey/UIAddressKey.csv
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 61645a4391ae7b74c97f4a0142b94659
+    m_Address: Configs/ExpConfig.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 66c637a28673632439751af9cf65c20b
+    m_Address: Styles/DamageUIStyle.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 676edd6af5d24274ca110a1de5e72510
+    m_Address: Configs/CrystalConfig.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6ec93c8b536b85142a66bce44d78bc2d
+    m_Address: Configs/GoldConfig.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7342067c661ded440acc735796f301cf
     m_Address: Assets/02.Prefabs/UI/Gold_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 743d4d0c05d42a749bcecaaac82d3e3c
+    m_Address: Styles/CrystalStyle.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 83bb1fc34e78d30468c8b2677af6404b
+    m_Address: AddressKey/SkillAddressKey.csv
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -85,8 +145,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cdf930a9139d4f0478b683339b81eb8c
+    m_Address: AddressKey/EquipAddressKey.csv
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d0bd2df7b6f3957439dfc46bdc8a867f
     m_Address: Assets/02.Prefabs/Eqip/Weapon/Standard_Spear.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e08f7ae02aae36d49a4b3f6ce6c60175
+    m_Address: AddressKey/StageConfigAddressKey.csv
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

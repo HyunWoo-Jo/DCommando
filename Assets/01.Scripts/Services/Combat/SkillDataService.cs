@@ -11,7 +11,7 @@ namespace Game.Services {
         #region 초기화
         public void Initialize() {
             try {
-                var skillAddressMap = CSVReader.ReadToDictionary("AddressKey/SkillAddressKey");
+                var skillAddressMap = CSVReader.ReadToDictionary("AddressKey/SkillAddressKey.csv");
                 _addressableService.RegisterAddressKeys(skillAddressMap.ToEnumKey<SkillName>());
             } catch {
                 GameDebug.LogError("Skill CSV 파일 로드에 실패했습니다.");

@@ -36,7 +36,7 @@ namespace Game.Services {
         }
 
         private void LoadUIInfoFromCSV() {
-            var csvData = CSVReader.ReadToMultiColumnDictionary("AddressKey/UIAddressKey");
+            var csvData = CSVReader.ReadToMultiColumnDictionary("AddressKey/UIAddressKey.csv");
 
             foreach (var row in csvData) {
                 try {
