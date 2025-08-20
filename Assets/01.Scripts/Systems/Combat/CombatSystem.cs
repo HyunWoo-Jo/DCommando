@@ -5,7 +5,7 @@ using Game.Models;
 using Game.Core;
 using R3;
 using Game.Core.Event;
-using Zenject.SpaceFighter;
+using Game.Policies;
 
 namespace Game.Systems {
     /// <summary>
@@ -15,12 +15,7 @@ namespace Game.Systems {
         // 의존성 주입
         [Inject] private CombatModel _combatModel;
         [Inject] private HealthSystem _healthSystem;
-
-        // 전투 관련 상수
-        private const int MIN_DAMAGE = 1;
-        private const float CRITICAL_DAMAGE_MULTIPLIER = 2.0f;
-        private const float DEFAULT_LIFESTEAL_RATE = 0.15f;
-        private const float DEFAULT_POISON_DURATION = 5.0f;
+        [Inject] private ICombatPolicy _combatPolicy;
 
         private readonly CompositeDisposable _disposables = new();
 
@@ -38,20 +33,18 @@ namespace Game.Systems {
         }
 
         public void OnUpgradeEvent(StatChangeEvent e) {
-            if(e.upgradeType == UpgradeType.Power) {
-                int id =AIDataProvider.GetPlayer().GetInstanceID();
+            if (e.upgradeType == UpgradeType.Power) {
+                int id = AIDataProvider.GetPlayer().GetInstanceID();
                 _combatModel.AddBonusAttack(id, (int)e.value);
-            } else if(e.upgradeType == UpgradeType.Defense) {
+            } else if (e.upgradeType == UpgradeType.Defense) {
                 int id = AIDataProvider.GetPlayer().GetInstanceID();
                 _combatModel.AddBonusDefense(id, (int)e.value);
-            } else if(e.upgradeType == UpgradeType.AttackSpeed) {
+            } else if (e.upgradeType == UpgradeType.AttackSpeed) {
                 int id = AIDataProvider.GetPlayer().GetInstanceID();
                 _combatModel.AddBonusAttackSpeed(id, e.value);
             }
         }
         #endregion
-
-
 
         #region 캐릭터 전투 등록/해제
 
@@ -83,7 +76,6 @@ namespace Game.Systems {
         public void OnProcessRequest(DamageRequestEvent drEvent) {
             ProcessAttack(drEvent.ownerID, drEvent.targetID, drEvent.damageType, false);
         }
-
 
         /// <summary>
         /// 타입별 공격 처리 (커스텀 데미지 지원 - WeaponSystem용)
@@ -131,7 +123,7 @@ namespace Game.Systems {
             bool result = ProcessAttack(attackerId, targetId, DamageType.Fire, isCritical);
 
             // 화상 효과 추가 (선택적)
-            if (result) {
+            if (result && _combatPolicy.CanApplyBurnEffect(DamageType.Fire)) {
                 ApplyBurnEffect(attackerId, targetId);
             }
 
@@ -145,7 +137,7 @@ namespace Game.Systems {
             bool result = ProcessAttack(attackerId, targetId, DamageType.Ice, isCritical);
 
             // 빙결 효과 추가 (선택적)
-            if (result) {
+            if (result && _combatPolicy.CanApplyFreezeEffect(DamageType.Ice)) {
                 ApplyFreezeEffect(targetId);
             }
 
@@ -159,7 +151,7 @@ namespace Game.Systems {
             bool result = ProcessAttack(attackerId, targetId, DamageType.Lightning, isCritical);
 
             // 감전 효과 추가 (선택적)
-            if (result) {
+            if (result && _combatPolicy.CanApplyStunEffect(DamageType.Lightning)) {
                 ApplyStunEffect(targetId);
             }
 
@@ -175,7 +167,7 @@ namespace Game.Systems {
             bool success = _healthSystem.TakeDamage(targetId, poisonDamage, DamageType.Poison);
 
             if (attackerId != -1) {
-                GameDebug.Log($"독 효과 적용 Attacker {attackerId} -> Target {targetId}: {poisonDamage} damage over {DEFAULT_POISON_DURATION}초");
+                GameDebug.Log($"독 효과 적용 Attacker {attackerId} -> Target {targetId}: {poisonDamage} damage over {_combatPolicy.GetDefaultPoisonDuration()}초");
             } else {
                 GameDebug.Log($"독 데미지 적용 Target {targetId}: {poisonDamage} damage");
             }
@@ -213,10 +205,13 @@ namespace Game.Systems {
         /// <summary>
         /// 흡혈 효과 처리
         /// </summary>
-        public bool ProcessLifesteal(int attackerId, int targetId, int damage, float lifestealRate = DEFAULT_LIFESTEAL_RATE) {
+        public bool ProcessLifesteal(int attackerId, int targetId, int damage, float lifestealRate = -1f) {
             if (!_healthSystem.HasCharacter(attackerId)) return false;
 
-            int healAmount = Mathf.RoundToInt(damage * lifestealRate);
+            // Policy에서 기본값 가져오기
+            float rate = lifestealRate >= 0 ? lifestealRate : _combatPolicy.GetDefaultLifestealRate();
+            int healAmount = _combatPolicy.CalculateLifestealAmount(damage, rate);
+
             bool success = _healthSystem.Heal(attackerId, healAmount);
 
             if (success) {
@@ -236,16 +231,16 @@ namespace Game.Systems {
         private bool ApplyDamage(int attackerId, int targetId, int baseDamage, int defense, DamageType damageType, bool isCritical = false) {
             int finalDamage;
 
-            // 순수 데미지나 독은 방어력 무시
-            if (damageType == DamageType.Pure || damageType == DamageType.Poison) {
+            // Policy를 통한 방어력 무시 여부 확인
+            if (_combatPolicy.ShouldIgnoreDefense(damageType)) {
                 finalDamage = baseDamage;
             } else {
-                finalDamage = CalculateFinalDamage(baseDamage, defense);
+                finalDamage = _combatPolicy.CalculateFinalDamage(baseDamage, defense);
             }
 
-            // 크리티컬 적용 (치료는 제외)
-            if (isCritical && damageType != DamageType.Heal) {
-                finalDamage = Mathf.RoundToInt(finalDamage * CRITICAL_DAMAGE_MULTIPLIER);
+            // Policy를 통한 크리티컬 적용
+            if (isCritical && _combatPolicy.CanApplyCritical(damageType)) {
+                finalDamage = _combatPolicy.CalculateCriticalDamage(finalDamage);
             }
 
             // HealthSystem을 통해 데미지 적용
@@ -254,21 +249,11 @@ namespace Game.Systems {
             if (success) {
                 string criticalText = isCritical ? " (크리티컬!)" : "";
                 GameDebug.Log($"캐릭터 {attackerId}가 {targetId}에게 {finalDamage} {damageType} 데미지{criticalText}");
-
-
             } else {
                 GameDebug.LogWarning($"데미지 적용 실패 {attackerId} -> {targetId}");
             }
 
             return success;
-        }
-
-        /// <summary>
-        /// 최종 데미지 계산
-        /// </summary>
-        private int CalculateFinalDamage(int baseDamage, int defense) {
-            // 방어력이 공격력보다 높으면 최소 데미지 보장
-            return Mathf.Max(MIN_DAMAGE, baseDamage - defense);
         }
 
         #endregion
@@ -372,9 +357,6 @@ namespace Game.Systems {
             return _combatModel.GetFinalDefense(characterId);
         }
 
-
-        
-
         public float GetFinalAttackSpeed(int characterId) {
             return _combatModel.GetFinalAttackSpeed(characterId);
         }
@@ -400,7 +382,6 @@ namespace Game.Systems {
             }
         }
 
-
         #endregion
 
         #region 검증 메서드
@@ -409,8 +390,8 @@ namespace Game.Systems {
         /// 공격 유효성 검증
         /// </summary>
         private bool ValidateAttack(int attackerId, int targetId) {
-            // 자기 자신 공격 방지
-            if (attackerId == targetId) {
+            // Policy를 통한 자기 자신 공격 검증
+            if (!_combatPolicy.CanAttackSelf(attackerId, targetId)) {
                 GameDebug.LogWarning($"자기 자신을 공격할 수 없음 Character {attackerId}");
                 return false;
             }
@@ -456,6 +437,11 @@ namespace Game.Systems {
 
             if (_healthSystem == null) {
                 GameDebug.LogError("HealthSystem이 주입되지 않음");
+                return false;
+            }
+
+            if (_combatPolicy == null) {
+                GameDebug.LogError("ICombatPolicy가 주입되지 않음");
                 return false;
             }
 

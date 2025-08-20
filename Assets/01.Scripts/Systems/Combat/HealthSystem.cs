@@ -4,22 +4,17 @@ using Game.Models;
 using Game.Core;
 using Game.Core.Event;
 using System;
-using static PlasticGui.PlasticTableCell;
 using R3;
+using Game.Policies;
 
 namespace Game.Systems {
     public class HealthSystem : IInitializable, IDisposable {
         [Inject] private HealthModel _healthModel;
-
-        // 상수
-        private const int MIN_DAMAGE = 0; // 최소 데미지
-        private const int MIN_HEAL = 1; // 최소 힐량
-        private const int MIN_HP = 1; // 최소 등록 HP
-
+        [Inject] private IHealthPolicy _healthPolicy;
 
         private CompositeDisposable _disposables = new();
 
-        #region 초기화 Zenjecct 관리
+        #region 초기화 Zenject 관리
         public void Initialize() {
             EventBus.Subscribe<StatChangeEvent>(OnUpgradeEvent).AddTo(_disposables);
         }
@@ -27,22 +22,21 @@ namespace Game.Systems {
         public void Dispose() {
             _disposables?.Dispose();
         }
+
         /// <summary>
         /// Upgrade 처리
         /// </summary>
-        /// <param name="e"></param>
         private void OnUpgradeEvent(StatChangeEvent e) {
-            if(e.upgradeType == UpgradeType.MaxHealth) {
+            if (e.upgradeType == UpgradeType.MaxHealth) {
                 int id = AIDataProvider.GetPlayer().GetInstanceID();
                 int value = (int)e.value;
                 SetMaxHp(id, _healthModel.GetMaxHp(id) + value);
-                SetCurrentHp(id, _healthModel.GetCurrentHp(id) + value);
-            } else if(e.upgradeType == UpgradeType.Heal) {
+                Heal(id, value);
+            } else if (e.upgradeType == UpgradeType.Heal) {
                 int id = AIDataProvider.GetPlayer().GetInstanceID();
                 int value = (int)e.value;
                 Heal(id, value);
             }
-
         }
 
         #endregion
@@ -55,10 +49,11 @@ namespace Game.Systems {
                 return false;
             }
 
-            if (maxHp < MIN_HP) {
-                GameDebug.LogError($"최대 체력이 최소값보다 적음 {MIN_HP}");
+            if (!_healthPolicy.IsValidMaxHp(maxHp)) {
+                GameDebug.LogError($"최대 체력이 최소값보다 적음 {_healthPolicy.GetMinimumHp()}");
                 return false;
             }
+
             // 모델에 추가
             _healthModel.AddHealth(characterID, maxHp);
             GameDebug.Log($"캐릭터 등록 Character {characterID} with {maxHp} HP");
@@ -93,13 +88,20 @@ namespace Game.Systems {
         public bool TakeDamage(int characterID, int damage, DamageType damageType) {
             // 유효성 검사
             if (!ValidateCharacterExists(characterID)) return false;
-            if (!ValidateDamageAmount(damage)) return false;
+            if (!_healthPolicy.IsValidDamageAmount(damage)) {
+                GameDebug.LogError($"데미지가 최소값보다 적음 {_healthPolicy.GetMinimumDamage()}");
+                return false;
+            }
             if (!CanTakeDamage(characterID)) return false;
 
             var prevHp = _healthModel.GetCurrentHp(characterID);
-            _healthModel.TakeDamage(characterID, damage);
+
+            // Policy를 통한 데미지 계산
+            var newHp = _healthPolicy.CalculateHpAfterDamage(prevHp, damage);
+            _healthModel.SetCurrentHp(characterID, newHp);
+
             var currentHp = _healthModel.GetCurrentHp(characterID);
-            var actualDamage = prevHp - currentHp;
+            var actualDamage = _healthPolicy.CalculateActualDamage(prevHp, currentHp);
 
             GameDebug.Log($"캐릭터 데미지 Character {characterID} took {actualDamage} damage ({prevHp} → {currentHp})");
 
@@ -107,7 +109,7 @@ namespace Game.Systems {
             EventBus.Publish(new DamageTakenEvent(characterID, damageType, actualDamage, currentHp));
 
             // 사망 체크
-            if (_healthModel.IsDead(characterID)) {
+            if (_healthPolicy.IsDead(currentHp)) {
                 OnCharacterDeath(characterID);
             }
 
@@ -117,7 +119,8 @@ namespace Game.Systems {
         // 데미지 가능 여부 확인
         public bool CanTakeDamage(int characterID) {
             if (!_healthModel.HasHealth(characterID)) return false;
-            return !_healthModel.IsDead(characterID);
+            var currentHp = _healthModel.GetCurrentHp(characterID);
+            return _healthPolicy.CanTakeDamage(currentHp);
         }
 
         // 즉사 처리
@@ -126,7 +129,8 @@ namespace Game.Systems {
             if (!CanTakeDamage(characterID)) return false;
 
             var currentHp = _healthModel.GetCurrentHp(characterID);
-            return TakeDamage(characterID, currentHp, DamageType.Pure);
+            var killDamage = _healthPolicy.CalculateInstantKillDamage(currentHp);
+            return TakeDamage(characterID, killDamage, DamageType.Pure);
         }
         #endregion
 
@@ -135,13 +139,21 @@ namespace Game.Systems {
         public bool Heal(int characterID, int healAmount) {
             // 유효성 검사
             if (!ValidateCharacterExists(characterID)) return false;
-            if (!ValidateHealAmount(healAmount)) return false;
+            if (!_healthPolicy.IsValidHealAmount(healAmount)) {
+                GameDebug.LogError($"치료량이 최소값보다 적음 {_healthPolicy.GetMinimumHeal()}");
+                return false;
+            }
             if (!CanHeal(characterID)) return false;
 
             var prevHp = _healthModel.GetCurrentHp(characterID);
-            _healthModel.Heal(characterID, healAmount);
+            var maxHp = _healthModel.GetMaxHp(characterID);
+
+            // Policy를 통한 치료 계산
+            var newHp = _healthPolicy.CalculateHpAfterHeal(prevHp, healAmount, maxHp);
+            _healthModel.SetCurrentHp(characterID, newHp);
+
             var currentHp = _healthModel.GetCurrentHp(characterID);
-            var actualHeal = currentHp - prevHp;
+            var actualHeal = _healthPolicy.CalculateActualHeal(prevHp, currentHp);
 
             GameDebug.Log($"캐릭터 치료 Character {characterID} healed {actualHeal} HP ({prevHp} → {currentHp})");
 
@@ -153,21 +165,20 @@ namespace Game.Systems {
         // 치료 가능 여부 확인
         public bool CanHeal(int characterID) {
             if (!_healthModel.HasHealth(characterID)) return false;
-            if (_healthModel.IsDead(characterID)) return false;
-
             var currentHp = _healthModel.GetCurrentHp(characterID);
             var maxHp = _healthModel.GetMaxHp(characterID);
-            return currentHp < maxHp;
+            return _healthPolicy.CanHeal(currentHp, maxHp);
         }
 
         // 완전 회복
         public bool FullHeal(int characterID) {
             if (!ValidateCharacterExists(characterID)) return false;
-            if (_healthModel.IsDead(characterID)) return false;
+
+            var currentHp = _healthModel.GetCurrentHp(characterID);
+            if (_healthPolicy.IsDead(currentHp)) return false;
 
             var maxHp = _healthModel.GetMaxHp(characterID);
-            var currentHp = _healthModel.GetCurrentHp(characterID);
-            var healAmount = maxHp - currentHp;
+            var healAmount = _healthPolicy.CalculateFullHealAmount(currentHp, maxHp);
 
             if (healAmount <= 0) return false; // 이미 풀피
 
@@ -182,10 +193,10 @@ namespace Game.Systems {
             if (!CanRevive(characterID)) return false;
 
             var maxHp = _healthModel.GetMaxHp(characterID);
-            var finalReviveHp = reviveHp == -1 ? maxHp : reviveHp;
+            var finalReviveHp = reviveHp == -1 ? _healthPolicy.GetDefaultReviveHp(maxHp) : reviveHp;
 
-            if (finalReviveHp < MIN_HP || finalReviveHp > maxHp) {
-                GameDebug.LogError($"부활 체력 값이 유효하지 않음 reviveHp: {finalReviveHp} (must be between {MIN_HP} and {maxHp})");
+            if (!_healthPolicy.IsValidReviveHp(finalReviveHp, maxHp)) {
+                GameDebug.LogError($"부활 체력 값이 유효하지 않음 reviveHp: {finalReviveHp} (must be between {_healthPolicy.GetMinimumHp()} and {maxHp})");
                 return false;
             }
 
@@ -200,7 +211,8 @@ namespace Game.Systems {
         // 부활 가능 여부 확인
         public bool CanRevive(int characterID) {
             if (!_healthModel.HasHealth(characterID)) return false;
-            return _healthModel.IsDead(characterID);
+            var currentHp = _healthModel.GetCurrentHp(characterID);
+            return _healthPolicy.CanRevive(currentHp);
         }
         #endregion
 
@@ -209,8 +221,8 @@ namespace Game.Systems {
         public bool SetMaxHp(int characterID, int maxHp) {
             if (!ValidateCharacterExists(characterID)) return false;
 
-            if (maxHp < MIN_HP) {
-                GameDebug.LogError($"최대 체력이 최소값보다 적음 {MIN_HP}");
+            if (!_healthPolicy.IsValidMaxHp(maxHp)) {
+                GameDebug.LogError($"최대 체력이 최소값보다 적음 {_healthPolicy.GetMinimumHp()}");
                 return false;
             }
 
@@ -228,13 +240,18 @@ namespace Game.Systems {
         public bool SetCurrentHp(int characterID, int hp) {
             if (!ValidateCharacterExists(characterID)) return false;
 
-            if (hp < 0) {
+            if (!_healthPolicy.IsValidCurrentHp(hp)) {
                 GameDebug.LogError("체력은 음수가 될 수 없음");
                 return false;
             }
 
             var prevHp = _healthModel.GetCurrentHp(characterID);
-            _healthModel.SetCurrentHp(characterID, hp);
+            var maxHp = _healthModel.GetMaxHp(characterID);
+
+            // Policy를 통한 체력 제한
+            var clampedHp = _healthPolicy.ClampHp(hp, maxHp);
+            _healthModel.SetCurrentHp(characterID, clampedHp);
+
             var currentHp = _healthModel.GetCurrentHp(characterID);
 
             GameDebug.Log($"캐릭터 체력 설정 Character {characterID} HP set ({prevHp} → {currentHp})");
@@ -243,9 +260,9 @@ namespace Game.Systems {
             EventBus.Publish(new HpSetEvent(characterID, currentHp, prevHp));
 
             // 사망/부활 체크
-            if (prevHp > 0 && currentHp <= 0) {
+            if (prevHp > 0 && _healthPolicy.IsDead(currentHp)) {
                 OnCharacterDeath(characterID);
-            } else if (prevHp <= 0 && currentHp > 0) {
+            } else if (_healthPolicy.IsDead(prevHp) && currentHp > 0) {
                 EventBus.Publish(new RevivedEvent(characterID, currentHp));
             }
 
@@ -255,10 +272,19 @@ namespace Game.Systems {
 
         #region 상태 조회
         // 사망 상태 확인
-        public bool IsDead(int characterID) => _healthModel?.IsDead(characterID) ?? false;
+        public bool IsDead(int characterID) {
+            if (!_healthModel.HasHealth(characterID)) return false;
+            var currentHp = _healthModel.GetCurrentHp(characterID);
+            return _healthPolicy.IsDead(currentHp);
+        }
 
         // 체력 비율 조회
-        public float GetHpRatio(int characterID) => _healthModel?.GetHpRatio(characterID) ?? 0f;
+        public float GetHpRatio(int characterID) {
+            if (!_healthModel.HasHealth(characterID)) return 0f;
+            var currentHp = _healthModel.GetCurrentHp(characterID);
+            var maxHp = _healthModel.GetMaxHp(characterID);
+            return _healthPolicy.CalculateHpRatio(currentHp, maxHp);
+        }
 
         // 현재 체력 조회
         public int GetCurrentHp(int characterID) => _healthModel?.GetCurrentHp(characterID) ?? 0;
@@ -287,24 +313,6 @@ namespace Game.Systems {
             }
             return true;
         }
-
-        // 데미지 양 검증
-        private bool ValidateDamageAmount(int damage) {
-            if (damage < MIN_DAMAGE) {
-                GameDebug.LogError($"데미지가 최소값보다 적음 {MIN_DAMAGE}");
-                return false;
-            }
-            return true;
-        }
-
-        // 치료 양 검증
-        private bool ValidateHealAmount(int healAmount) {
-            if (healAmount < MIN_HEAL) {
-                GameDebug.LogError($"치료량이 최소값보다 적음 {MIN_HEAL}");
-                return false;
-            }
-            return true;
-        }   
         #endregion
     }
 }

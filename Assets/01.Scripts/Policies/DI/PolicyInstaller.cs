@@ -19,6 +19,7 @@ namespace Game.Policies
                 break;
                 case SceneName.PlayScene:
                 BindGamePolicies();
+                BincCombatPolicies();
                 break;
             }
         }
@@ -30,6 +31,11 @@ namespace Game.Policies
             // 입력 정책 바인딩 (InputSystem에서 필요)
             Container.Bind<IInputPolicy>().To<InputPolicy>().AsCached();
             Container.Bind<IGoldPolicy>().To<GoldPolicy>().AsCached();
+        }
+
+        private void BincCombatPolicies() {
+            Container.Bind<ICombatPolicy>().To<CombatPolicy>().AsCached();
+            Container.Bind<IHealthPolicy>().To<HealthPolicy>().AsCached();
         }
     }
 }
