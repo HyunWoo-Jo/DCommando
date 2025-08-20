@@ -1,4 +1,4 @@
-using Game.Core;
+﻿using Game.Core;
 using UnityEngine;
 using Zenject;
 
@@ -12,12 +12,11 @@ namespace Game.Core
         [SerializeField] private SceneName _sceneName;
 
         public override void InstallBindings() {
-            // 씬 이름을 컨테이너에 바인딩
-            Container.BindInstance(_sceneName).WithId("SceneName");
-
+            // DIHelper 초기화
+            DIHelper.Initialize(Container);
             // 씬별 특화 바인딩
             InstallSceneSpecificBindings();
-            Debug.Log(GetType().Name + " Bind 완료");
+
         }
 
 
@@ -30,10 +29,10 @@ namespace Game.Core
         /// </summary>
         private void InstallSceneSpecificBindings(SceneName _sceneName) {
             switch (_sceneName) {
-                case SceneName.MainLobby:
+                case SceneName.MainScene:
                 BindMainLobbyScene();
                 break;
-                case SceneName.Play:
+                case SceneName.PlayScene:
                 BindPlayScene();
                 break;
             }
@@ -43,14 +42,14 @@ namespace Game.Core
         /// 메인 로비 씬 바인딩
         /// </summary>
         private void BindMainLobbyScene() {
-            Debug.Log("MainLobby 씬 특화 바인딩 설정");
+           
         }
 
         /// <summary>
         /// 게임플레이 씬 바인딩
         /// </summary>
         private void BindPlayScene() {
-            Debug.Log("Gameplay 씬 특화 바인딩 설정");
+        
         }
     }
 }

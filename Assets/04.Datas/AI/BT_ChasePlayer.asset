@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71d8ac9734a1f44bb2c8ae5c10e2e77, type: 3}
+  m_Name: BT_ChasePlayer
+  m_EditorClassIdentifier: Game.Systems::Game.Systems.SO_BehaviourTree
+  _rootNode:
+    rid: 6429658526099439697
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6429658526099439697
+      type: {class: Parallel, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: -2
+        _children:
+        - rid: 6429658526099439847
+        - rid: 6429658526099439699
+    - rid: 6429658526099439699
+      type: {class: Sequence, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: 6429658526099439697
+        _children:
+        - rid: 6429658526099439700
+        - rid: 6429658526099439850
+        - rid: 6429658526099439702
+    - rid: 6429658526099439700
+      type: {class: DelayAction, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: 6429658526099439699
+        _targetDelay: 1
+        _curTime: 0
+    - rid: 6429658526099439702
+      type: {class: DamageToPlayerAction, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: 6429658526099439699
+        _damageType: 0
+    - rid: 6429658526099439847
+      type: {class: Sequence, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: 6429658526099439697
+        _children:
+        - rid: 6429658526099439852
+        - rid: 6429658526099439851
+    - rid: 6429658526099439850
+      type: {class: IsPlayerInRange, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: 6429658526099439699
+        _range: 0.5
+    - rid: 6429658526099439851
+      type: {class: ChasePlayerAction, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: 6429658526099439847
+        _moveData:
+          moveSpeed: 1
+          rotationSpeed: 5
+    - rid: 6429658526099439852
+      type: {class: Inverter, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: 6429658526099439847
+        _child:
+          rid: 6429658526099439853
+    - rid: 6429658526099439853
+      type: {class: IsPlayerDead, ns: Game.Systems, asm: Game.Systems}
+      data:
+        _parentNode:
+          rid: 6429658526099439852

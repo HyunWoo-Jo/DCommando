@@ -1,0 +1,15 @@
+UI Name,UI Type,AddressKey
+Exp_UI,Screen,Assets/02.Prefabs/UI/Exp_UI.prefab
+Crystal_UI,Screen,Assets/02.Prefabs/UI/Crystal_UI.prefab
+Damage_UI,HUD1,Assets/02.Prefabs/UI/Damage_UI.prefab
+Exp_UI,Screen,Assets/02.Prefabs/UI/Exp_UI.prefab
+Gold_UI,Screen,Assets/02.Prefabs/UI/Gold_UI.prefab
+Health_UI,HUD,Assets/02.Prefabs/UI/Health_UI.prefab
+PlayerHealth_UI,HUD,Assets/02.Prefabs/UI/PlayerHealth_UI.prefab
+MoveController_UI,Screen,Assets/02.Prefabs/UI/MoveController_UI.prefab
+Pause_UI,Screen,Assets/02.Prefabs/UI/PauseButton_UI.prefab
+PausePanel_UI,Popup,Assets/02.Prefabs/UI/PausePanel_UI.prefab
+WipeEffect_UI,Overlay,Assets/02.Prefabs/UI/WipeUI.prefab
+UpgradePanel_UI,Popup,Assets/02.Prefabs/UI/UpgradePanel_UI.prefab
+GameOverPanel_UI,Popup,Assets/02.Prefabs/UI/GameOverPanel_UI.prefab
+GameWinPanel_UI,Popup,Assets/02.Prefabs/UI/GameWinPanel_UI.prefab

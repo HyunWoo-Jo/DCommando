@@ -1,0 +1,12 @@
+﻿upgradeName,discription,UpgradeID,upgradeCount,upgradeTypes,values,upgradeConditionTypes,conditionOperators,conditionValues,spriteAddressableKey
+HP 회복,HP 회복+50,100,1,Heal,50,,,,Assets/03.Assets/Sprites/Heart_Hp.png
+최대 HP 증가,최대 HP 증가+30,101,1,MaxHealth,30,,,,Assets/03.Assets/Sprites/Heart_Hp.png
+공격력 증가,공격력+5,102,1,Power,5,,,,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/0_Sword/Sword_2.png
+방어력 증가,방어력+2,103,1,Defense,2,,,,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/3_Shield/Shield_1.png
+공격 속도 증가,공격속도+10%,104,1,AttackSpeed,0.1,,,,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/4_Spear/Spear_1.png
+공격 거리 증가,공격거리+10%,105,1,AttackRange,0.1,,,,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/4_Spear/Spear_1.png
+공격 너비 증가,공격너비+10%,106,1,AttackWidth,0.1,,,,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/4_Spear/Spear_1.png
+이동 속도 증가,이동속도+10,107,1,MoveSpeed,1,,,,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/3_Pant/F_SR_Pants.png
+경량화,"이동속도+5, 공격속도+10%",301,2,MoveSpeed/AttackSpeed,0.5/0.1,UpgradeOwned,NotHas,301,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/1_Body/Elf_1.png
+경량화2,"이동속도+10, 공격속도+20%",302,2,MoveSpeed/AttackSpeed,1/0.2,PlayerLevel/UpgradeOwned,Greater/NotHas,3/302,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/1_Body/Elf_2.png
+경량화3,"이동속도+20, 공격속도+20%",303,2,MoveSpeed/AttackSpeed,2/0.3,PlayerLevel/UpgradeOwned,Greater/NotHas,5/303,Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/1_Body/Skelton_1.png

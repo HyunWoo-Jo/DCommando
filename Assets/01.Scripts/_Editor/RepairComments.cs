@@ -28,11 +28,11 @@ public class Repair
 
             try {
                 if (IsStrictUtf8(raw)) {
-                    // UTF‑8 (무 BOM) → BOM 추가
+                    // UTF‑8  -> BOM 추가
                     File.WriteAllText(file, Encoding.UTF8.GetString(raw), new UTF8Encoding(true));
                     addedBom++;
                 } else {
-                    // CP949 (ANSI) → UTF‑8 (BOM)
+                    // CP949 (ANSI) -> UTF‑8 (BOM)
                     File.WriteAllText(file, Encoding.GetEncoding(949).GetString(raw), new UTF8Encoding(true));
                     convertedCp++;
                 }

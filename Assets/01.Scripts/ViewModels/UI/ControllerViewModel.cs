@@ -13,26 +13,20 @@ namespace Game.ViewModels
         [Inject] private InputModel _inputModel;
 
         // UI 바인딩용 프로퍼티
-        public ReadOnlyReactiveProperty<Vector2> MoveDirection => _playerMoveModel.MoveDirection;
-        public ReadOnlyReactiveProperty<bool> IsMoving => _playerMoveModel.IsMoving;
-        public ReadOnlyReactiveProperty<InputType> InputType => _inputModel.InputType;
+        public ReadOnlyReactiveProperty<Vector2> RORP_MoveDirection => _playerMoveModel.RORP_MoveDirection;
+        public ReadOnlyReactiveProperty<bool> RORP_IsMoving => _playerMoveModel.RORP_IsMoving;
+        public ReadOnlyReactiveProperty<InputType> RORP_InputType => _inputModel.RORP_InputType;
         
         // Input 상태 프로퍼티들
-        public ReadOnlyReactiveProperty<Vector2> CurrentPosition => _inputModel.CurrentPosition;
-        public ReadOnlyReactiveProperty<Vector2> StartPosition => _inputModel.StartPosition;
-        public ReadOnlyReactiveProperty<Vector2> DragDirection => _inputModel.DragDirection;
-        public ReadOnlyReactiveProperty<float> DragDistance => _inputModel.DragDistance;
+        public ReadOnlyReactiveProperty<Vector2> RORP_CurrentPosition => _inputModel.RORP_CurrentPosition;
+        public ReadOnlyReactiveProperty<Vector2> RORP_StartPosition => _inputModel.RORP_StartPosition;
+        public ReadOnlyReactiveProperty<Vector2> RORP_DragDirection => _inputModel.RORP_DragDirection;
+        public ReadOnlyReactiveProperty<float> RORP_DragDistance => _inputModel.RORP_DragDistance;
         
-        // 편의 프로퍼티들
-        public Vector2 FirstFramePointScreenPosition => _inputModel.StartPosition.CurrentValue;
-        public Vector2 CurrentPointScreenPosition => _inputModel.CurrentPosition.CurrentValue;
-        public bool IsInputActive => _inputModel.DragDistance.CurrentValue > 10f; // 드래그 임계값
+
+        public Vector2 FirstFramePointScreenPosition => _inputModel.RORP_StartPosition.CurrentValue;
+        public Vector2 CurrentPointScreenPosition => _inputModel.RORP_CurrentPosition.CurrentValue;
         
-        /// <summary>
-        /// 데이터 변경 알림
-        /// </summary>
-        public void Notify() {
-            // 컨트롤러 초기화 완료 알림
-        }
+
     }
 }

@@ -11,36 +11,47 @@ namespace Game.ViewModels
     {
         [Inject] private UISystem _uiSystem;
 
-        /// <summary>
-        /// Screen UI 열기
-        /// </summary>
-        public async UniTask<T> OpenScreenAsync<T>(UI_Name uiName) where T : Component
-        {
-            return await _uiSystem.OpenScreenAsync<T>(uiName);
+        public GameObject OpenUI(int id, UIName uiName) {
+            return _uiSystem.CreateUI(id, uiName);
         }
 
         /// <summary>
-        /// Popup UI 열기
+        /// 비동기 Screen UI 열기
         /// </summary>
-        public async UniTask<T> OpenPopupAsync<T>(UI_Name uiName) where T : Component
+        public async UniTask<T> OpenUIAsync<T>(int id, UIName uiName) where T : Component
         {
-            return await _uiSystem.OpenPopupAsync<T>(uiName);
+            return await _uiSystem.CreateUIAsync<T>(id, uiName);
         }
+
 
         /// <summary>
         /// UI 닫기
         /// </summary>
-        public void CloseUI(UI_Name uiName)
+        public void CloseUI(int id, UIName uiName, GameObject hudUiObj = null)
         {
-            _uiSystem.CloseUI(uiName);
+            _uiSystem.CloseUI(id, uiName, hudUiObj);
         }
 
         /// <summary>
-        /// 데이터 변경 알림
+        /// Damage Prefab을 로드
         /// </summary>
-        public void Notify() 
-        {
-            // UI 상태 변경 알림 로직
+        /// <returns></returns>
+        public async UniTask<GameObject> LoadDamageUIPrefabAsync() {
+            return await _uiSystem.LoadPrefabsAsync(UIName.Damage_UI);
         }
+
+        public void ReleaseDamageUI() {
+            _uiSystem.ReleasePrefab(UIName.Damage_UI);
+        }
+
+        /// <summary>
+        /// UI 부모를 가지고옴
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Transform GetParent(UIType name) {
+            return _uiSystem.GetUIParent(name);
+        }
+
     }
 }

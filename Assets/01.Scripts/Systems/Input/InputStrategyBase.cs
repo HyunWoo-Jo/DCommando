@@ -4,16 +4,13 @@ using Game.Data;
 using Game.Core;
 
 namespace Game.Systems {
+    
+
+    /// <summary>
+    /// 순수 입력만 체크
+    /// </summary>
     public abstract class InputStrategyBase : IInputStrategy {
-        protected readonly IInputPolicy _inputPolicy;
-        protected readonly SO_InputConfig _config;
-
         protected InputType _inputType;
-
-        protected InputStrategyBase(IInputPolicy inputPolicy, SO_InputConfig config) {
-            _inputPolicy = inputPolicy;
-            _config = config;
-        }
 
         public virtual void UpdateInput() {
             ProcessInput();

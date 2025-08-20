@@ -1,86 +1,83 @@
 ﻿using UnityEngine;
 using R3;
 using System;
-using Core.Utilis;
 using Game.Core;
+using Zenject;
 
 namespace Game.Models
 {
     /// <summary>
     /// Input 상태 모델
     /// </summary>
-    public class InputModel
+    public class InputModel : IDisposable
     {
-        private readonly ReactiveProperty<InputType> _inputType;
-        private readonly ReactiveProperty<Vector2> _currentPosition;
-        private readonly ReactiveProperty<Vector2> _startPosition;
-        private readonly ReactiveProperty<float> _clickStartTime;
+        private readonly ReactiveProperty<InputType> RP_inputType = new(InputType.None, AlwaysFalseComparer<InputType>.Instance);
+        private readonly ReactiveProperty<Vector2> RP_currentPosition = new(Vector2.zero);
+        private readonly ReactiveProperty<Vector2> RP_startPosition = new(Vector2.zero);
+        private readonly ReactiveProperty<float> RP_clickStartTime = new(0f);
         
-        public ReadOnlyReactiveProperty<InputType> InputType { get; }
-        public ReadOnlyReactiveProperty<Vector2> CurrentPosition { get; }
-        public ReadOnlyReactiveProperty<Vector2> StartPosition { get; }
-        public ReadOnlyReactiveProperty<float> ClickStartTime { get; }
-        
+        public ReadOnlyReactiveProperty<InputType> RORP_InputType => RP_inputType;
+        public ReadOnlyReactiveProperty<Vector2> RORP_CurrentPosition => RP_currentPosition;
+        public ReadOnlyReactiveProperty<Vector2> RORP_StartPosition => RP_startPosition;
+        public ReadOnlyReactiveProperty<float> RORP_ClickStartTime => RP_clickStartTime;
+
         // 계산된 프로퍼티
-        public ReadOnlyReactiveProperty<Vector2> DragDirection { get; private set; }
-        public ReadOnlyReactiveProperty<float> DragDistance { get; private set; }
+        public ReadOnlyReactiveProperty<Vector2> RORP_DragDirection { get; private set; }
+        public ReadOnlyReactiveProperty<float> RORP_DragDistance { get; private set; }
         
         private CompositeDisposable _disposables = new();
-        
-        public InputModel()
-        {
-            _inputType = new ReactiveProperty<InputType>(Game.Core.InputType.None, 
-                AlwaysFalseComparer<InputType>.Instance);
-            _currentPosition = new ReactiveProperty<Vector2>(Vector2.zero);
-            _startPosition = new ReactiveProperty<Vector2>(Vector2.zero);
-            _clickStartTime = new ReactiveProperty<float>(0f);
-            
-            InputType = _inputType;
-            CurrentPosition = _currentPosition;
-            StartPosition = _startPosition;
-            ClickStartTime = _clickStartTime;
-            
-            // 드래그 방향 계산
-            DragDirection = Observable.CombineLatest(_currentPosition, _startPosition)
+
+        #region Zenject 관리;
+        [Inject]
+        public void Initialize() {
+            RORP_DragDirection = Observable.CombineLatest(RP_currentPosition, RP_startPosition)
                 .Select(positions => (positions[0] - positions[1]).normalized)
                 .ToReadOnlyReactiveProperty()
                 .AddTo(_disposables);
-            
+
             // 드래그 거리 계산
-            DragDistance = Observable.CombineLatest(_currentPosition, _startPosition)
+            RORP_DragDistance = Observable.CombineLatest(RP_currentPosition, RP_startPosition)
                 .Select(positions => Vector2.Distance(positions[0], positions[1]))
                 .ToReadOnlyReactiveProperty()
                 .AddTo(_disposables);
         }
-        
+
+        public void Dispose() {
+            RP_inputType?.Dispose();
+            RP_currentPosition?.Dispose();
+            RP_startPosition?.Dispose();
+            RP_clickStartTime?.Dispose();
+
+            RORP_DragDirection?.Dispose();
+            RORP_DragDistance?.Dispose();
+            _disposables?.Dispose();
+        }
+        #endregion
+
         public void SetInputType(InputType inputType)
         {
-            _inputType.Value = inputType;
+            RP_inputType.Value = inputType;
         }
         
         public void SetCurrentPosition(Vector2 position)
         {
-            _currentPosition.Value = position;
+            RP_currentPosition.Value = position;
         }
         
         public void SetStartPosition(Vector2 position)
         {
-            _startPosition.Value = position;
+            RP_startPosition.Value = position;
         }
         
         public void SetClickStartTime(float time)
         {
-            _clickStartTime.Value = time;
+            RP_clickStartTime.Value = time;
         }
         
         public float GetClickDuration()
         {
-            return _clickStartTime.Value > 0 ? Time.time - _clickStartTime.Value : 0f;
+            return RP_clickStartTime.Value > 0 ? Time.time - RP_clickStartTime.Value : 0f;
         }
         
-        public void Dispose()
-        {
-            _disposables?.Dispose();
-        }
     }
 }
