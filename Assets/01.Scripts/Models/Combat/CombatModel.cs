@@ -20,11 +20,16 @@ namespace Game.Models {
 
         private const float DEFAULT_MULTIPLIER = 1.0f; // 기본 배율
 
+        private int _killCount;
+
+
         // 모든 캐릭터의 전투 데이터를 Dictionary로 관리
         private readonly Dictionary<int, CombatModel> _weaponDataDict = new();
         private readonly Dictionary<int, ReactiveProperty<CombatData>> _combatDataDict = new();
         private bool _disposed = false;
 
+        public int KillCount => _killCount;
+        public void AddKillCount() {  ++_killCount; }
 
         public ReadOnlyReactiveProperty<CombatData> GetRORP_CombatData(int id) {
              if (!_combatDataDict.TryGetValue(id, out var property)) return null;

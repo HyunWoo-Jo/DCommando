@@ -8,13 +8,44 @@ using static PlasticGui.PlasticTableCell;
 using R3;
 
 namespace Game.Systems {
-    public class HealthSystem {
+    public class HealthSystem : IInitializable, IDisposable {
         [Inject] private HealthModel _healthModel;
 
         // 상수
         private const int MIN_DAMAGE = 0; // 최소 데미지
         private const int MIN_HEAL = 1; // 최소 힐량
         private const int MIN_HP = 1; // 최소 등록 HP
+
+
+        private CompositeDisposable _disposables = new();
+
+        #region 초기화 Zenjecct 관리
+        public void Initialize() {
+            EventBus.Subscribe<StatChangeEvent>(OnUpgradeEvent).AddTo(_disposables);
+        }
+
+        public void Dispose() {
+            _disposables?.Dispose();
+        }
+        /// <summary>
+        /// Upgrade 처리
+        /// </summary>
+        /// <param name="e"></param>
+        private void OnUpgradeEvent(StatChangeEvent e) {
+            if(e.upgradeType == UpgradeType.MaxHealth) {
+                int id = AIDataProvider.GetPlayer().GetInstanceID();
+                int value = (int)e.value;
+                SetMaxHp(id, _healthModel.GetMaxHp(id) + value);
+                SetCurrentHp(id, _healthModel.GetCurrentHp(id) + value);
+            } else if(e.upgradeType == UpgradeType.Heal) {
+                int id = AIDataProvider.GetPlayer().GetInstanceID();
+                int value = (int)e.value;
+                Heal(id, value);
+            }
+
+        }
+
+        #endregion
 
         #region 캐릭터 관리
         // 캐릭터 등록
@@ -273,7 +304,7 @@ namespace Game.Systems {
                 return false;
             }
             return true;
-        }
+        }   
         #endregion
     }
 }

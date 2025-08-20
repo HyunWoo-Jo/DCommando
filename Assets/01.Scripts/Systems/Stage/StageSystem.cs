@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using DG.Tweening;
 using Game.Models;
+using System.Security.Cryptography.X509Certificates;
 namespace Game.Systems {
     public class StageSystem : IInitializable, IDisposable {
         [Inject] private IStageService _stageService;
@@ -30,6 +31,8 @@ namespace Game.Systems {
             _enemyContainer.transform.position = Vector3.zero;
             EventBus.Subscribe<StartStageEvent>(OnStartStage).AddTo(_disposables);
             EventBus.Subscribe<EnemyDefeatedEvent>(OnEnemyDefeated).AddTo(_disposables);
+            EventBus.Subscribe<GameOverEvent>(_ => EventBus.Publish(new UICreationEvent(-1, UIName.GameOverPanel_UI))).AddTo(_disposables);
+            EventBus.Subscribe<GameWinEvent>(_ => EventBus.Publish(new UICreationEvent(-1, UIName.GameWinPanel_UI))).AddTo(_disposables);
         }
 
         public void Dispose() {
@@ -49,11 +52,7 @@ namespace Game.Systems {
             int stageLevel = _stageModel.StageLevel;
             // Load
             var stageSo = await _stageService.GetStageConfigAsync(stageName);
-            if (stageSo.stages.Length < stageLevel) {
-                EventBus.Publish(new GameWinEvent(_stageName, stageLevel - 1));
-                GameTime.Pause();
-                return;
-            }
+            if (CheckGameWin(stageLevel, stageSo)) { return; }
             _currentStageData = stageSo.stages[stageLevel - 1];
 
 
@@ -110,14 +109,30 @@ namespace Game.Systems {
 
         private async void EndStage() {
             GameDebug.Log($"Stage {_stageModel.StageLevel} 종료");
-
+            
             await UniTask.Delay(500); // 0.5초 대기 후 이벤트 발생
+            if (await CheckGameWinAsync()) { return; }
             EventBus.Publish(new StageEndedEvent(_stageModel.StageLevel, _currentStageData));
+            
             ClearEnemies();
             await UniTask.Delay(500); // 0.5초 대기 후 이벤트 발생
             if (_currentStageData.autoStartNextStage) {
                 EventBus.Publish(new StartStageEvent(_stageName));
             }
+        }
+
+        private async UniTask<bool> CheckGameWinAsync() {
+            int stageLevel = _stageModel.StageLevel;
+            var stageSo = await _stageService.GetStageConfigAsync(_stageName);
+            return CheckGameWin(stageLevel, stageSo);
+        }
+        private bool CheckGameWin(int stageLevel, SO_StageConfig stageSo) {
+            if (stageSo.stages.Length < stageLevel) {
+                EventBus.Publish(new GameWinEvent(_stageName, stageLevel - 1));
+                GameTime.Pause();
+                return true;
+            }
+            return false;
         }
 
         private void ClearEnemies() {

@@ -20,6 +20,7 @@ namespace Game.Services
                 break;
                 case SceneName.PlayScene:
                 BindStageService();
+                BindUpgradeService();
                 break;
             }
 
@@ -34,6 +35,13 @@ namespace Game.Services
 
             Container.Bind<IAddressableService<StageName, SO_StageConfig>>()
              .To<AddressableService<StageName, SO_StageConfig>>().AsCached();
+        }
+
+        private void BindUpgradeService() {
+            Container.BindInterfacesAndSelfTo<UpgradeService>().AsCached(); 
+
+            Container.Bind<IAddressableService<int, Sprite>>()
+              .To<AddressableService<int, Sprite>>().AsTransient();
         }
     }
 }

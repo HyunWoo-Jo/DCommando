@@ -30,6 +30,7 @@ namespace Game.Services {
         }
 
         public void RegisterAddressKeys(IReadOnlyDictionary<TKey, string> addressMap) {
+            
             foreach (var kvp in addressMap) {
                 _keyToAddressMap[kvp.Key] = kvp.Value;
             }

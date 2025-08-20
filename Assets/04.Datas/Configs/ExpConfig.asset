@@ -15,5 +15,5 @@ MonoBehaviour:
   startingLevel: 1
   startingExp: 0
   maxLevel: 100
-  baseExpPerLevel: 100
-  expIncreasePerLevel: 50
+  baseExpPerLevel: 50
+  expIncreasePerLevel: 60

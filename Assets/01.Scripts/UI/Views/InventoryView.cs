@@ -30,6 +30,7 @@ namespace Game.UI {
 #endif
             InstanceSlot();
             Bind();
+            _viewModel.Renew();
         }
 
         private void OnDestroy() {
@@ -48,7 +49,7 @@ namespace Game.UI {
                     _curWeapon = equipName;
                     if (equipName != EquipName.None) {
                         weaponImage.sprite = _viewModel.GetSprite(equipName);
-                        SetSizeSlot(weaponImage.rectTransform, weaponImage.sprite);
+                        weaponImage.rectTransform.SetSizeSlot(weaponImage.sprite, _style.fixedHeight);
                         weaponImage.gameObject.SetActive(true);
                     } else {
                         weaponImage.sprite = null;
@@ -113,7 +114,7 @@ namespace Game.UI {
             Image equipImage = equipObj.GetComponent<Image>();
             if (equipImage != null) {
                 equipImage.sprite = _viewModel.GetSprite(equipName);
-                SetSizeSlot(equipImage.rectTransform, equipImage.sprite);
+                equipImage.rectTransform.SetSizeSlot(equipImage.sprite, _style.fixedHeight);
                 equipImage.gameObject.SetActive(true);
             }
 
@@ -130,22 +131,7 @@ namespace Game.UI {
             _equipDict[equipName] = equipObj;
         }
 
-        /// <summary>
-        /// Sprite 비율을 확인해 사이즈 정함
-        /// </summary>
-        /// <param name="targetRect"></param>
-        /// <param name="sprite"></param>
-        private void SetSizeSlot(RectTransform targetRect, Sprite sprite) {
-            Rect rect = sprite.rect;
-            float spriteWidth = rect.width;
-            float spriteHeight = rect.height;
-
-            // Style에서 고정 높이 가져와서 x를 비율에 맞춰 계산
-            float aspectRatio = spriteWidth / spriteHeight;
-            float calculatedWidth = _style.fixedHeight * aspectRatio;
-
-            targetRect.sizeDelta = new Vector2(calculatedWidth, _style.fixedHeight);
-        }
+  
 
         // 사용 가능한 슬롯 인덱스 찾기
         private int GetAvailableSlotIndex() {

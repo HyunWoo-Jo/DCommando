@@ -59,7 +59,10 @@ namespace Game.Services
                 .AsSingle();
 
             Container.Bind<IAddressableService<UIName, GameObject>>()
-                .To<AddressableService<UIName, GameObject>>().AsSingle();
+                .To<AddressableService<UIName, GameObject>>()
+                .AsSingle();
+
+          
         }
     }
 }

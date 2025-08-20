@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 using Zenject;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using Game.Data;
-using Game.Services;
-using Game.Models;
 using Game.Core;
-using UnityEngine.UIElements;
+using Game.Models;
+using Game.Data;
+using Game.Core.Event;
+using R3;
 
-namespace Game.Systems.Weapon {
+namespace Game.Systems {
     /// <summary>
     /// 무기 기본 클래스 무기에 장착 (CombatModel 사용)
     /// </summary>
@@ -22,16 +20,14 @@ namespace Game.Systems.Weapon {
         [SerializeField] private int _baseAttack = 10;
         [SerializeField] private int _baseDefense = 0;
         [SerializeField] private float _baseAttackSpeed = 1;
-        [SerializeField] private int _rangeMultiplier = 1; // 길이 배율
-        [SerializeField] private int _widthOrAngleMultiplier = 1; // 너비, 각도  배율
+        [SerializeField] private float _rangeMultiplier = 1; // 길이 배율
+        [SerializeField] private float _widthOrAngleMultiplier = 1; // 너비, 각도  배율
         [Header("디버그")]
         [SerializeField] private bool _showGizmos = true;
 
         // DI 주입
-        [Inject] private readonly ISkillDataService _skillDataService;
-        [Inject] private readonly EquipSystem _equipSystem; 
+        [Inject] private readonly WeaponSystem _weaponSystem;
         [Inject] private readonly CombatModel _combatModel;
-        [Inject] private readonly CombatSystem _combatSystem;
 
         // 스킬 데이터
         private SO_SkillData _skillData;
@@ -45,9 +41,6 @@ namespace Game.Systems.Weapon {
         // 고유 ID
         private int _weaponId;
 
-        
-       
-
         // 프로퍼티
         public EquipName EquipName { get; private set; }
         public SkillName SkillName => _skillName;
@@ -55,25 +48,61 @@ namespace Game.Systems.Weapon {
         public bool IsInitialized => _isInitialized;
         public bool IsAttacking => _isAttacking;
         public int WeaponId => _weaponId;
+        public Transform AttackPoint => _attackPoint;
+        public LayerMask TargetLayers => _targetLayers;
+        public DamageType DamageType => _damageType;
+        public int BaseAttack => _baseAttack;
+        public int BaseDefense => _baseDefense;
+        public float BaseAttackSpeed => _baseAttackSpeed;
 
         public float AttackSpeed => _baseAttackSpeed;
         public Vector2 Forward => -_attackPoint.right;
 
         public GameObject GameObj => this.gameObject;
 
-        private float Width => _skillData.Width * _widthOrAngleMultiplier;
-        private float Angle => _skillData.Angle * _widthOrAngleMultiplier;
+        public float Width => _skillData?.Width * _widthOrAngleMultiplier ?? 0f;
+        public float Angle => _skillData?.Angle * _widthOrAngleMultiplier ?? 0f;
+        public float Range => _skillData?.Range * _rangeMultiplier ?? 0f;
 
-        private float Range => _skillData.Range * _rangeMultiplier;
+        // dispose
+        private CompositeDisposable _disposables = new();
+
+        private void Awake() {
+            EventBus.Subscribe<StatChangeEvent>(OnUpgradeEvent).AddTo(_disposables);
+        }
 
         private void OnDestroy() {
             Unequip();
+            _disposables?.Dispose();
         }
- 
+
+        private void OnUpgradeEvent(StatChangeEvent e) {
+            if (e.upgradeType == UpgradeType.AttackRange) {
+                _rangeMultiplier += e.value;
+            } else if (e.upgradeType == UpgradeType.AttackWidth) {
+                _widthOrAngleMultiplier += e.value;
+            }
+        }
+
+        #region 시스템 연동 메서드 (WeaponSystem에서 호출)
+
+        public void SetSkillData(SO_SkillData skillData) {
+            _skillData = skillData;
+        }
+
+        public void SetInitialized(bool initialized) {
+            _isInitialized = initialized;
+        }
+
+        public void SetAttacking(bool attacking) {
+            _isAttacking = attacking;
+        }
+
+        #endregion
 
         #region 스탯 관리
-        public void SetEquipName(EquipName equipName ) {
-            EquipName = EquipName;
+        public void SetEquipName(EquipName equipName) {
+            EquipName = equipName;
         }
 
         /// <summary>
@@ -95,166 +124,11 @@ namespace Game.Systems.Weapon {
 
         #region 공격 처리
         /// <summary>
-        /// 공격 실행
+        /// 공격 실행 (WeaponSystem에 위임)
         /// </summary>
         public virtual void PerformAttack() {
-            if (!_isInitialized || _isAttacking) {
-                GameDebug.LogWarning($"공격 불가: Initialized={_isInitialized}, Attacking={_isAttacking}");
-                return;
-            }
-
-            _isAttacking = true;
-
-            // 범위 내 타겟 찾기
-            var targets = FindTargetsInRange();
-
-            // 각 타겟에 대해 데미지 처리
-            foreach (var target in targets) {
-                ProcessAttackTarget(target);
-            }
-
-            GameDebug.Log($"무기 공격 실행: {_skillName}, 타겟 수: {targets.Count}, 공격력: {GetFinalAttack()}");
-
-            // 공격 완료
-            _isAttacking = false;
+            _weaponSystem.PerformAttack(this);
         }
-
-        /// <summary>
-        /// 범위 내 타겟 찾기
-        /// </summary>
-        private List<Collider2D> FindTargetsInRange() {
-            var targets = new List<Collider2D>();
-
-            if (_skillData == null || _attackPoint == null) return targets;
-
-            Vector2 attackPosition = _attackPoint.position;
-
-            switch (_skillData.RangeType) {
-                case SkillRangeType.Circle:
-                targets.AddRange(FindCircleTargets(attackPosition));
-                break;
-                case SkillRangeType.Sector:
-                targets.AddRange(FindSectorTargets(attackPosition));
-                break;
-                case SkillRangeType.Rectangle:
-                targets.AddRange(FindRectangleTargets(attackPosition));
-                break;
-                case SkillRangeType.Line:
-                targets.AddRange(FindLineTargets(attackPosition));
-                break;
-            }
-
-            return targets;
-        }
-
-        private List<Collider2D> FindCircleTargets(Vector2 center) {
-            var targets = new List<Collider2D>();
-            var colliders = Physics2D.OverlapCircleAll(center, Range, _targetLayers);
-            targets.AddRange(colliders);
-            return targets;
-        }
-
-        private List<Collider2D> FindSectorTargets(Vector2 center) {
-            var targets = new List<Collider2D>();
-            var potentialTargets = Physics2D.OverlapCircleAll(center,Range, _targetLayers);
-
-            float halfAngle = Angle * 0.5f * _widthOrAngleMultiplier;
-            Vector3 forward = Forward;
-
-            foreach (var collider in potentialTargets) {
-                Vector2 directionToTarget = (collider.transform.position - _attackPoint.position).normalized;
-                float angleToTarget = Vector2.Angle(forward, directionToTarget);
-
-                if (angleToTarget <= halfAngle) {
-                    targets.Add(collider);
-                }
-            }
-
-            return targets;
-        }
-
-        private List<Collider2D> FindRectangleTargets(Vector2 center) {
-            var targets = new List<Collider2D>();
-
-            // 사각형 영역 계산
-            Vector2 boxSize = new Vector2(Width, Range);
-            Vector2 boxCenter = center + Forward * (Range * 0.5f);
-
-            var colliders = Physics2D.OverlapBoxAll(boxCenter, boxSize, _attackPoint.eulerAngles.z, _targetLayers);
-            
-            targets.AddRange(colliders);
-
-            return targets;
-        }
-
-        private List<Collider2D> FindLineTargets(Vector2 center) {
-            var targets = new List<Collider2D>();
-
-            if (_skillData.Width > 0) {
-                // 두께가 있는 선 (사각형으로 처리)
-                Vector2 boxSize = new Vector2(Width, Range);
-                Vector2 boxCenter = center + (Vector2)Forward * (Range* 0.5f);
-
-                var colliders = Physics2D.OverlapBoxAll(boxCenter, boxSize, _attackPoint.eulerAngles.z, _targetLayers);
-                targets.AddRange(colliders);
-            } else {
-                // 단순한 선 (RaycastAll 사용)
-                Vector2 direction = Forward;
-                var hits = Physics2D.RaycastAll(center, direction, Range, _targetLayers);
-
-                foreach (var hit in hits) {
-                    if (hit.collider != null) {
-                        targets.Add(hit.collider);
-                    }
-                }
-            }
-
-            return targets;
-        }
-
-        /// <summary>
-        /// 개별 타겟에 대한 공격 처리
-        /// </summary>
-        private void ProcessAttackTarget(Collider2D target) {
-            // 최종 데미지 계산
-            float finalDamage = CalculateFinalDamage();
-
-            // 데미지 처리 (CombatSystem을 통해)
-            int attackerId = _weaponId; // 소유자 ID를 사용
-            int targetId = target.gameObject.GetInstanceID();
-
-            // 무기 타입에 따른 데미지 타입 결정 (확장 가능)
-            DamageType damageType = GetWeaponDamageType();
-
-            _combatSystem.ProcessAttack(attackerId, targetId, damageType, finalDamage);
-
-            GameDebug.Log($"무기 공격 처리: {target.name}, 데미지: {finalDamage}");
-        }
-
-        /// <summary>
-        /// 최종 데미지 계산 (스킬 데이터 + CombatModel 스탯)
-        /// </summary>
-        private float CalculateFinalDamage() {
-            // 스킬 데이터에서 기본 데미지와 배율
-            float skillBaseDamage = _skillData.AdditionalDamage;
-            float skillMultiplier = _skillData.DamageMultiplier;
-
-            // CombatModel에서 현재 공격력
-            int weaponAttack = GetFinalAttack();
-
-            // 최종 데미지 계산: (무기공격력 + 스킬추가데미지) * 스킬배율
-            float finalDamage = (weaponAttack + skillBaseDamage) * skillMultiplier;
-
-            return Mathf.Max(0, finalDamage);
-        }
-
-        /// <summary>
-        /// 무기 타입에 따른 데미지 타입 반환 (확장 가능)
-        /// </summary>
-        protected virtual DamageType GetWeaponDamageType() {
-            return _damageType;
-        }
-
         #endregion
 
         #region 디버그
@@ -277,7 +151,7 @@ namespace Game.Systems.Weapon {
 
             switch (_skillData.RangeType) {
                 case SkillRangeType.Circle:
-                Gizmos.DrawWireSphere(center, _skillData.Range);
+                Gizmos.DrawWireSphere(center, Range);
                 break;
                 case SkillRangeType.Sector:
                 DrawSectorGizmo(center);
@@ -303,11 +177,11 @@ namespace Game.Systems.Weapon {
         }
 
         private void DrawSectorGizmo(Vector3 center) {
-            float halfAngle = _skillData.Angle * 0.5f;
+            float halfAngle = Angle * 0.5f;
             Vector3 forward = Forward;
 
-            Vector3 leftBound = Quaternion.Euler(0, 0, halfAngle) * forward * _skillData.Range;
-            Vector3 rightBound = Quaternion.Euler(0, 0, -halfAngle) * forward * _skillData.Range;
+            Vector3 leftBound = Quaternion.Euler(0, 0, halfAngle) * forward * Range;
+            Vector3 rightBound = Quaternion.Euler(0, 0, -halfAngle) * forward * Range;
 
             Gizmos.DrawLine(center, center + leftBound);
             Gizmos.DrawLine(center, center + rightBound);
@@ -317,7 +191,7 @@ namespace Game.Systems.Weapon {
             Vector3 prevPoint = center + leftBound;
             for (int i = 1; i <= segments; i++) {
                 float angle = Mathf.Lerp(-halfAngle, halfAngle, (float)i / segments);
-                Vector3 point = center + Quaternion.Euler(0, 0, angle) * forward * _skillData.Range;
+                Vector3 point = center + Quaternion.Euler(0, 0, angle) * forward * Range;
                 Gizmos.DrawLine(prevPoint, point);
                 prevPoint = point;
             }
@@ -325,8 +199,8 @@ namespace Game.Systems.Weapon {
 
         private void DrawRectangleGizmo(Vector3 center) {
             Vector3 forward = Forward;
-            Vector3 boxCenter = center + forward * (_skillData.Range * 0.5f);
-            Vector3 size = new Vector3(_skillData.Width, _skillData.Range, 0.1f);
+            Vector3 boxCenter = center + forward * (Range * 0.5f);
+            Vector3 size = new Vector3(Width, Range, 0.1f);
 
             Gizmos.matrix = Matrix4x4.TRS(boxCenter, _attackPoint.rotation, Vector3.one);
             Gizmos.DrawWireCube(Vector3.zero, size);
@@ -335,13 +209,13 @@ namespace Game.Systems.Weapon {
 
         private void DrawLineGizmo(Vector3 center) {
             Vector3 forward = Forward;
-            Vector3 endPoint = center + forward * _skillData.Range;
+            Vector3 endPoint = center + forward * Range;
 
             Gizmos.DrawLine(center, endPoint);
 
-            if (_skillData.Width > 0) {
+            if (Width > 0) {
                 Vector3 right = _attackPoint.right;
-                float halfWidth = _skillData.Width * 0.5f;
+                float halfWidth = Width * 0.5f;
 
                 Vector3 leftStart = center - right * halfWidth;
                 Vector3 rightStart = center + right * halfWidth;
@@ -374,8 +248,8 @@ namespace Game.Systems.Weapon {
             GameDebug.Log($"보너스 공격력: {combatData.bonusAttack}");
             GameDebug.Log($"공격력 배율: {combatData.attackMultiplier:F2}");
             GameDebug.Log($"최종 공격력: {combatData.FinalAttack}");
-            GameDebug.Log($"스킬 범위: {_skillData.Range}");
-            GameDebug.Log($"스킬 타입: {_skillData.RangeType}");
+            GameDebug.Log($"스킬 범위: {Range}");
+            GameDebug.Log($"스킬 타입: {_skillData?.RangeType}");
         }
 
         /// <summary>
@@ -402,56 +276,27 @@ namespace Game.Systems.Weapon {
         public void SetTargetLayers(LayerMask newLayers) {
             _targetLayers = newLayers;
         }
+
         /// <summary>
-        /// 무기 장착
+        /// 무기 장착 (WeaponSystem에 위임)
         /// </summary>
-        public async void Equip(GameObject owner) {
+        public void Equip(GameObject owner) {
             if (_isInitialized) {
                 Unequip();
             }
             _owner = owner;
             _weaponId = owner.GetInstanceID();
             SetAttackPoint(owner.transform);
-            try {
-                // Service를 통해 스킬 데이터 로드
-                _skillData = await _skillDataService.LoadSkillDataAsync(_skillName);
 
-                if (_skillData == null) {
-                    GameDebug.LogError($"스킬 데이터 로드 실패: {_skillName}");
-                    return;
-                }
-
-                // CombatModel에 무기 데이터 등록
-                _combatModel.AddBonusAttack(_weaponId, _baseAttack);
-                _combatModel.AddBonusDefense(_weaponId, _baseDefense);
-                _combatModel.AddBonusAttackSpeed(_weaponId, _baseAttackSpeed);
-                _isInitialized = true;
-                GameDebug.Log($"무기 초기화 완료: {_skillName}, Range: {_skillData.Range}, Attack: {GetFinalAttack()}");
-
-            } catch (System.Exception e) {
-                GameDebug.LogError($"무기 초기화 실패: {_skillName}, 에러: {e.Message}");
-            }
-
+            _weaponSystem.EquipWeapon(this, owner);
         }
+
         /// <summary>
-        /// 장착 해제
+        /// 장착 해제 (WeaponSystem에 위임)
         /// </summary>
         public void Unequip() {
-            // 장착 해제
-            if (_isInitialized) {
-                _skillData = null;
-                _combatModel.AddBonusAttack(_weaponId, -_baseAttack);
-                _combatModel.AddBonusDefense(_weaponId, -_baseDefense);
-                _combatModel.AddBonusAttackSpeed(_weaponId, -_baseAttackSpeed);
-                _isInitialized = false;
-                _skillDataService.UnloadSkill(_skillName);
-                _equipSystem.UnLoadWeapon(this);
-                GameDebug.Log($"무기 해제: {_skillName}, ID: {_weaponId}");
-            }
+            _weaponSystem.UnequipWeapon(this);
         }
-
-
-       
         #endregion
     }
 }

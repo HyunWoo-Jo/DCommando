@@ -108,6 +108,7 @@ namespace Game.Systems
             // 모든 활성 오브젝트 반환
             public void ReturnAll() {
                 for (int i = _liveAmountList.Count - 1; i >= 0; i--) {
+                    if (_liveAmountList[i].obj == null) continue;
                     _liveAmountList[i].obj.transform.DOKill();
                     _pool.Release(_liveAmountList[i].obj);
                 }

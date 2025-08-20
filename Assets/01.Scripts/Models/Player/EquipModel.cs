@@ -221,6 +221,15 @@ namespace Game.Models {
 
             return equipData;
         }
+
+        /// <summary>
+        /// 보유 장비 알림 (수동)
+        /// </summary>
+        public void OnRenewOwnedEquip() {
+            _ownedEquipmentsSubject.OnNext(_ownedEquipments);
+        }
+
+
         #endregion
 
         #region R3 Observable 스트림

@@ -32,5 +32,8 @@ namespace Game.ViewModels
         public void EquipItem(EquipName equipName) {
             _equipSystem.EquipWeapon(equipName);
         }
+        public void Renew() {
+            _equipModel.OnRenewOwnedEquip();
+        }
     }
 }

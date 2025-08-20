@@ -8,6 +8,7 @@ using UnityEngine.Assertions;
 using Game.Core;
 using Game.Services;
 using System.Collections.Generic;
+using Game.Core.Event;
 namespace Game.Systems
 {
     // 실제 데이터를 이용해 Play를 Controller하는 클레스
@@ -62,6 +63,7 @@ namespace Game.Systems
         private void OnDeath() {
             _isDeath = true;
             _animControll.DeathAnim(true);
+            EventBus.Publish(new GameOverEvent());
         }
        
 

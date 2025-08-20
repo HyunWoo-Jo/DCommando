@@ -19,7 +19,9 @@ namespace Game.Core
 
 
         WipeEffect_UI,
-        
-       
+
+        UpgradePanel_UI,
+        GameOverPanel_UI,
+        GameWinPanel_UI,
     }
 }

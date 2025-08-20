@@ -20,6 +20,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 09023decdd565064aa34bee6deeb5557
+    m_Address: Assets/02.Prefabs/UI/GameWinPanel_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a7157a1ecb10214a824f70c8a57300e
+    m_Address: Assets/02.Prefabs/UI/GameOverPanel_UI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0ba782b88f56536458545359c3a24465
     m_Address: AddressKey/EnemyAddressKey.csv
     m_ReadOnly: 0
@@ -45,6 +55,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e7f1bcf5e1004551853fead34d7fb5b
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/1_Body/Skelton_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 400f84ca50ac94f20a75a7ecfbe2cfe8
     m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/0_Sword/Sword_2.png
     m_ReadOnly: 0
@@ -55,13 +70,33 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4a032486b1e64344594659bfd89fcaa0
+    m_Address: UpgradeTable/UpgradeTable.csv
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 50406782d3ed03548a73dddf4669756f
     m_Address: AddressKey/EquipSpriteAddressKey.csv
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50595133ffa7f47f984a134594aedcab
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/3_Pant/F_SR_Pants.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5364a532c77cd43bc8549a556cb49758
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/3_Shield/Shield_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 595f254b1014d7d49b34ff75e8a74ef3
     m_Address: Configs/CameraConfig.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5bc9c55e31d7c4c3380f05786b90bb35
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/1_Body/Elf_1.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -107,6 +142,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8d2e32343359643008ec8b92017bbf89
     m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/4_Spear/Soon_Spear.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9319101edbfea48f58b3eb3a01e16f2a
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/1_Body/Elf_2.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -165,6 +205,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e4c07de1d80de4718b58db6470c48501
+    m_Address: Assets/03.Assets/SPUM/Sprites/Addons/Legacy/0_Unit/0_Sprite/6_Weapons/4_Spear/Spear_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7bcd739e6542534bb617462b478d6fc
+    m_Address: Assets/03.Assets/Sprites/Heart_Hp.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e930ab305202b8149a11c55331d287e3
     m_Address: Assets/02.Prefabs/Enemys/SlimeGreen.prefab
     m_ReadOnly: 0
@@ -182,6 +232,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f5e8b42804ca9a645b143ab0140bce49
     m_Address: Assets/02.Prefabs/Eqip/Weapon/Standard_Sword.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd2acf4293c341f4fac92a8e49caae63
+    m_Address: Assets/02.Prefabs/UI/UpgradePanel_UI.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

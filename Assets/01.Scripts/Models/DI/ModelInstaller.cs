@@ -19,6 +19,7 @@ namespace Game.Models
                 BindPlayerModels();
                 BindGameModels();
                 BindCombatSceneModel();
+                BindUpgradeModels();
                 break;
             }
         }
@@ -32,6 +33,10 @@ namespace Game.Models
             Container.BindInterfacesAndSelfTo<InputModel>().AsCached();
             Container.BindInterfacesAndSelfTo<GoldModel>().AsCached();   
             Container.BindInterfacesAndSelfTo<ExpModel>().AsCached();
+        }
+
+        private void BindUpgradeModels() {
+            Container.BindInterfacesAndSelfTo<UpgradeModel>().AsCached();
         }
 
         /// <summary>

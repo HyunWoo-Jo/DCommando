@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Game.Core.Event
-{
+namespace Game.Core.Event {
     /// <summary>
     /// 게임 정지 이벤트
     /// </summary>
@@ -15,14 +14,12 @@ namespace Game.Core.Event
     /// <summary>
     /// 씬 전환 요청 이벤트
     /// </summary>
-    public readonly struct SceneLoadingEvent
-    {
+    public readonly struct SceneLoadingEvent {
         public readonly SceneName curSceneName;
         public readonly SceneName targetSceneName;
         public readonly float delay;
 
-        public SceneLoadingEvent(SceneName curSceneName, SceneName targetSceneName, float delay)
-        {
+        public SceneLoadingEvent(SceneName curSceneName, SceneName targetSceneName, float delay) {
             this.curSceneName = curSceneName;
             this.targetSceneName = targetSceneName;
             this.delay = delay;
@@ -41,4 +38,8 @@ namespace Game.Core.Event
             this.stageLevel = stageLevel;
         }
     }
+    /// <summary>
+    /// 게임 오버 이벤트
+    /// </summary>
+    public readonly struct GameOverEvent { }
 }

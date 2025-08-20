@@ -12,7 +12,7 @@ namespace Game.Systems {
         private readonly ExpModel _expModel;
         private readonly SO_ExpConfig _config;
         private CompositeDisposable _disposables = new();
-
+        private bool _isEnd = false;
         /// <summary>
         /// ExpSystem 생성자
         /// </summary>
@@ -32,6 +32,9 @@ namespace Game.Systems {
         /// 외부 이벤트 구독 설정
         /// </summary>
         private void SubscribeToEvents() {
+            EventBus.Subscribe<GameWinEvent>(_ => _isEnd = true);
+            EventBus.Subscribe<GameOverEvent>(_ => _isEnd = true);
+
             // 몬스터 처치, 퀘스트 완료 등에서 발생하는 경험치 획득 이벤트 구독
             EventBus.Subscribe<ExpRewardEvent>(OnExpReward).AddTo(_disposables);
         }
@@ -64,6 +67,7 @@ namespace Game.Systems {
         /// 자동으로 레벨업 체크 및 이벤트 발행 수행
         /// </summary>
         public bool GainExp(int amount) {
+            if (_isEnd) return false; // 게임이 끝나면 이벤트가 발생하지 않도록 설정
             // 유효성 검사
             if (amount <= 0) return false;
             if (_expModel.IsMaxLevel()) return false;
@@ -115,6 +119,7 @@ namespace Game.Systems {
             UpdateMaxExpForCurrentLevel();
 
             // 레벨업 이벤트 발행
+            
             EventBus.Publish(new LevelUpEvent(newLevel, currentLevel));
 
             // 최대 레벨 도달 체크 및 처리

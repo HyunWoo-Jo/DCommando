@@ -5,6 +5,7 @@ using Game.Models;
 using Game.Core;
 using R3;
 using Game.Core.Event;
+using Zenject.SpaceFighter;
 
 namespace Game.Systems {
     /// <summary>
@@ -27,13 +28,30 @@ namespace Game.Systems {
         public void Initialize() {
             GameDebug.Log("CombatSystem 초기화 완료");
             EventBus.Subscribe<DamageRequestEvent>(OnProcessRequest).AddTo(_disposables);
+            EventBus.Subscribe<EnemyDefeatedEvent>(_ => _combatModel.AddKillCount()).AddTo(_disposables); // enemy가 죽으면 Model Update
+            EventBus.Subscribe<StatChangeEvent>(OnUpgradeEvent).AddTo(_disposables);
         }
 
         public void Dispose() {
             _disposables?.Dispose();
             GameDebug.Log("CombatSystem 해제 완료");
         }
+
+        public void OnUpgradeEvent(StatChangeEvent e) {
+            if(e.upgradeType == UpgradeType.Power) {
+                int id =AIDataProvider.GetPlayer().GetInstanceID();
+                _combatModel.AddBonusAttack(id, (int)e.value);
+            } else if(e.upgradeType == UpgradeType.Defense) {
+                int id = AIDataProvider.GetPlayer().GetInstanceID();
+                _combatModel.AddBonusDefense(id, (int)e.value);
+            } else if(e.upgradeType == UpgradeType.AttackSpeed) {
+                int id = AIDataProvider.GetPlayer().GetInstanceID();
+                _combatModel.AddBonusAttackSpeed(id, e.value);
+            }
+        }
         #endregion
+
+
 
         #region 캐릭터 전투 등록/해제
 
@@ -237,10 +255,7 @@ namespace Game.Systems {
                 string criticalText = isCritical ? " (크리티컬!)" : "";
                 GameDebug.Log($"캐릭터 {attackerId}가 {targetId}에게 {finalDamage} {damageType} 데미지{criticalText}");
 
-                //// 흡혈 효과 확인 (물리/마법 데미지만)
-                //if (damageType == DamageType.Physical || damageType == DamageType.Magic) {
-                //    ProcessLifesteal(attackerId, targetId, finalDamage);
-                //}
+
             } else {
                 GameDebug.LogWarning($"데미지 적용 실패 {attackerId} -> {targetId}");
             }

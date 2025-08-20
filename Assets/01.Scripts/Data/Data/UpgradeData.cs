@@ -5,6 +5,8 @@ namespace Game.Data {
     public class UpgradeData {
         // 업그레이드
         public string upgradeName; // 업그레이드 이름
+        public string discription; // 설명
+        public int upgradeID; // 고유 id
         public int upgradeCount;// 업그레이드 개수
         public UpgradeType[] upgradeTypes; // 업그레이드 종류
         public float[] values; // 증가 수치

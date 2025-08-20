@@ -36,7 +36,6 @@ namespace Game.UI
             EventBus.Subscribe<UICreationEventAsync>(CreationEventAsync).AddTo(_disposables);
             EventBus.Subscribe<UICreationEvent>(CreationEvent).AddTo(_disposables);
             EventBus.Subscribe<UICloseEvent>(CloseEvent).AddTo(_disposables);
-            Debug.Log("등록 :" + Time.time);
         }
         private void OnDestroy() {
             _disposables?.Dispose();

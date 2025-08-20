@@ -23,6 +23,7 @@ namespace Game.Systems {
                 BindCombatSystems();
                 BindPlayerSystems();
                 BindEnemySystem();
+                BindUpgradeSystem();
                 break;
             }
             Debug.Log(GetType().Name + " Bind 완료");
@@ -60,6 +61,9 @@ namespace Game.Systems {
             Container.BindInterfacesAndSelfTo<ExpSystem>().AsCached().NonLazy();
         }
 
+        private void BindUpgradeSystem() {
+            Container.BindInterfacesAndSelfTo<UpgradeSystem>().AsCached().NonLazy();
+        }
 
         /// <summary>
         /// 전투 시스템 바인딩
@@ -67,6 +71,7 @@ namespace Game.Systems {
         private void BindCombatSystems() {
             Container.BindInterfacesAndSelfTo<HealthSystem>().AsCached().NonLazy();
             Container.BindInterfacesAndSelfTo<CombatSystem>().AsCached().NonLazy();
+            Container.BindInterfacesAndSelfTo<WeaponSystem>().AsCached().NonLazy();
         }
 
 
