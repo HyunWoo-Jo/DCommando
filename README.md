@@ -1,9 +1,24 @@
 # ProjectC
+**개발 기간 25.7.26 ~ 25.8.21 (한달)**
+
 
 **확장성과 유지보수성을 고려한 Unity 게임 프로젝트**
 
 이 프로젝트는 단순한 기능 구현을 넘어서, 확장성과 유지보수성을 고려한 구조적 설계에 중점을 두고 개발되었습니다.
+# 목차
+- [문서](#1)
+- [영상](#2)
+- [프로젝트 핵심 특징](#3)
+- [주요 시스템](#4)
+- [기술 스택](#5)
+- [OpenSource](#6)
+<a id=1> </a>
+# 문서
+- [개발일지](/DevelopmentLog_7_8.md)
+<a id=2> </a>
+# 영상
 
+<a id=3> </a>
 # 프로젝트 핵심 특징
 
 ## 1. 계층별 완전 분리 구조
@@ -307,7 +322,7 @@ public class ViewModelInstaller : MonoInstaller
 }
 ```
 
-
+<a id=4> </a>
 # 주요 시스템
 
 **Behaviour Tree**
@@ -356,7 +371,7 @@ public class ViewModelInstaller : MonoInstaller
 **UI System**
 - Service -> Addressables 기반 UI 생성, 제거
 
-
+<a id=5> </a>
 # 🛠️ 기술 스택
 
 - **Unity 6000.3.0a3**
@@ -367,7 +382,7 @@ public class ViewModelInstaller : MonoInstaller
 - **Firebase** - 데이터 저장, 로그인
 - **DOTween** - 트위닝 애니메이션
 
----
+<a id=6> </a>
 # OpenSource
 - [UniTask](https://github.com/Cysharp/UniTask) - 유니티 쓰레드 관리
 - [R3](https://github.com/Cysharp/R3) - 리액티브 프로그래밍
