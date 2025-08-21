@@ -17,6 +17,7 @@
 - [개발일지](/DevelopmentLog_7_8.md)
 <a id=2> </a>
 # 영상
+https://youtu.be/Ltw8gLyNqcM
 
 <a id=3> </a>
 # 프로젝트 핵심 특징
